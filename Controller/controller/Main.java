@@ -137,8 +137,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			v.initButtons();
 			if (v instanceof views.GameView) {
 				((views.GameView) v).loadImgs();
-			} else if (v instanceof views.MainView) {
-				((views.MainView) v).loadBackgroundImgs();
 			}
 		}
 		this.setButtonListeners();

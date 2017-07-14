@@ -77,7 +77,6 @@ public class SettingsView extends MainView {
 	 * Draw the settings view.
 	 */
 	public void paint(Graphics g) {
-		g.drawImage(this.getBackgroundImg(), 0, 0, null);
 		for (int i = 0; i < settingsMsgs.length; i++) {
 			g.drawString(this.settingsMsgs[i], this.settingsMsgsX[i], this.settingsMsgsY[i]);
 		}

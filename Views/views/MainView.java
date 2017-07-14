@@ -16,7 +16,6 @@ public class MainView extends View {
 	private JButton mg3Button;
 	private JButton controls;
 	private JButton exitButton;
-	private BufferedImage mainBackground;
 	private String state = "Delaware";
 	private boolean select = false;
 	
@@ -49,7 +48,6 @@ public class MainView extends View {
 	 * Draw the menu view.
 	 */
 	public void paint(Graphics g) {
-		g.drawImage(mainBackground, 0, 0, null);
 		if (!this.select) {
 			this.drawFlashingText(g);
 		} else {
@@ -59,18 +57,7 @@ public class MainView extends View {
 			this.drawDebugOutput(g);
 		}
 	}
-	
-	/**
-	 * Based on the device's screen size, load the background image.
-	 */
-	public void loadBackgroundImgs() {
-		if (this.getScreenHeight() > 900){
-			this.mainBackground = this.createImage("images/mainTitle1080.png");
-		} else {
-			this.mainBackground = this.createImage("images/mainTitle720.png");
-		}
-	}
-	
+
 	/**
 	 * Initialize buttons (after the view has established the width and height of 
 	 * the device).
@@ -91,10 +78,6 @@ public class MainView extends View {
 		
 		this.exitButton = new JButton("Exit");
 		this.exitButton.setBounds(this.getButtonXloc(), this.getButtonSlot5Y(), this.getButtonWidth(), this.getButtonHeight());
-	}
-	
-	public BufferedImage getBackgroundImg() {
-		return this.mainBackground;
 	}
 	
 	public boolean getSelect() {

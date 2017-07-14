@@ -55,7 +55,6 @@ public abstract class GameView extends View {
 	 * @param appState current app state
 	 */
 	public void drawPauseMenu(Graphics g, AppState appState) {
-		g.drawImage(super.getMenuBackground(),this.getButtonXloc() -((this.pauseMenuWidth - this.getButtonWidth() - this.getExtraTextOffset())/2), this.pauseMenuYloc, this.pauseMenuWidth, this.pauseMenuHeight,null);
 		g.setColor(Color.BLACK);
 		for(int p=0;p<3;p++){
 			g.drawRect(this.getButtonXloc() - ((this.pauseMenuWidth - this.getButtonWidth() - this.getExtraTextOffset())/2)+p, this.pauseMenuYloc+p, this.pauseMenuWidth-2*p, this.pauseMenuHeight-2*p);
@@ -95,7 +94,6 @@ public abstract class GameView extends View {
 	 * @param lastState last game state
 	 */
 	public void drawGameString(Graphics g, AppState appState, GameState gameState, GameState lastState) {
-		g.drawImage(this.getMenuBackground(),this.getButtonXloc() -((this.pauseMenuWidth - this.getButtonWidth() - this.getExtraTextOffset())/2), this.pauseMenuYloc, this.pauseMenuWidth, this.pauseMenuHeight,null);
 		g.setColor(Color.BLACK);
 		for (int p = 0; p < 3; p++){
 			g.drawRect(this.getButtonXloc() - ((this.pauseMenuWidth - this.getButtonWidth() - this.getExtraTextOffset())/2)+p, this.pauseMenuYloc+p, this.pauseMenuWidth-2*p, this.pauseMenuHeight-2*p);

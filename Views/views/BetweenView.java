@@ -78,7 +78,6 @@ public class BetweenView extends MainView {
 	 */
 	@Override
 	public void paint(Graphics g) {
-		g.drawImage(this.getBackgroundImg(), 0, 0, null);
 		if (this.firstTime && this.game == AppState.GAME3) {
 			String[] g3Text = {"Drag the cubes to create your story! ", 
 					"Press the shuffle button for a new selection of cubes.",

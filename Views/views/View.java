@@ -26,7 +26,6 @@ public abstract class View extends JPanel {
 	private int screenWidth;
 	private int screenHeight;
 	private boolean debugMode = false;
-	private BufferedImage menuBackground = this.createImage("images/menuBackground.png");
 	private AppState currentAppState;
 	private GameState game1State;
 	private GameState lastGame1State;
@@ -255,9 +254,5 @@ public abstract class View extends JPanel {
 	 * Empty method to be overriden.
 	 */
 	public void initButtons(){};
-	
-	public BufferedImage getMenuBackground(){
-		return this.menuBackground;
-	}
 
 }
