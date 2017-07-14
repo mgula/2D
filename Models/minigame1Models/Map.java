@@ -1,12 +1,5 @@
 package minigame1Models;
 
-/**
- * Maps have height, width, and a ground level (the line y = groundLevel will serve as the lowest
- * point on every map).
- * 
- * @author marcusgula
- *
- */
 public class Map {
 
 	private int height;

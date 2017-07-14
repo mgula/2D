@@ -1,13 +1,6 @@
 package minigame1Models;
 
-/**
- * Markers are used exclusively to indicate to the view that an image should be drawn at this
- * x and y coordinate. Crabs cannot interact with a marker in any way.
- * 
- * @author marcusgula
- *
- */
-public class Marker implements Minigame1Model {
+public class Marker implements Game1Model {
 
 	private int xloc;
 	private int yloc;

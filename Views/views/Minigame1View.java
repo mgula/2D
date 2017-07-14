@@ -3,7 +3,7 @@ package views;
 import enums.AppState;
 import enums.Direction;
 import enums.GameState;
-import games.Minigame1;
+import games.Game1;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -12,27 +12,18 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import minigame1Models.*;
 
-/**
- * Serves as the view of Minigame1. Uses a "following camera" feature to follow
- * the player around the map.
- * 
- * @author marcusgula
- *
- */
-
 public class Minigame1View extends GameView {
 	private JButton winButton;
 	private JButton loseButton;
 	private JButton playAgainButton;
-	private Crab drawPlayer;
+	private Player drawPlayer;
 	private Map map;
-	private ArrayList<Minigame1Model> draw;
+	private ArrayList<Game1Model> draw;
 	private BufferedImage heart;
 	private final int heartXloc = 40;
 	private final int heartYloc = 5;
 	private final int heartOffset = 10;
 	private BufferedImage arrow;
-	private final int textureDimensions = 100;
 	private boolean playerDrawable = true;
 	private int flash = 0;
 	private final int flashMod = 10;
@@ -89,11 +80,11 @@ public class Minigame1View extends GameView {
 		this.staticScreenAreaY = this.initialThresholdYD - this.initialThresholdYU;
 	}
 	
-	public Crab getPlayer() {
+	public Player getPlayer() {
 		return this.drawPlayer;
 	}
 	
-	public ArrayList<Minigame1Model> getDraw() {
+	public ArrayList<Game1Model> getDraw() {
 		return this.draw;
 	}
 	
@@ -121,9 +112,6 @@ public class Minigame1View extends GameView {
 		this.spaceBar = b;
 	}
 	
-	/**
-	 * Draw the game to the screen.
-	 */
 	public void paint(Graphics g) {
 		this.drawScreen(g);
 		if (this.getDebugMode()) {
@@ -158,18 +146,13 @@ public class Minigame1View extends GameView {
 		this.lastYloc = this.drawPlayer.getYloc();
 	}
 	
-	/**
-	 * Draw each object in the environment array list.
-	 * 
-	 * @param g Graphics object
-	 */
 	public void drawEnvironment(Graphics g) {
-		for (Minigame1Model m : this.draw) {
+		for (Game1Model m : this.draw) {
 			if (m instanceof minigame1Models.Sand) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof minigame1Models.Rock) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.SeaDebris) {
+			} else if (m instanceof minigame1Models.Debris) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof minigame1Models.Enemy) {
 				g.setColor(Color.RED);
@@ -190,11 +173,6 @@ public class Minigame1View extends GameView {
 		g.setColor(Color.BLACK);
 	}
 	
-	/**
-	 * Draw the player on the correct frame.
-	 *  
-	 * @param g Graphics object
-	 */
 	public void drawPlayer(Graphics g) {
 		if (this.drawPlayer.getEnemyCollision()) {
 			if (this.getGame1State() != GameState.PAUSE) {
@@ -211,9 +189,6 @@ public class Minigame1View extends GameView {
 		}
 	}
 	
-	/**
-	 * Draw debug information.
-	 */
 	@Override
 	public void drawDebugOutput(Graphics g) {
 		/*App state info*/
@@ -237,16 +212,12 @@ public class Minigame1View extends GameView {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
 		/*Environment and Enemy info*/ 
-		for (Minigame1Model m : this.draw) {
+		for (Game1Model m : this.draw) {
 			message = "X: " + m.getXloc() + ", Y: " + m.getYloc();
 			g.drawString(message, m.getXloc() - this.playerOffsetX - 20, m.getYloc() - 5 - this.playerOffsetY);
 		}
 	}
 	
-	/**
-	 * Initialize button locations (after the view has established the width and
-	 * height of the device).
-	 */
 	@Override
 	public void initButtons() {
 		super.initButtons();
@@ -258,12 +229,7 @@ public class Minigame1View extends GameView {
 		this.playAgainButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
 	}
 	
-	/**
-	 * Sync the array list to draw with given environment from the given game.
-	 * 
-	 * @param game game to be synced with
-	 */
-	public void load(Minigame1 game) {
+	public void load(Game1 game) {
 		this.offsetManager();
 		this.playerDrawable = true;
 		this.flash = 0;
@@ -273,9 +239,6 @@ public class Minigame1View extends GameView {
 		this.draw = game.getEnvironment();
 	}
 	
-	/**
-	 * Load the given offsets based on the current state of the game.
-	 */
 	public void offsetManager() {
 		if (this.getGame1State() == GameState.STAGE1) {
 			this.restoreInitialOffsets();
@@ -287,9 +250,6 @@ public class Minigame1View extends GameView {
 		}
 	}
 	
-	/**
-	 * Default offsets.
-	 */
 	public void restoreInitialOffsets() {
 		this.thresholdXR = this.initialThresholdXR;
 		this.thresholdXL = this.initialThresholdXL;
@@ -304,9 +264,6 @@ public class Minigame1View extends GameView {
 		this.playerDrawable = true;
 	}
 	
-	/**
-	 * Offsets for stage 2 and 3.
-	 */
 	public void loadLaterStageOffsets() {
 		this.thresholdXR = this.laterStageXR;
 		this.thresholdXL = 0;
@@ -316,9 +273,6 @@ public class Minigame1View extends GameView {
 		this.playerOffsetY = 0;
 	}
 	
-	/**
-	 * Load the view's images that it will draw.
-	 */
 	@Override
 	public void loadImgs() {
 		/*BufferedImage im = ImageIO.read(new File(getClass().getResource("/resources/image.jpg").toURI()));*/
@@ -326,9 +280,6 @@ public class Minigame1View extends GameView {
 		this.arrow = this.createImage("images/arrow.png");
 	}
 	
-	/**
-	 * Update offsets for the moving camera.
-	 */
 	public void updateOffsets() {
 		/*Update left/right booleans, x thresholds, and x object offset. First case: in between the two thresholds*/
 		if (this.drawPlayer.getXloc() <= this.thresholdXR && this.drawPlayer.getXloc() >= this.thresholdXL) {

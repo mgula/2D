@@ -23,22 +23,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
-/*TODO:
- *-JUnit testing
- *-magic #s
- *-duplicate code cleanup
- */
-
-/**
- * The Main class serves as the controller that mediates between the model and view. This class
- * also handles all key and button presses, as well as mouse interaction.
- * 
- * @author marcusgula
- *
- */
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private boolean play = true;
-	private Minigame1 game1 = new Minigame1(false);
+	private Game1 game1 = new Game1();
 	private MainView mainView;
 	private SettingsView settingsView;
 	private Minigame1View game1View;
@@ -61,21 +48,11 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private int releaseY;
 	private Dimension screenSize;
 	private boolean game1DebugLevel = false;
-	private boolean tutLock = false;
 	private boolean game1Lost = false;
 	private boolean screenHandled = false;
 	private boolean fullScreen = true;
-	private boolean newGame2 = false;
 	private static final int sleepTime = 30; //Time in milliseconds to wait each cycle of the main loop
 	
-	/**
-	 * The main method initializes the main instance and begins a while loop. In the while loop,
-	 * the main instance is constantly updating the application's current state, ticking, and repainting.
-	 * When the play boolean becomes false (by clicking the exit button), the loop ends and frame is 
-	 * disposed.
-	 * 
-	 * @param args unused
-	 */
 	public static void main(String[] args) {
 		Main main = new Main();
 		main.init();
@@ -93,12 +70,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
     	main.frame.dispose();
 	}
 	
-	/**
-	 * This method gets the screen size of the device and initializes all views using this screen size.
-	 * An array list of all views is created for easier view maintenance. This method then calls a method
-	 * that adds button listeners to all buttons, and a method that binds certain keys to their respective 
-	 * views. Lastly, this method adds the main menu to the frame.
-	 */
 	public void init() {
 		this.screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		int width = (int)this.screenSize.getWidth();
@@ -108,7 +79,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.mainView.addKeyListener(this);
 		this.settingsView = new SettingsView(width, height);
 		this.game1View = new Minigame1View(width, height);
-		this.game1ViewBV = new BetweenView(width, height, AppState.GAME1);
+		this.game1ViewBV = new BetweenView(width, height);
 		this.allViews.add(this.mainView);
 		this.allViews.add(this.settingsView);
 		this.allViews.add(this.game1View);
@@ -127,10 +98,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.addViewToFrame(this.mainView);
 	}
 	
-	/**
-	 * This method adds action listeners to every button in the application. Listeners
-	 * vary from button to button.
-	 */
 	public void setButtonListeners() {
 		/*Start with main view*/
 		this.mainView.getMg1Button().addActionListener(new ActionListener() {
@@ -283,13 +250,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
     	});
 	}
 	
-	/**
-	 * This method updates the state of the application only when intendedState isn't 
-	 * satisfied (this is to avoid loading the same things multiple times since this method 
-	 * is called every iteration of the main while loop). For each case, it adds each specific
-	 * view's buttons to the frame (if any), and then adds the view to the frame. At the end of the 
-	 * method, intendedState is set to satisfied.
-	 */
 	public void updateCurrentState() {
 		if (this.intendedState != AppState.SATISFIED) {
 			/*Reset the frame*/
@@ -316,7 +276,11 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 						this.frame.add(this.game1ViewBV.getDebugButton());
 					} else {
 						this.frame.add(this.game1ViewBV.getNewGameButton());
-						this.frame.add(this.game1ViewBV.getLoadButton());
+						if (this.game1.getFirstTime()) {
+							this.game1.setFirstTime();
+						} else {
+							this.frame.add(this.game1ViewBV.getLoadButton());
+						}
 					}
 					
 					this.addViewToFrame(this.game1ViewBV);
@@ -342,11 +306,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 	
-	/**
-	 * This method uses the concept of a state machine to load game 1 - it looks
-	 * at game 1's last state to determine which level to load.  This method call's 
-	 * Minigame1View's load() method to sync the game view with the model.
-	 */
 	public void loadGame1() {
 		this.game1.setJumping(false);
 		this.rightPressed = false;
@@ -414,16 +373,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.addViewToFrame(this.game1View);
 	}
 	
-	
-	
-	/**
-	 * This method is called every iteration of the main while loop to update model 
-	 * information. This method does nothing in other cases (settings view, for example,
-	 * doesn't need to update each tick - buttons are listening for presses and that's it
-	 * essentially). The code in the tutorial1 case is nearly identical to a case in 
-	 * handleGame1(), except it's not checking win or lose conditions (it is impossible
-	 * to die in the tutorial).
-	 */
 	public void tick() {
 		this.updateViewStates();
 		switch (this.currentState) {
@@ -440,14 +389,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 	
-	/**
-	 * This method is called every iteration of the main while loop to update model
-	 * information for game 1. In the cases of pause, win, and lose, a flag is used to
-	 * debounce (for lack of a better word) so that the screen is only redrawn with the
-	 * correct buttons a single time. The flag is reset on button press. The load case
-	 * calls loadGame1(), which changes the game state to ensure that it is only loaded 
-	 * a single time.
-	 */
 	public void handleGame1() {
 		switch (this.game1.getGameState()) {
 			case PAUSE:
@@ -509,20 +450,10 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 	
-	
-	/**
-	 * This method simply calls the frame's repaint method.
-	 */
 	public void paint() {
 		this.frame.repaint();
 	}
 	
-	/**
-	 * This method adds the given view to the frame, and performs
-	 * some other small setup for the frame.
-	 * 
-	 * @param view view to be added to the frame
-	 */
 	public void addViewToFrame(View view) {
 		this.frame.setBackground(Color.GRAY);
 		this.frame.getContentPane().add(view);
@@ -530,16 +461,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.frame.setVisible(true);
 	}
 	
-	/**
-	 * This method unpauses the given game, and adds the given view to the frame. This method assumes
-	 * you are adding a game's corresponding view; i.e., that you are not unpausing game 1
-	 * and adding view 2 to the frame.
-	 * 
-	 * @param	game	the game to be unpaused
-	 * @param	view	the view to be added to the frame after unpausing
-	 * 
-	 */
-	public void unpauseGame(Minigame game, GameView view) {
+	public void unpauseGame(Game game, GameView view) {
 		game.setGameState(game.getLastState());
 		game.setLastState(GameState.PAUSE);
 		this.frame.getContentPane().removeAll();
@@ -547,12 +469,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		addViewToFrame(view);
 	}
 	
-	/**
-	 * This method switches the frame from full screen to windowed or vice
-	 * versa depending on the argument passed.
-	 * 
-	 * @param b desired frame state: true -> full screen, false -> windowed
-	 */
 	public void toggleWindowedMode(boolean b) {
 		this.frame.dispose();
 		this.frame = new JFrame();
@@ -581,24 +497,12 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.addViewToFrame(this.settingsView);
 	}
 	
-	/**
-	 * This method is called by tick to update every view with game state information
-	 * (some view methods depend on the current game state).
-	 */
 	public void updateViewStates() {
 		for (View v : this.allViews) {
 			v.updateStates(this.currentState, this.game1.getGameState(), this.game1.getLastState());
 		}
 	}
 	
-	/**
-	 * Key event class for handling key presses. The application only cares about the P key,
-	 * space bar, right arrow, and left arrow. Each key press updates its respective boolean,
-	 * and updates a boolean in game 1 view.
-	 * 
-	 * @author marcusgula
-	 *
-	 */
 	public class ArrowKeyEvent extends AbstractAction {
 		private String command;
 		public ArrowKeyEvent(String command) {
@@ -662,9 +566,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 	
-	/**
-	 * This method binds certain keys to certain views.
-	 */
 	public void bindKeysToViews() {
 		for (View v : this.allViews) {
 			/*Bind arrow key and space bar presses and releases for game 1 and game 1 tut view*/
@@ -689,15 +590,9 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 
-	/**
-	 * Unused KeyListener method.
-	 */
 	@Override
 	public void keyTyped(KeyEvent e) {}
 
-	/**
-	 * Only used to change main view from start mode to select mode.
-	 */
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (this.currentState == AppState.START) {
@@ -708,65 +603,30 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 	}
 	
-	/**
-	 * Unused KeyListener method.
-	 */
 	@Override
 	public void keyReleased(KeyEvent e) {}
 	
-	/**
-	 * Unused MouseListener method.
-	 */
 	@Override
 	public void mouseClicked(MouseEvent click) {}
 
-	/**
-	 * Unused MouseListener method.
-	 */
 	@Override
 	public void mouseEntered(MouseEvent click) {}
 
-	/**
-	 * Unused MouseListener method.
-	 */
 	@Override
 	public void mouseExited(MouseEvent click) {}
 
-	/**
-	 * Used to update the respective click booleans. Also used to skip
-	 * tutorial 1.
-	 */
 	@Override
-	public void mousePressed(MouseEvent click) {
-		
-	}
+	public void mousePressed(MouseEvent click) {}
 
-	/**
-	 * Used to update the mouse released boolean for game 3.
-	 */
 	@Override
-	public void mouseReleased(MouseEvent release) {
-		
-	}
+	public void mouseReleased(MouseEvent release) {}
 	
-	/**
-	 * Used to update the mouse dragged boolean for game 3.
-	 */
 	@Override
-	public void mouseDragged(MouseEvent drag) {
-		
-	}
+	public void mouseDragged(MouseEvent drag) {}
 
-	/**
-	 * Unused MouseMotionListener method.
-	 */
 	@Override
 	public void mouseMoved(MouseEvent e) {}
 	
-	/**
-	 * Used to enable easier JUnit testing.
-	 * @return current state of the application
-	 */
 	public AppState getAppState() {
 		return this.currentState;
 	}

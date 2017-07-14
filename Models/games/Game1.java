@@ -6,24 +6,15 @@ import enums.Direction;
 import enums.GameState;
 import minigame1Models.*;
 
-/**
- * This class keeps track of an array list of Minigame1 models, a crab, and a map. The
- * crab compares against the array list of models to check for collisions. This class 
- * essentially mediates between Main.java and the various Minigame1 models.
- * 
- * @author marcusgula
- *
- */
-public class Minigame1 implements Minigame {
+public class Game1 implements Game {
 	private GameState gameState = GameState.UNINITIALIZED;
 	private GameState lastState = GameState.UNINITIALIZED;
-	private Crab player;
+	private Player player;
 	private int playerStartingXloc = 200; 
 	private int playerStartingYloc = 500;
 	private int playerHeight = 40;
 	private int playerWidth = 50;
 	private boolean jumping = false;
-	private boolean tutorialMode;
 	private boolean firstTime = true;
 	private Map currMap;
 	private Map map1;
@@ -32,82 +23,22 @@ public class Minigame1 implements Minigame {
 	private int groundLevel = 578;
 	private int mapWidth;
 	private int mapHeight;
-	private int tutBoundsLeft = 150;
-	private int tutBoundsRight = 1130;
-	private int tutGroundLevel = 400;
-	private ArrayList<Minigame1Model> environment;
+	private ArrayList<Game1Model> environment;
 	
-	public Minigame1(boolean b) {
-		this.tutorialMode = b;
-	}
-	
-	/**
-	 * Initialize a new crab instance.
-	 */
 	public void initPlayer() {
-		this.player = new Crab(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
+		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
 	}
 	
-	/**
-	 * Initialize a new crab instance with the given x and y loc. This method is only 
-	 * used by the tutorial.
-	 * 
-	 * @param xloc crab x location
-	 * @param yloc crab y location
-	 */
-	public void initTutPlayer(int xloc, int yloc) {
-		this.player = new Crab(xloc, yloc, this.playerHeight, this.playerWidth);
-	}
-	
-	/**
-	 * Sync the crab's array list and map with the current environment array list and map.
-	 */
 	public void passEnvironmentAndMapToPlayer() {
 		this.player.loadEnvironmentAndMap(this.environment, this.currMap);
 	}
 	
-	/**
-	 * Checks if the current environment instance is the same as the given environment
-	 * instance; and checks if the current player instance is the same as the given crab.
-	 * If they are not, this method sets the current instances to the given instances.
-	 * This method is only called for the tutorial (when view is adding things to its 
-	 * drawable array list).
-	 * 
-	 * @param a array list of Minigame1Models to sync
-	 * @param c crab to be synced
-	 */
-	public void balanceEnvironmentArrayListsAndCrab(ArrayList<Minigame1Model>  a, Crab c) {
-		if (!this.environment.equals(a)) {
-			this.environment = a;
-			this.passEnvironmentAndMapToPlayer();
-			this.player.checkLeavingSurface();
-			
-		}
-		if (!this.player.equals(c)) {
-			this.player = c;
-			this.passEnvironmentAndMapToPlayer();
-		}
-	}
-	
-	/**
-	 * Sets the current map to the debug map.
-	 */
 	public void initDebugLevel() {
 		this.playerStartingXloc = 200;
 		this.playerStartingYloc = 500;
 		this.currMap = new Map(2000, 5000, this.groundLevel);
 	}
 	
-	/**
-	 * Sets the current map to the tutorial map.
-	 */
-	public void initTutLevel() {
-		this.currMap = new Map(10000, 2000, this.tutGroundLevel);
-	}
-	
-	/**
-	 * Sets the current map to stage 1.
-	 */
 	public void initMap1() {
 		this.playerStartingXloc = 200;
 		this.playerStartingYloc = 500;
@@ -118,9 +49,6 @@ public class Minigame1 implements Minigame {
 		this.currMap = this.map1;
 	}
 	
-	/**
-	 * Sets the current map to stage 2.
-	 */
 	public void initMap2() {
 		this.playerStartingXloc = 0;
 		this.playerStartingYloc = this.groundLevel;
@@ -130,9 +58,6 @@ public class Minigame1 implements Minigame {
 		this.currMap = this.map2;
 	}
 	
-	/**
-	 * Sets the current map to stage 3.
-	 */
 	public void initMap3() {
 		this.playerStartingXloc = 0;
 		this.playerStartingYloc = this.groundLevel;
@@ -142,11 +67,8 @@ public class Minigame1 implements Minigame {
 		this.currMap = this.map3;
 	}
 	
-	/**
-	 * Initialize the debug stage environment.
-	 */
 	public void makeDebugStage() {
-		this.environment = new ArrayList<Minigame1Model>();
+		this.environment = new ArrayList<Game1Model>();
 		this.environment.add(new Sand(424, 377, 58, 71));
 		this.environment.add(new Rock(43, 540, 22, 73));
 		this.environment.add(new Sand(168, 428, 22, 73));
@@ -169,23 +91,17 @@ public class Minigame1 implements Minigame {
 		this.environment.add(new Current(2900, 560, 30, 500, Direction.EAST, 10));
 	}
 	
-	/**
-	 * Initialize the empty tutorial stage environment.
-	 */
 	public void makeTutStage1() {
 		this.environment = null;
-		this.environment = new ArrayList<Minigame1Model>();
+		this.environment = new ArrayList<Game1Model>();
 	}
 
-	/**
-	 * Initialize the stage 1 environment.
-	 */
 	public void makeStage1() {
-		this.environment = new ArrayList<Minigame1Model>();
-		this.environment.add(new SeaDebris(450, 475));
-		this.environment.add(new SeaDebris(900, 475));
-		this.environment.add(new SeaDebris(1200, 400));
-		this.environment.add(new SeaDebris(2050, 205));
+		this.environment = new ArrayList<Game1Model>();
+		this.environment.add(new Debris(450, 475));
+		this.environment.add(new Debris(900, 475));
+		this.environment.add(new Debris(1200, 400));
+		this.environment.add(new Debris(2050, 205));
 		this.environment.add(new Sand(1400, 350, 268, 2000));
 		this.environment.add(new Sand(2500, 200, 150, 1000));
 		this.environment.add(new RegenArea(1450, 300, 50, 50));
@@ -195,18 +111,15 @@ public class Minigame1 implements Minigame {
 		this.environment.add(new Marker(this.currMap.getWidth(), 0));
 	}
 	
-	/**
-	 * Initialize the stage 2 environment.
-	 */
 	public void makeStage2() {
-		this.environment = new ArrayList<Minigame1Model>();
-		this.environment.add(new SeaDebris(300, 475));
+		this.environment = new ArrayList<Game1Model>();
+		this.environment.add(new Debris(300, 475));
 		this.environment.add(new Sand(500, 345, 223, 199));
 		this.environment.add(new Sand(699, 205, 363, 150));
 		this.environment.add(new Sand(2350, 100, 528, 900));
-		this.environment.add(new SeaDebris(1250, 205));
-		this.environment.add(new SeaDebris(1650, 200));
-		this.environment.add(new SeaDebris(2050, 195));
+		this.environment.add(new Debris(1250, 205));
+		this.environment.add(new Debris(1650, 200));
+		this.environment.add(new Debris(2050, 195));
 		this.environment.add(new RegenArea(750, 155, 50, 50));
 		this.environment.add(new EnemyB(1400, 175, 50, 50, 150, 2));
 		this.environment.add(new EnemyB(1910, 175, 50, 50, 150, 2));
@@ -223,11 +136,8 @@ public class Minigame1 implements Minigame {
 		this.environment.add(new Marker(this.currMap.getWidth(), -50));
 	}
 	
-	/**
-	 * Initialize the stage 3 environment.
-	 */
 	public void makeStage3() {
-		this.environment = new ArrayList<Minigame1Model>();
+		this.environment = new ArrayList<Game1Model>();
 		this.environment.add(new Rock(500, 156, 462, 150));
 		this.environment.add(new Rock(650, 126, 492, 299));
 		this.environment.add(new Rock(949, 236, 382, 1152));
@@ -242,61 +152,29 @@ public class Minigame1 implements Minigame {
 		this.environment.add(new Marker(this.currMap.getWidth(), -540));
 	}
 	
-	/**
-	 * Check for right edge collisions, move right, check if left a surface.
-	 * If in the tutorial stage, the player won't be able to leave the 
-	 * tutorial rectangle.
-	 */
 	public void moveRight() {
 		this.player.checkRightEdgeCollisions();
-		if (this.tutorialMode) {
-			if (this.player.getXloc() < this.tutBoundsRight) {
-				this.player.moveRight();
-			}
-		} else {
-			this.player.moveRight();
-		}
+		this.player.moveRight();
 		this.player.checkLeavingSurface();
 	}
 	
-	/**
-	 * Check for left edge collisions, move left, check if left a surface.
-	 * If in the tutorial stage, the player won't be able to leave the 
-	 * tutorial rectangle.
-	 */
 	public void moveLeft() {
 		this.player.checkLeftEdgeCollisions();
-		if (this.tutorialMode) {
-			if (this.player.getXloc() > this.tutBoundsLeft) {
-				this.player.moveLeft();
-			}
-		} else {
-			this.player.moveLeft();
-		}
+		this.player.moveLeft();
 		this.player.checkLeavingSurface();
 	}
 	
-	/**
-	 * Check for bottom edge collisions, and assert gravity (lower the player's
-	 * y loc).
-	 */
 	public void assertGravity() {
 		this.player.checkBottomEdgeCollisions();
 		this.player.assertGravity();
 	}
 	
-	/**
-	 * Check for moving surface collisions.
-	 */
 	public void checkMovingSurfaces() {
 		this.player.checkMovingSurfaces(false);
 	}
 	
-	/**
-	 * Move all instances of Minigame1Models that move (enemies, moving platforms).
-	 */
 	public void moveAll() {
-		for (Minigame1Model m : this.environment) {
+		for (Game1Model m : this.environment) {
 			if (m instanceof minigame1Models.Enemy) {
 				((minigame1Models.Enemy) m).move();
 			} else if (m instanceof minigame1Models.Interactable) {
@@ -305,9 +183,6 @@ public class Minigame1 implements Minigame {
 		}
 	}
 	
-	/**
-	 * If currently jumping, check top edge collisions and raise the player's y loc.
-	 */
 	public void evaluateJumping() {
 		if (this.jumping) {
 			this.player.checkTopEdgeCollisions();
@@ -317,18 +192,11 @@ public class Minigame1 implements Minigame {
 		}
 	}
 	
-	/**
-	 * Check for collisions with currents and regen areas.
-	 */
 	public void checkAreaCollisions() {
 		this.player.checkAreaCollisions();
 		this.player.evaluateAreaCollisions();
 	}
 	
-	/**
-	 * Check for winning conditions (reached the right edge of the map)
-	 *  and losing conditions (player health reached 0).
-	 */
 	public void gameStateCheck() {
 		/*Check for win condition.*/
 		if (this.player.getXloc() == this.currMap.getWidth()) {
@@ -364,7 +232,7 @@ public class Minigame1 implements Minigame {
 		return this.firstTime;
 	}
 	
-	public Crab getPlayer() {
+	public Player getPlayer() {
 		return this.player;
 	}
 	
@@ -372,7 +240,7 @@ public class Minigame1 implements Minigame {
 		return this.currMap;
 	}
 	
-	public ArrayList<Minigame1Model> getEnvironment() {
+	public ArrayList<Game1Model> getEnvironment() {
 		return this.environment;
 	}
 	

@@ -4,12 +4,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import javax.swing.JButton;
 
-/**
- * This view serves as the select menu.
- * 
- * @author marcusgula
- *
- */
 public class MainView extends View { 
 	private JButton mg1Button;
 	private JButton controls;
@@ -33,9 +27,6 @@ public class MainView extends View {
 		return this.exitButton;
 	}
 	
-	/**
-	 * Draw the menu view.
-	 */
 	public void paint(Graphics g) {
 		if (!this.select) {
 			this.drawFlashingText(g);
@@ -46,10 +37,6 @@ public class MainView extends View {
 		}
 	}
 
-	/**
-	 * Initialize buttons (after the view has established the width and height of 
-	 * the device).
-	 */
 	@Override
 	public void initButtons() {
 		this.mg1Button = new JButton("go");

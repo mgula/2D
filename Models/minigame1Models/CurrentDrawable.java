@@ -1,14 +1,6 @@
 package minigame1Models;
 
-/**
- * Currents are implemented as small slices that are spaced out so that, in a current area,
- * the player will detect a collision with at least one of the slices. These slices are
- * difficult to draw, so this class will be placed over the slices and drawn by view.
- * 
- * @author marcusgula
- *
- */
-public class CurrentDrawable implements Minigame1Model {
+public class CurrentDrawable implements Game1Model {
 
 	private final int xloc;
 	private final int yloc;

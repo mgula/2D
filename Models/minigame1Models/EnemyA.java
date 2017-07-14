@@ -2,14 +2,6 @@ package minigame1Models;
 
 import enums.Direction;
 
-/**
- * Enemies move and deal damage to the player. Crab's collision detection doesn't treat enemies
- * as surfaces - the player can move through (and cannot land on) an enemy. These enemies move horizontally 
- * (from side to side).
- * 
- * @author marcusgula
- *
- */
 public class EnemyA extends Enemy {
 	private int xloc; // must be within moveThreshL and moveThreshR
 	private int yloc;

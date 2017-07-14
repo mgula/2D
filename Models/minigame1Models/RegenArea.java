@@ -1,13 +1,6 @@
 package minigame1Models;
 
-/**
- * Regeneration areas restore health to the player. Crab's collision detection doesn't treat regeneration areas
- * as surfaces - the player can move through (and cannot land on) a regeneration area.
- * 
- * @author marcusgula
- *
- */
-public class RegenArea implements Minigame1Model {
+public class RegenArea implements Game1Model {
 	
 	private final int xloc;
 	private final int yloc;

@@ -2,15 +2,7 @@ package minigame1Models;
 
 import enums.Direction;
 
-/**
- * Currents move the player in a certain direction. Location changes from currents stack with location
- * changes from button presses. Crab's collision detection doesn't treat currents as surfaces - the player 
- * can move through (and cannot land on) a current.
- * 
- * @author marcusgula
- *
- */
-public class Current implements Minigame1Model {
+public class Current implements Game1Model {
 	private final int xloc; 
 	private final int yloc;
 	private int height;

@@ -1,13 +1,6 @@
 package minigame1Models;
 
-/**
- * Sand doesn't move, and Crab's collision detection treats sand as a surface that the player can
- * land on, but not move through. Sand deals no damage.
- * 
- * @author marcusgula
- *
- */
-public class Sand implements Minigame1Model {
+public class Sand implements Game1Model {
 
 	private final int xloc;
 	private final int yloc;

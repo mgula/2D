@@ -1,13 +1,6 @@
 package minigame1Models;
 
-/**
- * Rocks don't move, and Crab's collision detection treats rocks as a surface that the player can
- * land on, but not move through. Rocks deal no damage.
- * 
- * @author marcusgula
- *
- */
-public class Rock implements Minigame1Model {
+public class Rock implements Game1Model {
 
 	private final int xloc;
 	private final int yloc;

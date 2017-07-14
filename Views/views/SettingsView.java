@@ -6,14 +6,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
 
-/**
- * This view allows the player to toggle debug mode, toggle full screen
- * or windowed mode, and toggle the current state they are in.
- * 
- * @author marcusgula
- *
- */
-
 public class SettingsView extends MainView {
 	private JButton backButton;
 	private ButtonGroup debugToggle;
@@ -57,9 +49,6 @@ public class SettingsView extends MainView {
 		return this.backButton;
 	}
 	
-	/**
-	 * Draw the settings view.
-	 */
 	public void paint(Graphics g) {
 		for (int i = 0; i < settingsMsgs.length; i++) {
 			g.drawString(this.settingsMsgs[i], this.settingsMsgsX[i], this.settingsMsgsY[i]);
@@ -69,10 +58,6 @@ public class SettingsView extends MainView {
 		}
 	}
 	
-	/**
-	 * Initialize buttons (after the view has established the width and height of 
-	 * the device).
-	 */
 	@Override
 	public void initButtons() {
 		int[] temp = {this.getButtonXloc(), this.getButtonXloc(), this.getButtonXloc() + 45, this.getButtonXloc(), this.getButtonXloc(), this.getButtonXloc() + 120, this.getButtonXloc(), this.getButtonXloc(), this.getButtonXloc() + 100, this.getButtonXloc() + 220};

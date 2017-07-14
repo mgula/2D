@@ -4,27 +4,9 @@ import java.util.ArrayList;
 
 import enums.Direction;
 
+public class Player implements Game1Model {
 
-/**
- * Serves as the player. Crabs interact with other minigame 1 models in specific ways.
- * 
- * Surfaces: Rocks, seaweed, ground, interactables
- * Areas: enemies, currents, regeneration areas
- *
- * Crabs cannot move through surfaces. Crabs can land on surfaces.
- *
- * Crabs can move through areas. Crabs cannot land on areas. Areas will influence an attribute of 
- * the crab in some way:
- * 		enemies - lower health
- * 		currents - change x/y location
- *		regeneration areas - increase health
- * 
- * @author marcusgula
- *
- */
-public class Crab implements Minigame1Model {
-
-	private ArrayList<Minigame1Model> environment;
+	private ArrayList<Game1Model> environment;
 	private Map map;
 	private int xloc;
 	private int yloc;
@@ -69,7 +51,7 @@ public class Crab implements Minigame1Model {
 	 * @param h crab height
 	 * @param w crab width
 	 */
-	public Crab(int x, int y, int h, int w) {
+	public Player(int x, int y, int h, int w) {
 		this.xloc = x;
 		this.yloc = y;
 		this.height = h;
@@ -140,7 +122,7 @@ public class Crab implements Minigame1Model {
 	 * @param e the given array list of Minigame1Models
 	 * @param m the given map
 	 */
-	public void loadEnvironmentAndMap(ArrayList<Minigame1Model> e, Map m) {
+	public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Map m) {
 		this.environment = e;
 		this.map = m;
 	}
@@ -279,8 +261,8 @@ public class Crab implements Minigame1Model {
 			boolean contact = false;
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
-			for (Minigame1Model m : this.environment) {
-				if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.SeaDebris || m instanceof minigame1Models.Sand) {
+			for (Game1Model m : this.environment) {
+				if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Sand) {
 					if (this.checkBottomSurface(m)) {
 						contact = true;
 					}
@@ -372,8 +354,8 @@ public class Crab implements Minigame1Model {
 			this.onSurfaceBottom = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Minigame1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.SeaDebris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+		for (Game1Model m : this.environment) {
+			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
 				if (this.checkBottomSurface(m)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
@@ -413,8 +395,8 @@ public class Crab implements Minigame1Model {
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Minigame1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.SeaDebris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+		for (Game1Model m : this.environment) {
+			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int w = m.getWidth();
@@ -452,8 +434,8 @@ public class Crab implements Minigame1Model {
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Minigame1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.SeaDebris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+		for (Game1Model m : this.environment) {
+			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int h = m.getHeight();
@@ -490,8 +472,8 @@ public class Crab implements Minigame1Model {
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Minigame1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.SeaDebris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+		for (Game1Model m : this.environment) {
+			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int w = m.getWidth();
@@ -523,7 +505,7 @@ public class Crab implements Minigame1Model {
 	 */
 	public void checkAreaCollisions() {
 		this.currentCollision = false; // innocent until proven guilty policy
-		for (Minigame1Model m : this.environment) {
+		for (Game1Model m : this.environment) {
 			if (m instanceof minigame1Models.Enemy || m instanceof minigame1Models.RegenArea || m instanceof minigame1Models.Current) {
 				int x = m.getXloc();
 				int y = m.getYloc();
@@ -566,7 +548,7 @@ public class Crab implements Minigame1Model {
 	 * @param m the given Minigame1Model
 	 * @return true if collision, false otherwise
 	 */
-	public boolean checkBottomSurface(Minigame1Model m) {
+	public boolean checkBottomSurface(Game1Model m) {
 		int x = m.getXloc();
 		int y = m.getYloc();
 		int w = m.getWidth();

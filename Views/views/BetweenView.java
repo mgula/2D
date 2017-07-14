@@ -6,14 +6,6 @@ import javax.swing.JButton;
 
 import enums.AppState;
 
-/**
- * BetweenView serves as the in-between screen for pressing a main view button
- * and actually entering the game. The view typically provides 2 options to the 
- * player: start a new game, or resume the paused one.
- * 
- * @author marcusgula
- *
- */
 public class BetweenView extends MainView {
 	private JButton okButton;
 	private JButton newGameButton;
@@ -24,11 +16,9 @@ public class BetweenView extends MainView {
 	private JButton stage3Button;
 	private int textXloc;
 	private boolean firstTime = true;
-	private AppState game; // need to know if this is the screen before game 1, 2 or 3
 	
-	public BetweenView(int w, int h, AppState s) {
+	public BetweenView(int w, int h) {
 		super(w, h);
-		this.game = s;
 	}
 	
 	public JButton getOkButton() {
@@ -67,10 +57,6 @@ public class BetweenView extends MainView {
 		this.firstTime = b;
 	}
 	
-	/**
-	 * Only game 3 needs text drawn to the screen on the between view. Minigames 1 and 2
-	 * have tutorials to explain the controls.
-	 */
 	@Override
 	public void paint(Graphics g) {
 		if (this.getDebugMode()) {
@@ -78,28 +64,20 @@ public class BetweenView extends MainView {
 		}
 	}
 	
-	/**
-	 * Initialize button locations (after the view has established the width and
-	 * height of the device).
-	 */
 	@Override
 	public void initButtonLocations() {
 		super.initButtonLocations();
 		this.textXloc = this.getButtonXloc();
 	}
 	
-	/**
-	 * Initialize buttons (after the view has established the width and height of 
-	 * the device).
-	 */
 	@Override
 	public void initButtons() {
 		this.okButton = new JButton("Got it");
 		this.okButton.setBounds(this.getButtonXloc(), this.getButtonSlot4Y(), this.getButtonWidth(), this.getButtonHeight());
-		this.newGameButton = new JButton("New Game");
-		this.newGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
-		this.loadPreviousGameButton = new JButton("Continue last game");
-		this.loadPreviousGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot1Y(), this.getButtonWidth() + this.getExtraTextOffset(), this.getButtonHeight());
+		this.newGameButton = new JButton("new game");
+		this.newGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot3Y(), this.getButtonWidth(), this.getButtonHeight());
+		this.loadPreviousGameButton = new JButton("resume");
+		this.loadPreviousGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth() + this.getExtraTextOffset(), this.getButtonHeight());
 		/*Debug buttons*/
 		this.stage1Button = new JButton("Stage 1");
 		this.stage1Button.setBounds(this.getButtonXloc(), this.getButtonSlot1Y(), this.getButtonWidth(), this.getButtonHeight());

@@ -15,13 +15,6 @@ import javax.swing.JPanel;
 import enums.AppState;
 import enums.GameState;
 
-/**
- * The underlying view class that all views will extend. All views will
- * override the paint(Graphics g) method.
- * 
- * @author marcusgula
- *
- */
 public abstract class View extends JPanel {
 	private int screenWidth;
 	private int screenHeight;
@@ -135,10 +128,6 @@ public abstract class View extends JPanel {
 		this.debugMode = b;
 	}
 	
-	/**
-	 * Initialize buttons (after the view has established the width and height of 
-	 * the device).
-	 */
 	public void initButtonLocations() {
 		this.buttonXloc = (this.screenWidth / 2) - (this.buttonWidth / 2);
 		this.buttonXlocB = ((this.screenWidth / 5) * 4) - (this.buttonWidth / 2);
@@ -151,11 +140,6 @@ public abstract class View extends JPanel {
 		this.buttonSlot6Y = (this.buttonYloc * 6) - (this.buttonYloc / 2);
 	}
 	
-	/**
-	 * Draw debug information to the screen.
-	 * 
-	 * @param g Graphics object
-	 */
 	public void drawDebugOutput(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(875, 0, 500, 60);
@@ -164,17 +148,6 @@ public abstract class View extends JPanel {
 		g.drawString("curr game 1 state: " + this.game1State + ", last state: " + this.lastGame1State, 890, 25);
 	}
 
-	/**
-	 * Update the view with information about all games, and the applciation.
-	 * 
-	 * @param curr current application state
-	 * @param g1 current game 1 state
-	 * @param g1last last game 1 state
-	 * @param g2 current game 2 state
-	 * @param g2last last game 2 state
-	 * @param g3 current game 3 state
-	 * @param g3last last game 3 state
-	 */
 	public void updateStates(AppState curr, GameState g1, 
 			GameState g1last) {
 		this.currentAppState = curr;
@@ -182,11 +155,6 @@ public abstract class View extends JPanel {
 		this.lastGame1State = g1last;
 	}
 	
-	/**
-	 * Draw flashing text on the screen.
-	 * 
-	 * @param g Graphics object
-	 */
 	public void drawFlashingText(Graphics g) {
 		if (this.flashingTextCounter < this.getFlashingTextThresh()/2) {
 			this.flashingTextCounter++;
@@ -199,12 +167,6 @@ public abstract class View extends JPanel {
 		}
 	}
 	
-	/**
-	 * Create the image at the given filepath.
-	 * 
-	 * @param filepath given filepath
-	 * @return the created image
-	 */
 	public BufferedImage createImage(String filepath) {
 		BufferedImage bufferedImage;
 		try {
@@ -221,9 +183,6 @@ public abstract class View extends JPanel {
 		this.screenWidth = w;
 	}
 	
-	/**
-	 * Empty method to be overriden.
-	 */
 	public void initButtons(){};
 
 }
