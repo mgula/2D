@@ -68,17 +68,6 @@ public abstract class GameView extends View {
 				g.drawString("Pause the game: P key", this.getButtonXloc(), this.getButtonSlot1Y() + (TEXT_OFFSET*3));
 				break;
 				
-			case GAME2:
-				g.drawString("Interact with item: click (use mouse)", this.getButtonXloc()-60, this.getButtonSlot1Y());
-				g.drawString("Pause the game: P key", this.getButtonXloc()-20, this.getButtonSlot1Y() + TEXT_OFFSET);
-				break;
-				
-			case GAME3:
-				g.drawString("Change cubes: Shuffle button", this.getButtonXloc(), this.getButtonSlot1Y());
-				g.drawString("Submit: Submit button", this.getButtonXloc(), this.getButtonSlot1Y()+TEXT_OFFSET);
-				g.drawString("Pause the game: P key", this.getButtonXloc(), this.getButtonSlot1Y()+(TEXT_OFFSET*2));
-				break;
-				
 			default:
 				break;
 		}
@@ -114,25 +103,6 @@ public abstract class GameView extends View {
 					case LOSE:
 						g.drawString("Your crab got tired and ", this.getButtonXloc() - 10, this.getButtonSlot1Y());
 						g.drawString("decided to take a break.", this.getButtonXloc() - 10, this.getButtonSlot1Y() + 20);
-						break;
-						
-					default:
-						break;
-				}
-				break;
-				
-			case GAME2:
-				switch (gameState) {
-					case WIN:
-						if (lastState == GameState.ROUND4) {
-							g.drawString("Congratulations, you defended the shore!", this.getButtonXloc() - 50, this.getButtonSlot1Y());
-						} else {
-							g.drawString("You made it to the next round!", this.getButtonXloc() - 30, this.getButtonSlot1Y());
-						}
-						break;
-						
-					case LOSE:
-						g.drawString("Oops, the beach took too much damage.", this.getButtonXloc() - 50, this.getButtonSlot1Y());
 						break;
 						
 					default:

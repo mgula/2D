@@ -12,28 +12,17 @@ import javax.swing.JButton;
  */
 public class MainView extends View { 
 	private JButton mg1Button;
-	private JButton mg2Button;
-	private JButton mg3Button;
 	private JButton controls;
 	private JButton exitButton;
-	private String state = "Delaware";
 	private boolean select = false;
 	
 	public MainView(int w, int h) {
 		super(w, h);
-		this.setFlashingText("Press Any Key to Continue");
+		this.setFlashingText("press any key to continue");
 	}
 	
 	public JButton getMg1Button() {
 		return this.mg1Button;
-	}
-	
-	public JButton getMg2Button() {
-		return this.mg2Button;
-	}
-	
-	public JButton getMg3Button() {
-		return this.mg3Button;
 	}
 	
 	public JButton getControlsButton() {
@@ -50,9 +39,8 @@ public class MainView extends View {
 	public void paint(Graphics g) {
 		if (!this.select) {
 			this.drawFlashingText(g);
-		} else {
-			g.drawString(this.state, 10, 30);
 		}
+		
 		if (this.getDebugMode()) {
 			this.drawDebugOutput(g);
 		}
@@ -64,20 +52,14 @@ public class MainView extends View {
 	 */
 	@Override
 	public void initButtons() {
-		this.mg1Button = new JButton("Estuary Run");
-		this.mg1Button.setBounds(this.getButtonXloc(), this.getButtonSlot1Y(), this.getButtonWidth(), this.getButtonHeight());
+		this.mg1Button = new JButton("go");
+		this.mg1Button.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
 		
-		this.mg2Button = new JButton("Shore Defense");
-		this.mg2Button.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
+		this.controls = new JButton("settings");
+		this.controls.setBounds(this.getButtonXloc(), this.getButtonSlot3Y(), this.getButtonWidth(), this.getButtonHeight());
 		
-		this.mg3Button = new JButton("Story Cubes");
-		this.mg3Button.setBounds(this.getButtonXloc(), this.getButtonSlot3Y(), this.getButtonWidth(), this.getButtonHeight());
-		
-		this.controls = new JButton("Settings");
-		this.controls.setBounds(this.getButtonXloc(), this.getButtonSlot4Y(), this.getButtonWidth(), this.getButtonHeight());
-		
-		this.exitButton = new JButton("Exit");
-		this.exitButton.setBounds(this.getButtonXloc(), this.getButtonSlot5Y(), this.getButtonWidth(), this.getButtonHeight());
+		this.exitButton = new JButton("exit");
+		this.exitButton.setBounds(this.getButtonXloc(), this.getButtonSlot4Y(), this.getButtonWidth(), this.getButtonHeight());
 	}
 	
 	public boolean getSelect() {
@@ -86,9 +68,5 @@ public class MainView extends View {
 	
 	public void setSelect() {
 		this.select = true;
-	}
-	
-	public void setState(String state) {
-		this.state = state;
 	}
 }

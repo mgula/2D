@@ -18,7 +18,6 @@ public class BetweenView extends MainView {
 	private JButton okButton;
 	private JButton newGameButton;
 	private JButton loadPreviousGameButton;
-	private JButton game1TutButton;
 	private JButton debugButton;
 	private JButton stage1Button;
 	private JButton stage2Button;
@@ -42,10 +41,6 @@ public class BetweenView extends MainView {
 	
 	public JButton getLoadButton() {
 		return this.loadPreviousGameButton;
-	}
-	
-	public JButton getGame1TutButton() {
-		return this.game1TutButton;
 	}
 	
 	public JButton getDebugButton() {
@@ -78,14 +73,6 @@ public class BetweenView extends MainView {
 	 */
 	@Override
 	public void paint(Graphics g) {
-		if (this.firstTime && this.game == AppState.GAME3) {
-			String[] g3Text = {"Drag the cubes to create your story! ", 
-					"Press the shuffle button for a new selection of cubes.",
-					"You can submit your story after you have placed all of the cubes."};
-			for (int i = 0; i < g3Text.length; i++) {
-				g.drawString(g3Text[i], this.textXloc - 50 - (60*i), this.getButtonSlot1Y() + 30*i);
-			}
-		}
 		if (this.getDebugMode()) {
 			this.drawDebugOutput(g);
 		}
@@ -113,8 +100,6 @@ public class BetweenView extends MainView {
 		this.newGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
 		this.loadPreviousGameButton = new JButton("Continue last game");
 		this.loadPreviousGameButton.setBounds(this.getButtonXloc(), this.getButtonSlot1Y(), this.getButtonWidth() + this.getExtraTextOffset(), this.getButtonHeight());
-		this.game1TutButton = new JButton("Tutorial");
-		this.game1TutButton.setBounds(this.getButtonXloc(), this.getButtonSlot3Y(), this.getButtonWidth(), this.getButtonHeight());
 		/*Debug buttons*/
 		this.stage1Button = new JButton("Stage 1");
 		this.stage1Button.setBounds(this.getButtonXloc(), this.getButtonSlot1Y(), this.getButtonWidth(), this.getButtonHeight());

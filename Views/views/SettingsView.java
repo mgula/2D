@@ -22,16 +22,12 @@ public class SettingsView extends MainView {
 	private ButtonGroup windowedToggle;
 	private JRadioButton windowedOn;
 	private JRadioButton windowedOff;
-	private ButtonGroup stateToggle;
-	private JRadioButton delaware;
-	private JRadioButton florida;
-	private JRadioButton texas;
 	private final int YLOC = 300;
 	private final int Y_OFFSET = 30;
 	private final int Y_OFFSET_2 = 20;
 	private final int debugToggleSize = 25;
-	private final String[] settingsMsgs = {"Toggle debug mode:", "On", "Off", "Toggle windowed mode:",
-			"Windowed", "Fullscreen", "Toggle State:", "Delaware", "Florida", "Texas"};
+	private final String[] settingsMsgs = {"toggle debug mode:", "on", "off", "toggle windowed mode:",
+			"windowed", "fullscreen"};
 	private int[] settingsMsgsX;
 	private final int[] settingsMsgsY = {this.YLOC, this.YLOC + this.Y_OFFSET, this.YLOC + this.Y_OFFSET, this.YLOC + (this.Y_OFFSET * 3),
 			this.YLOC + (this.Y_OFFSET * 4), this.YLOC + (this.Y_OFFSET * 4), this.YLOC + (this.Y_OFFSET * 6), this.YLOC + (this.Y_OFFSET * 7),
@@ -55,18 +51,6 @@ public class SettingsView extends MainView {
 	
 	public JRadioButton getWindowedOff() {
 		return this.windowedOff;
-	}
-	
-	public JRadioButton getDelaware() {
-		return this.delaware;
-	}
-	
-	public JRadioButton getFlorida() {
-		return this.florida;
-	}
-	
-	public JRadioButton getTexas() {
-		return this.texas;
 	}
 	
 	public JButton getBackButton() {
@@ -111,16 +95,5 @@ public class SettingsView extends MainView {
 		this.windowedOff.setBounds(this.getButtonXloc() + 130, this.YLOC + (this.Y_OFFSET * 5) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
 		this.windowedToggle.add(this.windowedOn);
 		this.windowedToggle.add(this.windowedOff);
-		this.stateToggle = new ButtonGroup();
-		this.delaware = new JRadioButton("Delaware");
-		this.delaware.setSelected(true);
-		this.delaware.setBounds(this.getButtonXloc() + 15, this.YLOC + (this.Y_OFFSET * 8) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
-		this.florida = new JRadioButton("Florida");
-		this.florida.setBounds(this.getButtonXloc() + 115, this.YLOC + (this.Y_OFFSET * 8) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
-		this.texas = new JRadioButton("Texas");
-		this.texas.setBounds(this.getButtonXloc() + 225, this.YLOC + (this.Y_OFFSET * 8) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
-		this.stateToggle.add(this.delaware);
-		this.stateToggle.add(this.florida);
-		this.stateToggle.add(this.texas);
 	}
 }

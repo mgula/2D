@@ -29,10 +29,6 @@ public abstract class View extends JPanel {
 	private AppState currentAppState;
 	private GameState game1State;
 	private GameState lastGame1State;
-	private GameState game2State;
-	private GameState lastGame2State;
-	private GameState game3State;
-	private GameState lastGame3State;
 	private int buttonWidth = 150;
 	private int buttonHeight = 35;
 	private int buttonXloc;
@@ -42,7 +38,6 @@ public abstract class View extends JPanel {
 	private int flashingTextCounter = 0;
 	private int flashingTextThresh = 60;
 	private final int fontSize = 20;
-	private final String font = "GillSansUltraBold";
 	private int buttonSlot1Y;
 	private int buttonSlot2Y;
 	private int buttonSlot3Y;
@@ -116,20 +111,8 @@ public abstract class View extends JPanel {
 		return this.game1State;
 	}
 	
-	public GameState getGame2State() {
-		return this.game2State;
-	}
-	
-	public GameState getGame3State() {
-		return this.game3State;
-	}
-	
 	public GameState getLastGame1State() {
 		return this.lastGame1State;
-	}
-	
-	public GameState getLastGame2State() {
-		return this.lastGame2State;
 	}
 	
 	public boolean getDebugMode() {
@@ -176,13 +159,9 @@ public abstract class View extends JPanel {
 	public void drawDebugOutput(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(875, 0, 500, 60);
-		g.setFont(new JLabel().getFont());
 		g.setColor(Color.BLACK);
 		g.drawString("curr app state: " + this.currentAppState, 1000, 10);
 		g.drawString("curr game 1 state: " + this.game1State + ", last state: " + this.lastGame1State, 890, 25);
-		g.drawString("curr game 2 state: " + this.game2State + ", last state: " + this.lastGame2State, 890, 40);
-		g.drawString("curr game 3 state: " + this.game3State + ", last state: " + this.lastGame3State, 890, 55);
-		g.setFont(new Font(this.font, Font.PLAIN, this.fontSize));
 	}
 
 	/**
@@ -197,14 +176,10 @@ public abstract class View extends JPanel {
 	 * @param g3last last game 3 state
 	 */
 	public void updateStates(AppState curr, GameState g1, 
-			GameState g1last, GameState g2, GameState g2last, GameState g3, GameState g3last) {
+			GameState g1last) {
 		this.currentAppState = curr;
 		this.game1State = g1;
 		this.lastGame1State = g1last;
-		this.game2State = g2;
-		this.lastGame2State = g2last;
-		this.game3State = g3;
-		this.lastGame3State = g3last;
 	}
 	
 	/**
@@ -238,16 +213,12 @@ public abstract class View extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	return null;
+		return null;
 	}
 	
 	public void setSizes(int h, int w) {
 		this.screenHeight = h;
 		this.screenWidth = w;
-	}
-	
-	public void setViewFont() {
-		this.setFont(new Font(this.font, Font.PLAIN, this.fontSize));
 	}
 	
 	/**
