@@ -26,6 +26,8 @@ import java.util.ArrayList;
 /*TODO:
  * -implement serializable
  * -file system (no new game button, just save slots)
+ * -migrate from hearts to health bar
+ * -redo pause menu
  */
 
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
@@ -52,7 +54,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private int releaseX;
 	private int releaseY;
 	private Dimension screenSize;
-	private boolean game1Lost = false;
 	private boolean screenHandled = false;
 	private boolean fullScreen = true;
 	private static final int sleepTime = 30; //Time in milliseconds to wait each cycle of the main loop
@@ -197,7 +198,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.game1View.getLoseButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game1Lost = true;
 				game1.setGameState(GameState.LOAD);
 				frame.getContentPane().removeAll();
 				screenHandled = false;
