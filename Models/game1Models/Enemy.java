@@ -1,4 +1,4 @@
-package minigame1Models;
+package game1Models;
 
 public abstract class Enemy implements Game1Model {
 

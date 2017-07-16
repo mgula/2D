@@ -1,13 +1,13 @@
-package minigame1Models;
+package game1Models;
 
-public class Sand implements Game1Model {
+public class Rock implements Game1Model {
 
 	private final int xloc;
 	private final int yloc;
 	private int height;
 	private int width;
 	
-	public Sand(int x, int y, int h, int w) {
+	public Rock(int x, int y, int h, int w) {
 		this.xloc = x;
 		this.yloc = y;
 		this.height = h;

@@ -1,4 +1,4 @@
-package minigame1Models;
+package game1Models;
 
 public interface Game1Model {
 

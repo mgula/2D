@@ -3,21 +3,23 @@ package views;
 import enums.AppState;
 import enums.Direction;
 import enums.GameState;
+import game1Models.*;
 import games.Game1;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import minigame1Models.*;
 
-public class Minigame1View extends GameView {
+public class Game1View extends GameView {
 	private JButton winButton;
 	private JButton loseButton;
 	private JButton playAgainButton;
 	private Player drawPlayer;
-	private Map map;
+	private Room map;
 	private ArrayList<Game1Model> draw;
 	private BufferedImage heart;
 	private final int heartXloc = 40;
@@ -59,14 +61,10 @@ public class Minigame1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int debugMsg3X = 5;
-	private final int debugMsg3Y = 380;
-	private final int debugMsg4X = 550;
-	private final int debugMsg4Y = 690;
 	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 1120, 1120, 10, 10, 350, 350, 550};
 	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 690, 705, 690, 705, 690, 705, 705};
 	
-	public Minigame1View(int w, int h) {
+	public Game1View(int w, int h) {
 		super(w, h);
 		this.initialThresholdXR = (int)((double)w * this.upperRatio);
 		this.thresholdXR = this.initialThresholdXR;
@@ -138,34 +136,30 @@ public class Minigame1View extends GameView {
 		if (this.getGame1State() == GameState.PAUSE){
 			this.drawPauseMenu(g, AppState.GAME1);
 		}
-		/*Draw additional messages, if applicable*/
-		if (this.getGame1State() == GameState.WIN || this.getGame1State() == GameState.LOSE) {
-			this.drawGameString(g, AppState.GAME1, this.getGame1State(), this.getLastGame1State());
-		}
 		/*Update last y location, in order to know when to use falling animation*/
 		this.lastYloc = this.drawPlayer.getYloc();
 	}
 	
 	public void drawEnvironment(Graphics g) {
 		for (Game1Model m : this.draw) {
-			if (m instanceof minigame1Models.Sand) {
+			if (m instanceof game1Models.Sand) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.Rock) {
+			} else if (m instanceof game1Models.Rock) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.Debris) {
+			} else if (m instanceof game1Models.Debris) {
 				g.drawRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.Enemy) {
+			} else if (m instanceof game1Models.Enemy) {
 				g.setColor(Color.RED);
 				g.fillRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.Marker) {
+			} else if (m instanceof game1Models.Marker) {
 				//img = this.arrow;
-			} else if (m instanceof minigame1Models.RegenArea) {
+			} else if (m instanceof game1Models.RegenArea) {
 				g.setColor(Color.GREEN);
 				g.fillRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.CurrentDrawable) {
+			} else if (m instanceof game1Models.CurrentDrawable) {
 				g.setColor(Color.CYAN);
 				g.fillRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof minigame1Models.Interactable) {
+			} else if (m instanceof game1Models.Interactable) {
 				g.setColor(Color.YELLOW);
 				g.fillRect(m.getXloc() - this.playerOffsetX, m.getYloc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			}
@@ -201,9 +195,6 @@ public class Minigame1View extends GameView {
 		g.drawString(message, this.drawPlayer.getXloc() - this.playerOffsetX - this.debugMsgOffset1X, this.drawPlayer.getYloc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
 		message = "damaged: " + this.drawPlayer.getEnemyCollision();
 		g.drawString(message, this.drawPlayer.getXloc() - this.playerOffsetX - this.debugMsgOffset2, this.drawPlayer.getYloc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
-		double salinityPercent = (double)this.drawPlayer.getXloc() / (double)this.map.getWidth() * 100;
-		g.drawString(String.format("%.2f", 100 - salinityPercent) + " / 100", this.debugMsg3X, this.debugMsg3Y); //exact salinity %
-		g.drawString(message, this.debugMsg4X, this.debugMsg4Y); //animation info
 		String[] debugMessages = {"Stat bool (X): " + this.viewStationaryX, "Left bool: " + this.viewMovingLeft, "Right bool: " + this.viewMovingRight,
 				"Stat bool (Y): " + this.viewStationaryY, "Up bool: " + this.viewMovingUp, "Down bool: " + this.viewMovingDown, "Y Thresh (U): " + this.thresholdYU,
 				"Y Thresh (D): " + this.thresholdYD, "X Thresh (R): " + this.thresholdXR, "X Thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
@@ -230,24 +221,13 @@ public class Minigame1View extends GameView {
 	}
 	
 	public void load(Game1 game) {
-		this.offsetManager();
+		this.restoreInitialOffsets(); //fix later
 		this.playerDrawable = true;
 		this.flash = 0;
 		this.drawPlayer = game.getPlayer();
 		this.map = game.getMap();
 		this.lastYloc = this.drawPlayer.getYloc();
 		this.draw = game.getEnvironment();
-	}
-	
-	public void offsetManager() {
-		if (this.getGame1State() == GameState.STAGE1) {
-			this.restoreInitialOffsets();
-			return;
-		}
-		if (this.getGame1State() == GameState.STAGE2 || this.getGame1State() == GameState.STAGE3) {
-			this.loadLaterStageOffsets();
-			return;
-		}
 	}
 	
 	public void restoreInitialOffsets() {

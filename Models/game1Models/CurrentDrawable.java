@@ -1,17 +1,15 @@
-package minigame1Models;
+package game1Models;
 
-public class RegenArea implements Game1Model {
-	
+public class CurrentDrawable implements Game1Model {
+
 	private final int xloc;
 	private final int yloc;
-	private int height;
-	private int width;
+	private int height = 50;
+	private int width = 185;
 	
-	public RegenArea(int x, int y, int h, int w) {
+	public CurrentDrawable(int x, int y) {
 		this.xloc = x;
 		this.yloc = y;
-		this.height = h;
-		this.width = w;
 	}
 	
 	@Override

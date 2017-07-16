@@ -1,4 +1,4 @@
-package minigame1Models;
+package game1Models;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import enums.Direction;
 public class Player implements Game1Model {
 
 	private ArrayList<Game1Model> environment;
-	private Map map;
+	private Room map;
 	private int xloc;
 	private int yloc;
 	private final int width;
@@ -107,30 +107,15 @@ public class Player implements Game1Model {
 		return this.enemyCollision;
 	}
 	
-	/**
-	 * View needs to know if the crab is resting on a surface in order to draw the correct images.
-	 * 
-	 * @return on bottom surface boolean
-	 */
 	public boolean getOnASurface() {
 		return this.onSurfaceBottom || this.onMovingSurfaceBottom;
 	}
 	
-	/**
-	 * Load the given environment and map.
-	 * 
-	 * @param e the given array list of Minigame1Models
-	 * @param m the given map
-	 */
-	public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Map m) {
+	public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Room m) {
 		this.environment = e;
 		this.map = m;
 	}
 	
-	/**
-	 * Instead of moving by xIncr all at once, the idea here is to move by a single pixel,
-	 * and then check for collisions.
-	 */
 	public void incrX() {
 		if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
 			this.xloc++;
@@ -138,10 +123,6 @@ public class Player implements Game1Model {
 		this.currXSegment++;
 	}
 	
-	/**
-	 * Instead of moving by xIncr all at once, the idea here is to move by a single pixel,
-	 * and then check for collisions.
-	 */
 	public void decrX() {
 		if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
 			this.xloc--;
@@ -149,21 +130,13 @@ public class Player implements Game1Model {
 		this.currXSegment++;
 	}
 	
-	/**
-	 * Instead of moving by yIncr all at once, the idea here is to move by a single pixel,
-	 * and then check for collisions.
-	 */
-	public void incrY() {
+	void incrY() {
 		if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
 			this.yloc--;
 		}
 		this.currYSegment++;
 	}
 	
-	/**
-	 * Instead of moving by yIncr all at once, the idea here is to move by a single pixel,
-	 * and then check for collisions.
-	 */
 	public void decrY() {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 			this.yloc++;
@@ -171,9 +144,6 @@ public class Player implements Game1Model {
 		this.currYSegment++;
 	}
 	
-	/**
-	 * Move right, if right edge is not against a surface.
-	 */
 	public void moveRight() {
 		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (this.currXSegment < this.xIncr) {
@@ -183,9 +153,6 @@ public class Player implements Game1Model {
 		this.currXSegment = 0;
 	}
 	
-	/**
-	 * Move left, if left edge is not against a surface.
-	 */
 	public void moveLeft() {
 		while (this.currXSegment < this.xIncr) {
 			this.checkLeftEdgeCollisions();
@@ -194,10 +161,6 @@ public class Player implements Game1Model {
 		this.currXSegment = 0;
 	}
 	
-	/**
-	 * Increment yloc if there are no top edge collisions. Also, reset the floating counter when yloc is decreased. 
-	 * If the top edge is against a surface, end the current jump by setting the jump counter to the jump duration.
-	 */
 	public void raiseY() {
 		if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
 			this.onSurfaceBottom = false;
@@ -214,12 +177,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * If the player hasn't already jumped more than the maximum number jumps, call raiseY() and increase the 
-	 * jumping counter. When the counter reaches jumpDuration, increment jump count and reset the counter.
-	 * 
-	 * @return false if still jumping, true if jump completed
-	 */
 	public boolean initiateJumpArc() {
 		if (this.jumpCount < this.maxJumps) {
 			if (this.jumpingCounter < this.jumpDuration) {
@@ -236,9 +193,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * If the bottom edge isn't on a surface, and if the floating counter is less than the threshold, decrement yloc.
-	 */
 	public void assertGravity() {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 			if (this.floatingCounter < this.floatingThreshold) {
@@ -253,20 +207,17 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check to see if bottom edge has left a surface.
-	 */
 	public void checkLeavingSurface() {
 		if (this.onSurfaceBottom || this.onMovingSurfaceBottom) {
 			boolean contact = false;
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
 			for (Game1Model m : this.environment) {
-				if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Sand) {
+				if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Sand) {
 					if (this.checkBottomSurface(m)) {
 						contact = true;
 					}
-				} else if (m instanceof minigame1Models.Interactable) {
+				} else if (m instanceof game1Models.Interactable) {
 					if (this.checkBottomSurface(m)) {
 						movingContact = true;
 					}
@@ -285,15 +236,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * The key difference between regular surfaces and moving surfaces is that moving surfaces can
-	 * push the crab in a certain direction. This difference is key because this means the crab may
-	 * now be moving even if there's no player input - in other words, crab movement can occur in 
-	 * multiple regions of the tick(). We use the boolean calledByInteractable essentially to indicate 
-	 * where in tick() this method is being called from.
-	 * 
-	 * @param calledByInteractable whether or not the method was called by Interactable.java
-	 */
 	public void checkMovingSurfaces(boolean calledByInteractable) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
 		this.checkLeftEdgeCollisions();
@@ -343,9 +285,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check bottom edge for collisions.
-	 */
 	public void checkBottomEdgeCollisions() {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
 		if (this.yloc >= this.map.getGroundLevel()) {
@@ -355,16 +294,16 @@ public class Player implements Game1Model {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				if (this.checkBottomSurface(m)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
 					this.jumpingCounter = 0;
 					this.jumpCount = 0;
 					this.floatingCounter = 0;
-					if (m instanceof minigame1Models.Interactable) {
+					if (m instanceof game1Models.Interactable) {
 						this.inContactWith = (Interactable) m;
-						switch (((minigame1Models.Interactable) m).getDirection()) {
+						switch (((game1Models.Interactable) m).getDirection()) {
 							case NORTH:
 								this.againstMovingSurfaceBottom = true;
 								this.onMovingSurfaceBottom = false;
@@ -383,9 +322,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check top edge for collisions.
-	 */
 	public void checkTopEdgeCollisions() {
 		boolean newCollision = false;
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
@@ -396,7 +332,7 @@ public class Player implements Game1Model {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int w = m.getWidth();
@@ -405,7 +341,7 @@ public class Player implements Game1Model {
 					for (int i = x - this.width + 1; i < x + w; i++) {
 						if (this.xloc == i) {
 							newCollision = true;
-							if (m instanceof minigame1Models.Interactable) {
+							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
 								this.againstMovingSurfaceTop = true;
 							} else {
@@ -423,9 +359,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check right edge for collisions.
-	 */
 	public void checkRightEdgeCollisions() {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
@@ -435,7 +368,7 @@ public class Player implements Game1Model {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int h = m.getHeight();
@@ -443,7 +376,7 @@ public class Player implements Game1Model {
 					for (int i = y - this.height + 1; i < y + h; i++) {
 						if (this.yloc == i) {
 							newCollision = true;
-							if (m instanceof minigame1Models.Interactable) {
+							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
 								this.againstMovingSurfaceRight = true;
 							} else {
@@ -461,9 +394,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check left edge for collisions.
-	 */
 	public void checkLeftEdgeCollisions() {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
@@ -473,7 +403,7 @@ public class Player implements Game1Model {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.environment) {
-			if (m instanceof minigame1Models.Rock || m instanceof minigame1Models.Debris || m instanceof minigame1Models.Interactable || m instanceof minigame1Models.Sand) {
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int w = m.getWidth();
@@ -482,7 +412,7 @@ public class Player implements Game1Model {
 					for (int i = y - this.height + 1; i < y + h; i++) {
 						if (this.yloc == i) {
 							newCollision = true;
-							if (m instanceof minigame1Models.Interactable) {
+							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
 								this.againstMovingSurfaceLeft = true;
 							} else {
@@ -500,13 +430,10 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Check for collisions with objects that don't act as surfaces: health regen areas and enemies.
-	 */
 	public void checkAreaCollisions() {
 		this.currentCollision = false; // innocent until proven guilty policy
 		for (Game1Model m : this.environment) {
-			if (m instanceof minigame1Models.Enemy || m instanceof minigame1Models.RegenArea || m instanceof minigame1Models.Current) {
+			if (m instanceof game1Models.Enemy || m instanceof game1Models.RegenArea || m instanceof game1Models.Current) {
 				int x = m.getXloc();
 				int y = m.getYloc();
 				int w = m.getWidth();
@@ -519,17 +446,17 @@ public class Player implements Game1Model {
 								if (i == k && j == l) {
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
-									if (m instanceof minigame1Models.Enemy) {
+									if (m instanceof game1Models.Enemy) {
 										this.enemyCollision = true;
-										this.healthDecrease = ((minigame1Models.Enemy)m).getDamage();
+										this.healthDecrease = ((game1Models.Enemy)m).getDamage();
 										return;
-									} else if (m instanceof minigame1Models.RegenArea) {
+									} else if (m instanceof game1Models.RegenArea) {
 										this.regenCollision = true;
 										return;
-									} else if (m instanceof minigame1Models.Current) {
+									} else if (m instanceof game1Models.Current) {
 										this.currentCollision = true;
-										this.dirOfCurrent = ((minigame1Models.Current)m).getFlowDirection();
-										this.incrFromCurrent = ((minigame1Models.Current)m).getIncr();
+										this.dirOfCurrent = ((game1Models.Current)m).getFlowDirection();
+										this.incrFromCurrent = ((game1Models.Current)m).getIncr();
 										return;
 									}
 								}
@@ -541,13 +468,6 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	/**
-	 * Return true if a bottom edge collision with the given Minigame1Model
-	 *  is detected, and false otherwise.
-	 * 
-	 * @param m the given Minigame1Model
-	 * @return true if collision, false otherwise
-	 */
 	public boolean checkBottomSurface(Game1Model m) {
 		int x = m.getXloc();
 		int y = m.getYloc();
@@ -562,9 +482,6 @@ public class Player implements Game1Model {
 		return false;
 	}
 	
-	/**
-	 * Look at enemy and regen collision flags and update player health accordingly.
-	 */
 	public void evaluateAreaCollisions() {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {

@@ -23,13 +23,18 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
+/*TODO:
+ * -implement serializable
+ * -file system (no new game button, just save slots)
+ */
+
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private boolean play = true;
 	private Game1 game1 = new Game1();
 	private MainView mainView;
 	private SettingsView settingsView;
-	private Minigame1View game1View;
-	private BetweenView game1ViewBV;
+	private Game1View game1View;
+	private BetweenView betweenView;
 	private ArrayList<View> allViews  = new ArrayList<View>();
 	private AppState currentState = AppState.START;
 	private AppState intendedState = AppState.SATISFIED;
@@ -47,7 +52,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private int releaseX;
 	private int releaseY;
 	private Dimension screenSize;
-	private boolean game1DebugLevel = false;
 	private boolean game1Lost = false;
 	private boolean screenHandled = false;
 	private boolean fullScreen = true;
@@ -78,12 +82,12 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.mainView.setFocusable(true);
 		this.mainView.addKeyListener(this);
 		this.settingsView = new SettingsView(width, height);
-		this.game1View = new Minigame1View(width, height);
-		this.game1ViewBV = new BetweenView(width, height);
+		this.game1View = new Game1View(width, height);
+		this.betweenView = new BetweenView(width, height);
 		this.allViews.add(this.mainView);
 		this.allViews.add(this.settingsView);
 		this.allViews.add(this.game1View);
-		this.allViews.add(this.game1ViewBV);
+		this.allViews.add(this.betweenView);
 		for (View v : this.allViews) {
 			v.initButtonLocations();
 			v.initButtons();
@@ -119,61 +123,20 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			}
     	});
 		/*In between view 1*/
-		this.game1ViewBV.getNewGameButton().addActionListener(new ActionListener() {
+		this.betweenView.getNewGameButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				intendedState = AppState.GAME1;
 				game1.setLastState(GameState.UNINITIALIZED);
 			}
     	});
-		this.game1ViewBV.getLoadButton().addActionListener(new ActionListener() {
+		this.betweenView.getLoadButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentState = AppState.GAME1;
 				unpauseGame(game1, game1View);
 			}
     	});
-		this.game1ViewBV.getStage1Button().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (game1ViewBV.getFirstTime()) {
-					game1ViewBV.setFirstTime(false);
-				}
-				intendedState = AppState.GAME1;
-				game1.setLastState(GameState.UNINITIALIZED);
-			}
-    	});
-		this.game1ViewBV.getStage2Button().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (game1ViewBV.getFirstTime()) {
-					game1ViewBV.setFirstTime(false);
-				}
-				intendedState = AppState.GAME1;
-				game1.setLastState(GameState.STAGE1);
-			}
-    	});
-		this.game1ViewBV.getStage3Button().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (game1ViewBV.getFirstTime()) {
-					game1ViewBV.setFirstTime(false);
-				}
-				intendedState = AppState.GAME1;
-				game1.setLastState(GameState.STAGE2);
-			}
-    	});
-		this.game1ViewBV.getDebugButton().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (game1ViewBV.getFirstTime()) {
-					game1ViewBV.setFirstTime(false);
-				}
-				game1DebugLevel = true;
-				intendedState = AppState.GAME1;
-			}
-    	});
-		
 		/*Settings view*/
 		this.settingsView.getBackButton().addActionListener(new ActionListener() {
 			@Override
@@ -269,21 +232,13 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					break;
 					
 				case INBETWEEN1:
-					if (this.game1View.getDebugMode() == true) {
-						this.frame.add(this.game1ViewBV.getStage1Button());
-						this.frame.add(this.game1ViewBV.getStage2Button());
-						this.frame.add(this.game1ViewBV.getStage3Button());
-						this.frame.add(this.game1ViewBV.getDebugButton());
+					this.frame.add(this.betweenView.getNewGameButton());
+					if (this.game1.getFirstTime()) {
+						this.game1.setFirstTime();
 					} else {
-						this.frame.add(this.game1ViewBV.getNewGameButton());
-						if (this.game1.getFirstTime()) {
-							this.game1.setFirstTime();
-						} else {
-							this.frame.add(this.game1ViewBV.getLoadButton());
-						}
+						this.frame.add(this.betweenView.getLoadButton());
 					}
-					
-					this.addViewToFrame(this.game1ViewBV);
+					this.addViewToFrame(this.betweenView);
 					break;
 					
 				case SETTINGS:
@@ -310,61 +265,18 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.game1.setJumping(false);
 		this.rightPressed = false;
 		this.spacePressed = false;
-		if (this.game1DebugLevel) {
-			this.game1DebugLevel = false;
-			this.game1.setGameState(GameState.DEBUG);
-			this.game1.initDebugLevel();
-			this.game1.makeDebugStage();
-		} else {
-			switch (this.game1.getLastState()) {
-				case UNINITIALIZED:
-					this.game1.setGameState(GameState.STAGE1);
-					this.game1.initMap1();
-					this.game1.makeStage1();
-					break;
-					
-				case STAGE1:
-					if (this.game1Lost) {
-						this.game1Lost = false;
-						this.game1.setGameState(GameState.STAGE1);
-						this.game1.initMap1();
-						this.game1.makeStage1();
-					} else {
-						this.game1.setGameState(GameState.STAGE2);
-						this.game1.initMap2();
-						this.game1.makeStage2();
-					}
-					break;
-					
-				case STAGE2:
-					if (this.game1Lost) {
-						this.game1Lost = false;
-						this.game1.setGameState(GameState.STAGE2);
-						this.game1.initMap2();
-						this.game1.makeStage2();
-					} else {
-						this.game1.setGameState(GameState.STAGE3);
-						this.game1.initMap3();
-						this.game1.makeStage3();
-					}
-					break;
-					
-				case STAGE3:
-					if (this.game1Lost) {
-						this.game1Lost = false;
-						this.game1.setGameState(GameState.STAGE3);
-						this.game1.initMap3();
-						this.game1.makeStage3();
-					} else {
-						this.game1.setGameState(GameState.STAGE1);
-						this.game1.initMap1();
-						this.game1.makeStage1();
-					}
-					break;
-					
-				default:
-					break;
-			}
+		switch (this.game1.getLastState()) {
+			case UNINITIALIZED:
+				this.game1.setGameState(GameState.PLAY);
+				this.game1.initRooms();
+				break;
+			
+			case PAUSE:
+				this.game1.setGameState(GameState.PLAY);
+				break;
+			
+			default:
+				break;
 		}
 		this.game1.setLastState(GameState.LOAD);
 		this.game1.initPlayer();
@@ -401,22 +313,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				}
 				break;
 				
-			case WIN:
-				if (!this.screenHandled) {
-					this.screenHandled = true;
-					this.frame.getContentPane().removeAll();
-					if (this.game1.getLastState() == GameState.STAGE3) {
-						this.frame.add(this.game1View.getPlayAgainButton());
-						this.frame.add(this.game1View.getBackButton());
-						this.addViewToFrame(this.game1View);
-					} else {
-						this.frame.add(this.game1View.getWinButton());
-						this.addViewToFrame(this.game1View);
-					}
-				}
-				break;
-				
-			case LOSE:
+			case DEATH:
 				if (!this.screenHandled) {
 					this.screenHandled = true;
 					this.frame.getContentPane().removeAll();
@@ -569,7 +466,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	public void bindKeysToViews() {
 		for (View v : this.allViews) {
 			/*Bind arrow key and space bar presses and releases for game 1 and game 1 tut view*/
-			if (v instanceof views.Minigame1View) {
+			if (v instanceof views.Game1View) {
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RightPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SpacePressed");

@@ -1,17 +1,15 @@
-package minigame1Models;
+package game1Models;
 
-public class Rock implements Game1Model {
+public class Debris implements Game1Model {
 
 	private final int xloc;
 	private final int yloc;
-	private int height;
-	private int width;
+	private final int height = 30;
+	private final int width = 100;
 	
-	public Rock(int x, int y, int h, int w) {
+	public Debris(int x, int y) {
 		this.xloc = x;
 		this.yloc = y;
-		this.height = h;
-		this.width = w;
 	}
 	
 	@Override
