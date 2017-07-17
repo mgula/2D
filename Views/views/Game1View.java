@@ -23,6 +23,8 @@ public class Game1View extends GameView {
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;
 	
+	private boolean roomChangeEvent = false;
+	
 	private BufferedImage heart;
 	private final int heartXloc = 40;
 	private final int heartYloc = 5;
@@ -110,6 +112,10 @@ public class Game1View extends GameView {
 	
 	public void setSpaceBar(boolean b) {
 		this.spaceBar = b;
+	}
+	
+	public void setRoomChangeEvent(boolean b) {
+		this.roomChangeEvent = b;
 	}
 	
 	public void paint(Graphics g) {
@@ -200,7 +206,7 @@ public class Game1View extends GameView {
 		String[] debugMessages = {"Stat bool (X): " + this.viewStationaryX, "Left bool: " + this.viewMovingLeft, "Right bool: " + this.viewMovingRight,
 				"Stat bool (Y): " + this.viewStationaryY, "Up bool: " + this.viewMovingUp, "Down bool: " + this.viewMovingDown, "Y Thresh (U): " + this.thresholdYU,
 				"Y Thresh (D): " + this.thresholdYD, "X Thresh (R): " + this.thresholdXR, "X Thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
-				"Player offset Y: " + this.playerOffsetY, "Current room:" + this.currRoom.getName()};
+				"Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getName()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
@@ -229,6 +235,11 @@ public class Game1View extends GameView {
 		this.player = game.getPlayer();
 		this.currRoom = game.getCurrRoom();
 		this.lastYloc = this.player.getYloc();
+		this.environment = game.getEnvironment();
+	}
+	
+	public void updateView(Game1 game) {
+		this.currRoom = game.getCurrRoom();
 		this.environment = game.getEnvironment();
 	}
 	

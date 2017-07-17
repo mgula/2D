@@ -142,18 +142,18 @@ public class Player implements Game1Model {
 		this.currYSegment++;
 	}
 	
-	public void moveRight(Room r, ArrayList<Game1Model> e) {
+	public void moveRight(int upperXBound, ArrayList<Game1Model> e) {
 		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (this.currXSegment < this.xIncr) {
-			this.checkRightEdgeCollisions(r, e);
+			this.checkRightEdgeCollisions(upperXBound, e);
 			this.incrX();
 		}
 		this.currXSegment = 0;
 	}
 	
-	public void moveLeft(ArrayList<Game1Model> e) {
+	public void moveLeft(int lowerXBound, ArrayList<Game1Model> e) {
 		while (this.currXSegment < this.xIncr) {
-			this.checkLeftEdgeCollisions(e);
+			this.checkLeftEdgeCollisions(lowerXBound, e);
 			this.decrX();
 		}
 		this.currXSegment = 0;
@@ -191,13 +191,13 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void assertGravity(Room r, ArrayList<Game1Model> e) {
+	public void assertGravity(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e) {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 			if (this.floatingCounter < this.floatingThreshold) {
 				this.floatingCounter++;
 			} else {
 				while (this.currYSegment < this.yIncr) {
-					this.checkMovingSurfaces(r, e, true);
+					this.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 					this.decrY();
 				}
 				this.currYSegment = 0;
@@ -234,10 +234,10 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkMovingSurfaces(Room r, ArrayList<Game1Model> e, boolean calledByInteractable) {
+	public void checkMovingSurfaces(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e, boolean calledByInteractable) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
-		this.checkLeftEdgeCollisions(e);
-		this.checkRightEdgeCollisions(r, e);
+		this.checkLeftEdgeCollisions(lowerXBound, e);
+		this.checkRightEdgeCollisions(upperXBound, e);
 		this.checkBottomEdgeCollisions(r, e);
 		this.checkTopEdgeCollisions(r, e);
 		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
@@ -357,10 +357,10 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkRightEdgeCollisions(Room r, ArrayList<Game1Model> e) {
+	public void checkRightEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (this.xloc >= r.getWidth()) {
+		if (this.xloc >= mapBound) {
 			this.againstSurfaceRight = true;
 			newCollision = true;
 		}
@@ -392,10 +392,10 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkLeftEdgeCollisions(ArrayList<Game1Model> e) {
+	public void checkLeftEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (this.xloc <= 0) {
+		if (this.xloc <= mapBound) {
 			this.againstSurfaceLeft = true;
 			newCollision = true;
 		}
@@ -480,7 +480,7 @@ public class Player implements Game1Model {
 		return false;
 	}
 	
-	public void evaluateAreaCollisions(Room r, ArrayList<Game1Model> e) {
+	public void evaluateAreaCollisions(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e) {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
@@ -511,14 +511,14 @@ public class Player implements Game1Model {
 		if (this.currentCollision) {
 			switch (this.dirOfCurrent) {
 				case EAST:
-					this.checkRightEdgeCollisions(r, e);
+					this.checkRightEdgeCollisions(upperXBound, e);
 					if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
 						this.xloc += this.incrFromCurrent;
 					}
 					break;
 					
 				case WEST:
-					this.checkLeftEdgeCollisions(e);
+					this.checkLeftEdgeCollisions(lowerXBound, e);
 					if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
 						this.xloc -= this.incrFromCurrent;
 					}

@@ -1,7 +1,7 @@
 package controller;
 
 import enums.AppState;
-
+import enums.Direction;
 import enums.GameState;
 import games.*;
 import views.*;
@@ -268,7 +268,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		switch (this.game1.getLastState()) {
 			case UNINITIALIZED:
 				this.game1.setGameState(GameState.PLAY);
-				this.game1.initRooms();
+				this.game1.makeBaseRoom();
 				break;
 			
 			case PAUSE:
@@ -279,7 +279,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				break;
 		}
 		this.game1.setLastState(GameState.LOAD);
-		this.game1.initPlayer();
 		this.game1View.load(this.game1);
 		this.addViewToFrame(this.game1View);
 	}
@@ -333,9 +332,17 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				this.game1.checkAreaCollisions();
 				if (this.rightPressed) {
 					this.game1.moveRight();
+					if (this.game1.getRoomChangeEvent()) {
+						this.game1.changeRoom(Direction.EAST);
+						this.game1View.updateView(this.game1);
+					}
 				}
 				if (this.leftPressed) {
 					this.game1.moveLeft();
+					if (this.game1.getRoomChangeEvent()) {
+						this.game1.changeRoom(Direction.WEST);
+						this.game1View.updateView(this.game1);
+					}
 				}
 				if (this.spacePressed) {
 					this.game1.setJumping(true);
