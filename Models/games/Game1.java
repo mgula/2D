@@ -18,22 +18,39 @@ public class Game1 implements Game {
 	private boolean jumping = false;
 	private boolean firstTime = true;
 	private Room currRoom;
-	private Room baseRoom1;
+	private String currRoomID = "base";
+	private String[] roomIDs = {"base", "east", "west"};
 	private ArrayList<Game1Model> currEnvironment;
 	
-	public Game1() {
-		ArrayList<Game1Model> baseRoom1Env = new ArrayList<Game1Model>();
-		baseRoom1Env.add(new Rock(500, 500, 70, 70));
-		baseRoom1Env.add(new Rock(1500, 500, 70, 70));
-		baseRoom1Env.add(new Interactable(1100, 400, 50, 50, Direction.WEST, 1000, 5));
-		
-		this.baseRoom1 = new Room(2000, 2000, 578, baseRoom1Env);
+	public void makeCurrRoom() {
+		ArrayList<Game1Model> env = new ArrayList<Game1Model>();
+		switch (this.currRoomID) {
+			case "base":
+				env.add(new Rock(500, 500, 70, 70));
+				env.add(new Rock(500, 1500, 70, 70));
+				env.add(new Rock(500, 500, 70, 70));
+				
+				env.add(new Interactable(800, 400, 50, 50, Direction.WEST, 1000, 5));
+				this.currRoom = new Room(this.currRoomID, 2000, 2000, 578, env);
+				break;
+				
+			case "east":
+				env.add(new Rock(300, 500, 70, 70));
+				this.currRoom = new Room(this.currRoomID, 1000, 1000, 578, env);
+				break;
+				
+			case "west":
+				env.add(new Rock(400, 500, 70, 70));
+				this.currRoom = new Room(this.currRoomID, 1000, 1000, 578, env);
+				break;
+				
+			default:
+				break;
+		}
 	}
 	
 	public void initRooms() {
-		this.currRoom = this.baseRoom1;
-		
-		
+		this.makeCurrRoom();
 		
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
@@ -42,29 +59,50 @@ public class Game1 implements Game {
 		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
 	}
 	
-	public void passEnvironmentAndMapToPlayer() {
-		this.player.loadEnvironmentAndMap(this.currEnvironment, this.currRoom);
+	public void advanceToRoom(Direction d) {
+		switch (d) {
+			case EAST:
+				this.currRoomID = "east";
+				this.makeCurrRoom();
+				break;
+				
+			case WEST:
+				this.currRoomID = "west";
+				this.makeCurrRoom();
+				break;
+				
+			default:
+				break;
+		}
 	}
 	
 	public void moveRight() {
-		this.player.checkRightEdgeCollisions();
-		this.player.moveRight();
-		this.player.checkLeavingSurface();
+		this.player.checkRightEdgeCollisions(this.currRoom, this.currEnvironment);
+		this.player.moveRight(this.currRoom, this.currEnvironment);
+		this.player.checkLeavingSurface(this.currEnvironment);
+		/*Check if entering new room*/
+		if (this.player.getXloc() > this.currRoom.getWidth()) {
+			this.advanceToRoom(Direction.EAST);
+		}
 	}
 	
 	public void moveLeft() {
-		this.player.checkLeftEdgeCollisions();
-		this.player.moveLeft();
-		this.player.checkLeavingSurface();
+		this.player.checkLeftEdgeCollisions(this.currEnvironment);
+		this.player.moveLeft(this.currEnvironment);
+		this.player.checkLeavingSurface(this.currEnvironment);
+		/*Check if entering new room*/
+		if (this.player.getXloc() <= 0) {
+			this.advanceToRoom(Direction.WEST);
+		}
 	}
 	
 	public void assertGravity() {
-		this.player.checkBottomEdgeCollisions();
-		this.player.assertGravity();
+		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
+		this.player.assertGravity(this.currRoom, this.currEnvironment);
 	}
 	
 	public void checkMovingSurfaces() {
-		this.player.checkMovingSurfaces(false);
+		this.player.checkMovingSurfaces(this.currRoom, this.currEnvironment, false);
 	}
 	
 	public void moveAll() {
@@ -72,23 +110,23 @@ public class Game1 implements Game {
 			if (m instanceof game1Models.Enemy) {
 				((game1Models.Enemy) m).move();
 			} else if (m instanceof game1Models.Interactable) {
-				((game1Models.Interactable) m).move(this.player);
+				((game1Models.Interactable) m).move(this.currRoom, this.currEnvironment, this.player);
 			}
 		}
 	}
 	
 	public void evaluateJumping() {
 		if (this.jumping) {
-			this.player.checkTopEdgeCollisions();
-			if (this.player.initiateJumpArc()) {
+			this.player.checkTopEdgeCollisions(this.currRoom, this.currEnvironment);
+			if (this.player.initiateJumpArc(this.currRoom, this.currEnvironment)) {
 				this.jumping = false;
 			}
 		}
 	}
 	
 	public void checkAreaCollisions() {
-		this.player.checkAreaCollisions();
-		this.player.evaluateAreaCollisions();
+		this.player.checkAreaCollisions(this.currEnvironment);
+		this.player.evaluateAreaCollisions(this.currRoom, this.currEnvironment);
 	}
 	
 	public void gameStateCheck() {
@@ -123,7 +161,7 @@ public class Game1 implements Game {
 		return this.player;
 	}
 	
-	public Room getMap() {
+	public Room getCurrRoom() {
 		return this.currRoom;
 	}
 	

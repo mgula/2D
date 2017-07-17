@@ -6,8 +6,6 @@ import enums.Direction;
 
 public class Player implements Game1Model {
 
-	private ArrayList<Game1Model> environment;
-	private Room map;
 	private int xloc;
 	private int yloc;
 	private final int width;
@@ -111,10 +109,10 @@ public class Player implements Game1Model {
 		return this.onSurfaceBottom || this.onMovingSurfaceBottom;
 	}
 	
-	public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Room m) {
+	/*public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Room m) {
 		this.environment = e;
-		this.map = m;
-	}
+		this.currRoom = m;
+	}*/
 	
 	public void incrX() {
 		if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
@@ -144,31 +142,31 @@ public class Player implements Game1Model {
 		this.currYSegment++;
 	}
 	
-	public void moveRight() {
+	public void moveRight(Room r, ArrayList<Game1Model> e) {
 		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (this.currXSegment < this.xIncr) {
-			this.checkRightEdgeCollisions();
+			this.checkRightEdgeCollisions(r, e);
 			this.incrX();
 		}
 		this.currXSegment = 0;
 	}
 	
-	public void moveLeft() {
+	public void moveLeft(ArrayList<Game1Model> e) {
 		while (this.currXSegment < this.xIncr) {
-			this.checkLeftEdgeCollisions();
+			this.checkLeftEdgeCollisions(e);
 			this.decrX();
 		}
 		this.currXSegment = 0;
 	}
 	
-	public void raiseY() {
+	public void raiseY(Room r, ArrayList<Game1Model> e) {
 		if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
 			this.onSurfaceBottom = false;
 			this.onMovingSurfaceBottom = false;
 			this.againstMovingSurfaceBottom = false;
 			this.floatingCounter = 0;
 			while (this.currYSegment < this.yIncr) {
-				this.checkTopEdgeCollisions();
+				this.checkTopEdgeCollisions(r, e);
 				this.incrY();
 			}
 			this.currYSegment = 0;
@@ -177,10 +175,10 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public boolean initiateJumpArc() {
+	public boolean initiateJumpArc(Room r, ArrayList<Game1Model> e) {
 		if (this.jumpCount < this.maxJumps) {
 			if (this.jumpingCounter < this.jumpDuration) {
-				this.raiseY();
+				this.raiseY(r, e);
 				this.jumpingCounter++;
 				return false;
 			} else {
@@ -193,13 +191,13 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void assertGravity() {
+	public void assertGravity(Room r, ArrayList<Game1Model> e) {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 			if (this.floatingCounter < this.floatingThreshold) {
 				this.floatingCounter++;
 			} else {
 				while (this.currYSegment < this.yIncr) {
-					this.checkMovingSurfaces(true);
+					this.checkMovingSurfaces(r, e, true);
 					this.decrY();
 				}
 				this.currYSegment = 0;
@@ -207,12 +205,12 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkLeavingSurface() {
+	public void checkLeavingSurface(ArrayList<Game1Model> e) {
 		if (this.onSurfaceBottom || this.onMovingSurfaceBottom) {
 			boolean contact = false;
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
-			for (Game1Model m : this.environment) {
+			for (Game1Model m : e) {
 				if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Sand) {
 					if (this.checkBottomSurface(m)) {
 						contact = true;
@@ -236,12 +234,12 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkMovingSurfaces(boolean calledByInteractable) {
+	public void checkMovingSurfaces(Room r, ArrayList<Game1Model> e, boolean calledByInteractable) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
-		this.checkLeftEdgeCollisions();
-		this.checkRightEdgeCollisions();
-		this.checkBottomEdgeCollisions();
-		this.checkTopEdgeCollisions();
+		this.checkLeftEdgeCollisions(e);
+		this.checkRightEdgeCollisions(r, e);
+		this.checkBottomEdgeCollisions(r, e);
+		this.checkTopEdgeCollisions(r, e);
 		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
 		 *the same while loop scheme to move (move a pixel and then check for collisions).*/
 		if (this.againstMovingSurfaceLeft && this.inContactWith.getDirection() == Direction.EAST) {
@@ -285,15 +283,15 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkBottomEdgeCollisions() {
+	public void checkBottomEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (this.yloc >= this.map.getGroundLevel()) {
+		if (this.yloc >= r.getGroundLevel()) {
 			this.jumpingCounter = 0;
 			this.jumpCount = 0;
 			this.onSurfaceBottom = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : this.environment) {
+		for (Game1Model m : e) {
 			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				if (this.checkBottomSurface(m)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
@@ -322,16 +320,16 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkTopEdgeCollisions() {
+	public void checkTopEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
 		 *to map.getGroundLevel() - map.getHeight(), since y = 0 is the top of the screen.*/
-		if (this.yloc <= this.map.getGroundLevel() - this.map.getHeight()) {
+		if (this.yloc <= r.getGroundLevel() - r.getHeight()) {
 			this.againstSurfaceTop = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : this.environment) {
+		for (Game1Model m : e) {
 			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
@@ -359,15 +357,15 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkRightEdgeCollisions() {
+	public void checkRightEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (this.xloc >= this.map.getWidth()) {
+		if (this.xloc >= r.getWidth()) {
 			this.againstSurfaceRight = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : this.environment) {
+		for (Game1Model m : e) {
 			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
@@ -394,7 +392,7 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkLeftEdgeCollisions() {
+	public void checkLeftEdgeCollisions(ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
 		if (this.xloc <= 0) {
@@ -402,7 +400,7 @@ public class Player implements Game1Model {
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : this.environment) {
+		for (Game1Model m : e) {
 			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
 				int x = m.getXloc();
 				int y = m.getYloc();
@@ -430,9 +428,9 @@ public class Player implements Game1Model {
 		}
 	}
 	
-	public void checkAreaCollisions() {
+	public void checkAreaCollisions(ArrayList<Game1Model> e) {
 		this.currentCollision = false; // innocent until proven guilty policy
-		for (Game1Model m : this.environment) {
+		for (Game1Model m : e) {
 			if (m instanceof game1Models.Enemy || m instanceof game1Models.RegenArea || m instanceof game1Models.Current) {
 				int x = m.getXloc();
 				int y = m.getYloc();
@@ -482,7 +480,7 @@ public class Player implements Game1Model {
 		return false;
 	}
 	
-	public void evaluateAreaCollisions() {
+	public void evaluateAreaCollisions(Room r, ArrayList<Game1Model> e) {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
@@ -513,28 +511,28 @@ public class Player implements Game1Model {
 		if (this.currentCollision) {
 			switch (this.dirOfCurrent) {
 				case EAST:
-					this.checkRightEdgeCollisions();
+					this.checkRightEdgeCollisions(r, e);
 					if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
 						this.xloc += this.incrFromCurrent;
 					}
 					break;
 					
 				case WEST:
-					this.checkLeftEdgeCollisions();
+					this.checkLeftEdgeCollisions(e);
 					if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
 						this.xloc -= this.incrFromCurrent;
 					}
 					break;
 					
 				case NORTH:
-					this.checkTopEdgeCollisions();
+					this.checkTopEdgeCollisions(r, e);
 					if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
 						this.yloc -= this.incrFromCurrent;
 					}
 					break;
 					
 				case SOUTH:
-					this.checkBottomEdgeCollisions();
+					this.checkBottomEdgeCollisions(r, e);
 					if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 						this.yloc += this.incrFromCurrent;
 					}

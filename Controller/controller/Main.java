@@ -280,7 +280,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 		this.game1.setLastState(GameState.LOAD);
 		this.game1.initPlayer();
-		this.game1.passEnvironmentAndMapToPlayer();
 		this.game1View.load(this.game1);
 		this.addViewToFrame(this.game1View);
 	}

@@ -1,5 +1,7 @@
 package game1Models;
 
+import java.util.ArrayList;
+
 import enums.Direction;
 
 public class Interactable implements Game1Model {
@@ -60,13 +62,13 @@ public class Interactable implements Game1Model {
 		return this.incr;
 	}
 	
-	public void move(Player c) {
+	public void move(Room r, ArrayList<Game1Model> e, Player c) {
 		switch (this.currDir) {
 			case EAST:
 				while (this.currSegment < this.incr) {
 					this.xloc++;
 					this.currSegment++;
-					c.checkMovingSurfaces(true);
+					c.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.xloc >= this.moveThreshR) {
@@ -79,7 +81,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.xloc--;
 					this.currSegment++;
-					c.checkMovingSurfaces(true);
+					c.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.xloc <= this.moveThreshL) {
@@ -92,7 +94,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.yloc--;
 					this.currSegment++;
-					c.checkMovingSurfaces(true);
+					c.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.yloc <= this.moveThreshU) {
@@ -105,7 +107,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.yloc++;
 					this.currSegment++;
-					c.checkMovingSurfaces(true);
+					c.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.yloc >= this.moveThreshD) {
