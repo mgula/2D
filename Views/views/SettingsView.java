@@ -68,7 +68,7 @@ public class SettingsView extends MainView {
 		this.debugToggleOn = new JRadioButton("On");
 		this.debugToggleOn.setBounds(this.getButtonXloc() -5, this.YLOC + (this.Y_OFFSET * 2) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
 		this.debugToggleOff = new JRadioButton("Off");
-		this.debugToggleOff.setSelected(true);
+		this.debugToggleOn.setSelected(true); //default to debug mode on
 		this.debugToggleOff.setBounds(this.getButtonXloc() + 40, this.YLOC + (this.Y_OFFSET * 2) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
 		this.debugToggle.add(this.debugToggleOn);
 		this.debugToggle.add(this.debugToggleOff);

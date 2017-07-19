@@ -20,6 +20,7 @@ public class Game1View extends GameView {
 	private JButton playAgainButton;
 	
 	private Player player;
+	private AreaMap currMap;
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;
 	
@@ -53,9 +54,6 @@ public class Game1View extends GameView {
 	private int thresholdYD; // signal for the screen to start moving down
 	private int playerOffsetX; // x offset that drawscreen() will use to draw the player and evironment
 	private int playerOffsetY; // y offset that drawscreen() will use to draw the player and environment
-	private final int laterStageXR = 550;
-	private final int laterStageYU = 200;
-	private final int laterStageOffsetX = -365;
 	private boolean viewStationaryX = true; // flag that is true if the screen is not moving left or right
 	private boolean viewStationaryY = true; // flag that is true if the screen is not moving up or down
 	private boolean viewMovingRight = false; // flag that is true only if the screen is moving right
@@ -65,8 +63,8 @@ public class Game1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 1120, 1120, 10, 10, 350, 350, 550};
-	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 690, 705, 690, 705, 690, 705, 705};
+	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 1120, 1120, 10, 10, 350, 350, 550, 10, 10, 10, 10};
+	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 690, 705, 690, 705, 690, 705, 705, 185, 200, 215, 230};
 	
 	public Game1View(int w, int h) {
 		super(w, h);
@@ -78,6 +76,12 @@ public class Game1View extends GameView {
 		this.thresholdYU = this.initialThresholdYU;
 		this.initialThresholdYD = (int)((double)h * this.upperRatio);
 		this.thresholdYD = this.initialThresholdYD;
+		
+		/*???*/
+		this.thresholdYU = -343;
+		this.thresholdYD = 0;
+		this.playerOffsetY = -571;
+		
 		this.staticScreenAreaX = this.initialThresholdXR - this.initialThresholdXL;
 		this.staticScreenAreaY = this.initialThresholdYD - this.initialThresholdYU;
 	}
@@ -127,13 +131,10 @@ public class Game1View extends GameView {
 	
 	public void drawScreen(Graphics g) {
 		this.updateOffsets();
-		/*Draw the ground - shouldn't be completely static (will fit to screen when y is increasing)*/
-		g.drawLine(0, this.currRoom.getGroundLevel() + this.player.getHeight() - this.playerOffsetY, this.currRoom.getWidth(), this.currRoom.getGroundLevel() + this.player.getHeight() - this.playerOffsetY);
-		/*for (int i = -this.extraSand; i < this.map.getWidth()/this.textureDimensions + this.extraSand; i++) {
-			for (int j = 0; j < this.sandLayers; j++) {
-				g.drawImage(this.sand, (i*this.textureDimensions)  - this.playerOffsetX, (j*this.textureDimensions) + (this.map.getGroundLevel() + this.drawPlayer.getHeight() - this.playerOffsetY), null, this);
-			}
-		}*/
+		
+		/*Draw the current room*/
+		g.drawRect(this.currRoom.getXLoc() - this.playerOffsetX, this.currRoom.getYLoc() + this.player.getHeight() - this.playerOffsetY - this.currRoom.getHeight(), this.currRoom.getWidth() + this.player.getWidth(), this.currRoom.getHeight());
+		
 		this.drawEnvironment(g);
 		this.drawPlayer(g);
 		/*Draw HUD components: start with life*/
@@ -198,7 +199,7 @@ public class Game1View extends GameView {
 		/*Player info*/
 		g.setFont(new JLabel().getFont());
 		g.setColor(Color.BLACK);
-		g.drawRect(this.player.getXloc() - this.playerOffsetX, this.player.getYloc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight()); //hitbox
+		//g.drawRect(this.player.getXloc() - this.playerOffsetX, this.player.getYloc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight()); //hitbox
 		String message = "X: " + this.player.getXloc() + ", Y: " + this.player.getYloc();
 		g.drawString(message, this.player.getXloc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYloc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
 		message = "damaged: " + this.player.getEnemyCollision();
@@ -206,7 +207,8 @@ public class Game1View extends GameView {
 		String[] debugMessages = {"Stat bool (X): " + this.viewStationaryX, "Left bool: " + this.viewMovingLeft, "Right bool: " + this.viewMovingRight,
 				"Stat bool (Y): " + this.viewStationaryY, "Up bool: " + this.viewMovingUp, "Down bool: " + this.viewMovingDown, "Y Thresh (U): " + this.thresholdYU,
 				"Y Thresh (D): " + this.thresholdYD, "X Thresh (R): " + this.thresholdXR, "X Thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
-				"Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getName()};
+				"Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getName(), "Initial X Threshold (R): " + this.initialThresholdXR,
+				"Initial X Threshold (L): " + this.initialThresholdXL, "Initial Y Threshold (U): " + this.initialThresholdYU, "Initial Y Threshold (D): " + this.initialThresholdYD};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
@@ -229,18 +231,21 @@ public class Game1View extends GameView {
 	}
 	
 	public void load(Game1 game) {
-		this.restoreInitialOffsets(); //fix later
 		this.playerDrawable = true;
 		this.flash = 0;
 		this.player = game.getPlayer();
+		this.currMap = game.getCurrMap();
 		this.currRoom = game.getCurrRoom();
 		this.lastYloc = this.player.getYloc();
 		this.environment = game.getEnvironment();
+		
+		this.updateOffsets();
 	}
 	
 	public void updateView(Game1 game) {
 		this.currRoom = game.getCurrRoom();
 		this.environment = game.getEnvironment();
+		this.lastYloc = this.player.getYloc();
 	}
 	
 	public void restoreInitialOffsets() {
@@ -255,15 +260,6 @@ public class Game1View extends GameView {
 		/*Reset flash effect variables*/
 		this.flash = 0;
 		this.playerDrawable = true;
-	}
-	
-	public void loadLaterStageOffsets() {
-		this.thresholdXR = this.laterStageXR;
-		this.thresholdXL = 0;
-		this.thresholdYU = this.laterStageYU;
-		
-		this.playerOffsetX = this.laterStageOffsetX;
-		this.playerOffsetY = 0;
 	}
 	
 	@Override

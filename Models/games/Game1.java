@@ -11,24 +11,27 @@ public class Game1 implements Game {
 	private GameState gameState = GameState.UNINITIALIZED;
 	private GameState lastState = GameState.UNINITIALIZED;
 	private Player player;
-	private int playerStartingXloc = 1000; 
-	private int playerStartingYloc = 500;
+	private int playerStartingXloc = 2000; 
+	private int playerStartingYloc = -100;
 	private int playerHeight = 40;
-	private int playerWidth = 50;
-	private int groundLevel = 578;
+	private int playerWidth = 40;
+	private int groundLevel = 0;
 	private boolean jumping = false;
-	private boolean firstTime = true;
 	private boolean roomChangeEvent = false;
-	private Map map1;
+	
+	private AreaMap map1;
+	private String[] map1RoomIDs = {"base", "east", "west"};
+	private int[][] roomData;
+	
 	private Room currRoom;
 	private String currRoomID = "base";
 	private String lastRoomID = "base";
-	private String[] roomIDs = {"base", "east", "west"};
 	private ArrayList<Game1Model> currEnvironment;
 	
 	public Game1() {
-		this.map1 = new Map(3000, -1000, 1000, 0);
 		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
+		
+		this.map1 = new AreaMap(4000, 2000, this.map1RoomIDs, "base", this.map1RoomIDs.length);
 		this.makeCurrRoom();
 	}
 	
@@ -36,35 +39,41 @@ public class Game1 implements Game {
 		ArrayList<Game1Model> env = new ArrayList<Game1Model>();
 		int roomHeight = 0;
 		int roomWidth = 0;
+		int roomX = 0;
+		int roomY = this.groundLevel;
 		switch (this.currRoomID) {
 			case "base":
-				env.add(new Rock(500, 500, 70, 70));
-				env.add(new Rock(1500, 500, 70, 70));
+				env.add(new Rock(1500, -100, 70, 70));
+				env.add(new Rock(1600, -200, 30, 70));
+				env.add(new Rock(2500, -100, 70, 70));
 				
-				env.add(new Interactable(800, 400, 50, 50, Direction.WEST, 1000, 5));
+				env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 				
+				roomX = 1000;
 				roomHeight = 2000;
 				roomWidth = 2000;
 				break;
 				
 			case "east":
-				env.add(new Rock(2500, 500, 70, 70));
+				env.add(new Rock(3500, -100, 70, 70));
 				
-				roomHeight = 1000;
+				roomX = 3000;
+				roomHeight = 2000;
 				roomWidth = 1000;
 				break;
 				
 			case "west":
-				env.add(new Rock(-500, 500, 70, 70));
+				env.add(new Rock(500, -100, 70, 70));
 				
-				roomHeight = 1000;
+				roomX = 0;
+				roomHeight = 2000;
 				roomWidth = 1000;
 				break;
 				
 			default:
 				break;
 		}
-		this.currRoom = new Room(this.currRoomID, roomHeight, roomWidth, this.groundLevel, env);
+		this.currRoom = new Room(this.currRoomID, roomX, roomY, roomHeight, roomWidth, env);
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
 	
@@ -118,13 +127,13 @@ public class Game1 implements Game {
 		if (curr == last) {
 			return;
 		} else {
-			if (last >= 0 && last <= 2000) {
-				if (curr < 0 || curr > 2000) {
+			if (last <= 1000 && curr > 1000) {
+				this.roomChangeEvent = true;
+			} else if (last > 1000 && last <= 3000) {
+				if (curr < 1000 || curr > 3000) {
 					this.roomChangeEvent = true;
 				}
-			} else if (last < 0 && curr >= 0) {
-				this.roomChangeEvent = true;
-			} else if (last > 2000 && curr <= 2000) {
+			} else if (last > 3000 && curr <= 3000) {
 				this.roomChangeEvent = true;
 			}
 		}
@@ -133,8 +142,8 @@ public class Game1 implements Game {
 	public void moveRight() {
 		int lastX = this.player.getXloc();
 		
-		this.player.checkRightEdgeCollisions(this.map1.getUpperXBound(), this.currEnvironment);
-		this.player.moveRight(this.map1.getUpperXBound(), this.currEnvironment);
+		this.player.checkRightEdgeCollisions(this.map1.getWidth(), this.currEnvironment);
+		this.player.moveRight(this.map1.getWidth(), this.currEnvironment);
 		this.player.checkLeavingSurface(this.currEnvironment);
 		
 		this.checkRoomBoundaries(this.player.getXloc(), lastX);
@@ -143,8 +152,8 @@ public class Game1 implements Game {
 	public void moveLeft() {
 		int lastX = this.player.getXloc();
 		
-		this.player.checkLeftEdgeCollisions(this.map1.getLowerXBound(), this.currEnvironment);
-		this.player.moveLeft(this.map1.getLowerXBound(), this.currEnvironment);
+		this.player.checkLeftEdgeCollisions(0, this.currEnvironment);
+		this.player.moveLeft(0, this.currEnvironment);
 		this.player.checkLeavingSurface(this.currEnvironment);
 		
 		this.checkRoomBoundaries(this.player.getXloc(), lastX);
@@ -152,11 +161,11 @@ public class Game1 implements Game {
 	
 	public void assertGravity() {
 		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.assertGravity(this.map1.getUpperXBound(), this.map1.getLowerXBound(), this.currRoom, this.currEnvironment);
+		this.player.assertGravity(this.map1.getWidth(), 0, this.currRoom, this.currEnvironment);
 	}
 	
 	public void checkMovingSurfaces() {
-		this.player.checkMovingSurfaces(this.map1.getUpperXBound(), this.map1.getLowerXBound(), this.currRoom, this.currEnvironment, false);
+		this.player.checkMovingSurfaces(this.map1.getWidth(), 0, this.currRoom, this.currEnvironment, false);
 	}
 	
 	public void moveAll() {
@@ -164,7 +173,7 @@ public class Game1 implements Game {
 			if (m instanceof game1Models.Enemy) {
 				((game1Models.Enemy) m).move();
 			} else if (m instanceof game1Models.Interactable) {
-				((game1Models.Interactable) m).move(this.map1.getUpperXBound(), this.map1.getLowerXBound(), this.currRoom, this.currEnvironment, this.player);
+				((game1Models.Interactable) m).move(this.map1.getWidth(), 0, this.currRoom, this.currEnvironment, this.player);
 			}
 		}
 	}
@@ -180,7 +189,7 @@ public class Game1 implements Game {
 	
 	public void checkAreaCollisions() {
 		this.player.checkAreaCollisions(this.currEnvironment);
-		this.player.evaluateAreaCollisions(this.map1.getUpperXBound(), this.map1.getLowerXBound(), this.currRoom, this.currEnvironment);
+		this.player.evaluateAreaCollisions(this.map1.getWidth(), 0, this.currRoom, this.currEnvironment);
 	}
 	
 	public void gameStateCheck() {
@@ -191,10 +200,6 @@ public class Game1 implements Game {
 	}
 	
 	/*Setters*/
-	public void setFirstTime() {
-		this.firstTime = false;
-	}
-	
 	public void setGameState(GameState state) {
 		this.gameState = state;
 	}
@@ -207,10 +212,6 @@ public class Game1 implements Game {
 	}
 	
 	/*Getters*/
-	public boolean getFirstTime() {
-		return this.firstTime;
-	}
-	
 	public boolean getRoomChangeEvent() {
 		return this.roomChangeEvent;
 	}
@@ -221,6 +222,10 @@ public class Game1 implements Game {
 	
 	public Room getCurrRoom() {
 		return this.currRoom;
+	}
+	
+	public AreaMap getCurrMap() {
+		return this.map1;
 	}
 	
 	public String getCurrRoomID() {

@@ -5,37 +5,48 @@ import java.util.ArrayList;
 public class Room {
 
 	private String ID;
+	private int xLoc; //x coord of the SOUTH WEST most corner of the room
+	private int yLoc; //y coord of the SOUTH WEST most corner of the room
 	private int height;
 	private int width;
-	private int groundLevel;
 	private ArrayList<Game1Model> environment;
-	private boolean hasRoomLeft;
-	private boolean hasRoomRight;
-	private boolean hasRoomUp;
-	private boolean hasRoomDown;
+	private String roomWestID;
+	private String roomEastID;
+	private String roomNorthID;
+	private String roomSouthID;
 	
-	public Room(String n, int h, int w, int g, ArrayList<Game1Model> e) {
+	public Room(String n, int x, int y, int h, int w, ArrayList<Game1Model> e) {
 		this.ID = n;
+		this.xLoc = x;
+		this.yLoc = y;
 		this.height = h;
 		this.width = w;
-		this.groundLevel = g;
 		this.environment = e;
 	}
 	
-	public Room(String n, int h, int w, int g, ArrayList<Game1Model> e, boolean l, boolean r, boolean u, boolean d) {
+	public Room(String n, int x, int y, int h, int w, int g, ArrayList<Game1Model> e, String west, String east, String north, String south) {
 		this.ID = n;
+		this.xLoc = x;
+		this.yLoc = y;
 		this.height = h;
 		this.width = w;
-		this.groundLevel = g;
 		this.environment = e;
-		this.hasRoomLeft = l;
-		this.hasRoomRight = r;
-		this.hasRoomUp = u;
-		this.hasRoomDown = d;
+		this.roomWestID = west;
+		this.roomEastID = east;
+		this.roomNorthID = north;
+		this.roomSouthID = south;
 	}
 	
 	public String getName() {
 		return this.ID;
+	}
+	
+	public int getXLoc() {
+		return this.xLoc;
+	}
+	
+	public int getYLoc() {
+		return this.yLoc;
 	}
 	
 	public int getHeight() {
@@ -46,27 +57,23 @@ public class Room {
 		return this.width;
 	}
 	
-	public int getGroundLevel() {
-		return this.groundLevel;
-	}
-	
 	public ArrayList<Game1Model> getEnvironment() {
 		return this.environment;
 	}
 	
-	public boolean hasRoomLeft() {
-		return this.hasRoomLeft;
+	public String getRoomWest() {
+		return this.roomWestID;
 	}
 	
-	public boolean hasRoomRight() {
-		return this.hasRoomRight;
+	public String getRoomEast() {
+		return this.roomEastID;
 	}
 	
-	public boolean hasRoomUp() {
-		return this.hasRoomUp;
+	public String getRoomNorth() {
+		return this.roomNorthID;
 	}
 	
-	public boolean hasRoomDown() {
-		return this.hasRoomDown;
+	public String getRoomSouth() {
+		return this.roomSouthID;
 	}
 }

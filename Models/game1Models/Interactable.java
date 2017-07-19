@@ -62,13 +62,13 @@ public class Interactable implements Game1Model {
 		return this.incr;
 	}
 	
-	public void move(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e, Player c) {
+	public void move(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e, Player p) {
 		switch (this.currDir) {
 			case EAST:
 				while (this.currSegment < this.incr) {
 					this.xloc++;
 					this.currSegment++;
-					c.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.xloc >= this.moveThreshR) {
@@ -81,7 +81,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.xloc--;
 					this.currSegment++;
-					c.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.xloc <= this.moveThreshL) {
@@ -94,7 +94,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.yloc--;
 					this.currSegment++;
-					c.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.yloc <= this.moveThreshU) {
@@ -107,7 +107,7 @@ public class Interactable implements Game1Model {
 				while (this.currSegment < this.incr) {
 					this.yloc++;
 					this.currSegment++;
-					c.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.yloc >= this.moveThreshD) {

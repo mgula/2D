@@ -285,7 +285,7 @@ public class Player implements Game1Model {
 	
 	public void checkBottomEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (this.yloc >= r.getGroundLevel()) {
+		if (this.yloc >= r.getYLoc()) {
 			this.jumpingCounter = 0;
 			this.jumpCount = 0;
 			this.onSurfaceBottom = true;
@@ -324,7 +324,7 @@ public class Player implements Game1Model {
 		boolean newCollision = false;
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
 		 *to map.getGroundLevel() - map.getHeight(), since y = 0 is the top of the screen.*/
-		if (this.yloc <= r.getGroundLevel() - r.getHeight()) {
+		if (this.yloc <= r.getYLoc() - r.getHeight()) {
 			this.againstSurfaceTop = true;
 			newCollision = true;
 		}

@@ -28,11 +28,19 @@ import java.util.ArrayList;
  * -file system (no new game button, just save slots)
  * -migrate from hearts to health bar
  * -redo pause menu
+ * -room transitions
+ * -add WASD keys
+ * -platforms (no top edge collision detection, only bottom edge)
+ * -sound
+ * 
+ * BUGS
+ * -new game button (after 1st click)
+ * -interactables
  */
 
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private boolean play = true;
-	private Game1 game1 = new Game1();
+	private Game1 game1 = new Game1(); //avoid null pointer in updateViewStates()
 	private MainView mainView;
 	private SettingsView settingsView;
 	private Game1View game1View;
@@ -41,6 +49,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private AppState currentState = AppState.START;
 	private AppState intendedState = AppState.SATISFIED;
 	private JFrame frame = new JFrame();
+	private boolean firstPlay = true;
 	private boolean rightPressed = false;
 	private boolean leftPressed = false;
 	private boolean spacePressed = false;
@@ -92,6 +101,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		for (View v : this.allViews) {
 			v.initButtonLocations();
 			v.initButtons();
+			v.setDebugMode(true); //default to debug mode on
 			if (v instanceof views.GameView) {
 				((views.GameView) v).loadImgs();
 			}
@@ -127,8 +137,8 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.betweenView.getNewGameButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.GAME1;
 				game1.setLastState(GameState.UNINITIALIZED);
+				intendedState = AppState.GAME1;
 			}
     	});
 		this.betweenView.getLoadButton().addActionListener(new ActionListener() {
@@ -220,6 +230,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			switch (this.intendedState) {
 				case GAME1:
 					this.loadGame1();
+					this.addViewToFrame(this.game1View);
 					break;
 					
 				case SELECT:
@@ -233,8 +244,8 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					
 				case INBETWEEN1:
 					this.frame.add(this.betweenView.getNewGameButton());
-					if (this.game1.getFirstTime()) {
-						this.game1.setFirstTime();
+					if (this.firstPlay) {
+						this.firstPlay = false;
 					} else {
 						this.frame.add(this.betweenView.getLoadButton());
 					}
@@ -267,6 +278,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.spacePressed = false;
 		switch (this.game1.getLastState()) {
 			case UNINITIALIZED:
+				this.game1 = new Game1();
 				this.game1.setGameState(GameState.PLAY);
 				this.game1.makeBaseRoom();
 				break;
@@ -280,7 +292,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		}
 		this.game1.setLastState(GameState.LOAD);
 		this.game1View.load(this.game1);
-		this.addViewToFrame(this.game1View);
 	}
 	
 	public void tick() {

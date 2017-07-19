@@ -142,10 +142,10 @@ public abstract class View extends JPanel {
 	
 	public void drawDebugOutput(Graphics g) {
 		g.setColor(Color.WHITE);
-		g.fillRect(875, 0, 500, 60);
+		g.fillRect(875, 0, 500, 40);
 		g.setColor(Color.BLACK);
-		g.drawString("curr app state: " + this.currentAppState, 1000, 10);
-		g.drawString("curr game 1 state: " + this.game1State + ", last state: " + this.lastGame1State, 890, 25);
+		g.drawString("curr app state: " + this.currentAppState, 1000, 15);
+		g.drawString("curr game 1 state: " + this.game1State + ", last state: " + this.lastGame1State, 890, 30);
 	}
 
 	public void updateStates(AppState curr, GameState g1, 
