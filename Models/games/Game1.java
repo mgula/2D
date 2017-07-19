@@ -36,11 +36,10 @@ public class Game1 implements Game {
 		
 		this.map1 = new AreaMap(4000, 2000, this.map1RoomIDs, "base", this.map1RoomIDs.length);
 		
-		int[] roomDims = new int[this.RoomDataArrayLength];
-		ArrayList<Game1Model> env = new ArrayList<Game1Model>();
-		String[] roomLinks = new String[this.RoomLinksArrayLength];
-		
 		for (int i = 0; i < this.map1.getRoomIDs().length; i++) {
+			int[] roomDims = new int[this.RoomDataArrayLength];
+			ArrayList<Game1Model> env = new ArrayList<Game1Model>();
+			String[] roomLinks = new String[this.RoomLinksArrayLength];
 			switch (this.map1.getRoomIDs()[i]) {
 				case "base":
 					roomDims[0] = 1000;
@@ -62,10 +61,11 @@ public class Game1 implements Game {
 				case "east":
 					roomDims[0] = 3000;
 					roomDims[1] = this.groundLevel;
-					roomDims[2] = 2000;
+					roomDims[2] = 500;
 					roomDims[3] = 1000;
 					
 					env.add(new Rock(3500, -100, 70, 70));
+					env.add(new Rock(3250, -250, 50, 50));
 					
 					roomLinks[0] = "base";
 					roomLinks[1] = null;
@@ -76,10 +76,11 @@ public class Game1 implements Game {
 				case "west":
 					roomDims[0] = 0;
 					roomDims[1] = this.groundLevel;
-					roomDims[2] = 2000;
+					roomDims[2] = 500;
 					roomDims[3] = 1000;
 					
 					env.add(new Rock(500, -100, 70, 70));
+					env.add(new Rock(750, -250, 50, 50));
 					
 					roomLinks[0] = null;
 					roomLinks[1] = "base";
@@ -93,10 +94,6 @@ public class Game1 implements Game {
 			this.map1.addRoomData(this.map1.getRoomIDs()[i], roomDims);
 			this.map1.addRoomEnv(this.map1.getRoomIDs()[i], env);
 			this.map1.addRoomLinks(this.map1.getRoomIDs()[i], roomLinks);
-			
-			roomDims = new int[this.RoomDataArrayLength];
-			env = new ArrayList<Game1Model>();
-			roomLinks = new String[this.RoomLinksArrayLength];
 		}
 	}
 	

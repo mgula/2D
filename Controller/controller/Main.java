@@ -29,13 +29,12 @@ import java.util.ArrayList;
  * -migrate from hearts to health bar
  * -redo pause menu
  * -room transitions
- * -add WASD keys
  * -platforms (no top edge collision detection, only bottom edge)
  * -sound
  * 
  * BUGS
  * -new game button (after 1st click)
- * -interactables
+ * -WASD keys
  */
 
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
@@ -482,7 +481,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	
 	public void bindKeysToViews() {
 		for (View v : this.allViews) {
-			/*Bind arrow key and space bar presses and releases for game 1 and game 1 tut view*/
 			if (v instanceof views.Game1View) {
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RightPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
