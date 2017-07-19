@@ -3,7 +3,6 @@ package game1Models;
 import java.util.ArrayList;
 
 public class Room {
-
 	private String ID;
 	private int xLoc; //x coord of the SOUTH WEST most corner of the room
 	private int yLoc; //y coord of the SOUTH WEST most corner of the room
@@ -24,7 +23,7 @@ public class Room {
 		this.environment = e;
 	}
 	
-	public Room(String n, int x, int y, int h, int w, int g, ArrayList<Game1Model> e, String west, String east, String north, String south) {
+	public Room(String n, int x, int y, int h, int w, ArrayList<Game1Model> e, String west, String east, String north, String south) {
 		this.ID = n;
 		this.xLoc = x;
 		this.yLoc = y;
@@ -37,7 +36,7 @@ public class Room {
 		this.roomSouthID = south;
 	}
 	
-	public String getName() {
+	public String getID() {
 		return this.ID;
 	}
 	
@@ -75,5 +74,25 @@ public class Room {
 	
 	public String getRoomSouth() {
 		return this.roomSouthID;
+	}
+	
+	@Override
+	public String toString() {
+		String info = "Room ID: " + this.ID +
+				"\nX Loc: " + this.xLoc + 
+				"\nY Loc: " + this.yLoc + 
+				"\nHeight: " + this.height +
+				"\nWidth: " + this.width +
+				"\nEnvironment Contents:\n";
+		
+		for (Game1Model m : this.environment) {
+			info += "\t" + m.toString() + "\n";
+		}
+		
+		info += "\nWest Room ID: " + this.roomWestID +
+				"\nEast Room ID: " + this.roomEastID +
+				"\nNorth Room ID: " + this.roomNorthID +
+				"\nSouth Room ID: " + this.roomSouthID;
+		return info;
 	}
 }

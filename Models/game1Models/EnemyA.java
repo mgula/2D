@@ -2,11 +2,8 @@ package game1Models;
 
 import enums.Direction;
 
+/*X loc must be within moveThreshL and moveThreshR!*/
 public class EnemyA extends Enemy {
-	private int xloc; // must be within moveThreshL and moveThreshR
-	private int yloc;
-	private int width;
-	private int height;
 	private final int xIncr;
 	private final int damage = 1;
 	private int moveThreshL;
@@ -14,34 +11,14 @@ public class EnemyA extends Enemy {
 	private Direction currDir;
 
 	public EnemyA(int x, int y, int h, int w, Direction d, int moveVariance, int xIncr) {
-		this.xloc = x;
-		this.yloc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 		this.currDir = d;
 		this.moveThreshL = x - moveVariance;
 		this.moveThreshR = x + moveVariance;
 		this.xIncr = xIncr;
-	}
-	
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
-	}
-
-	@Override
-	public int getHeight() {
-		return this.height;
-	}
-
-	@Override
-	public int getWidth() {
-		return this.width;
 	}
 	
 	public Direction getCurrDir() {
@@ -52,15 +29,15 @@ public class EnemyA extends Enemy {
 	public void move() {
 		switch (this.currDir) {
 			case EAST:
-				this.xloc += xIncr;
-				if (this.xloc >= this.moveThreshR) {
+				this.setXLoc(this.getXLoc() + this.xIncr);
+				if (this.getXLoc() >= this.moveThreshR) {
 					this.currDir = Direction.WEST;
 				}
 				break;
 				
 			case WEST:
-				this.xloc -= xIncr;
-				if (this.xloc <= this.moveThreshL) {
+				this.setXLoc(this.getXLoc() - this.xIncr);
+				if (this.getXLoc() <= this.moveThreshL) {
 					this.currDir = Direction.EAST;
 				}
 				break;
@@ -73,5 +50,14 @@ public class EnemyA extends Enemy {
 	@Override
 	public int getDamage() {
 		return this.damage;
+	}
+	
+	@Override
+	public String toString() {
+		String info = this.getInfo() + 
+				"\nX Increase: " + this.xIncr +
+				"\nDamage: " + this.damage +
+				"\nCurrent Direction: " + this.currDir;
+		return info;
 	}
 }

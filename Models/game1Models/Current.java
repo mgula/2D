@@ -2,41 +2,17 @@ package game1Models;
 
 import enums.Direction;
 
-public class Current implements Game1Model {
-	private final int xloc; 
-	private final int yloc;
-	private int height;
-	private int width;
+public class Current extends Game1Model {
 	private Direction flowDir;
 	private int incr;
 	
 	public Current(int x, int y, int h, int w, Direction d, int incr) {
-		this.xloc = x;
-		this.yloc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 		this.flowDir = d;
 		this.incr = incr;
-	}
-	
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
-	}
-	
-	@Override
-	public int getHeight() {
-		return this.height;
-	}
-	
-	@Override
-	public int getWidth() {
-		return this.width;
 	}
 	
 	public int getIncr() {
@@ -52,5 +28,13 @@ public class Current implements Game1Model {
 	}
 	public void setFlowDirection(Direction d) {
 		this.flowDir = d;
+	}
+	
+	@Override
+	public String toString() {
+		String info = this.getInfo() + 
+				"\nFlow Direction: " + this.flowDir +
+				"\nFlow Increase: " + this.incr;
+		return info;
 	}
 }

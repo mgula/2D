@@ -1,10 +1,10 @@
 package game1Models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AreaMap {
-
 	private int width;
 	private int height;
 	
@@ -24,6 +24,10 @@ public class AreaMap {
 		this.roomIDs = rooms;
 		this.startRoomID = startingRoom;
 		this.numRooms = numRooms;
+		
+		this.roomData = new HashMap<String, int[]>();
+		this.roomEnvs = new HashMap<String, ArrayList<Game1Model>>();
+		this.roomLinks = new HashMap<String, String[]>();
 	}
 	
 	public int[] accessRoomData(String key) {
@@ -39,7 +43,7 @@ public class AreaMap {
 	}
 	
 	/* int[] roomDims data structure:
-	 * [x loc, y loc, height, widthl]
+	 * [x loc, y loc, height, width]
 	 */
 	public void addRoomData(String roomID, int[] roomDims) {
 		this.roomData.put(roomID, roomDims);
@@ -84,5 +88,35 @@ public class AreaMap {
 	
 	public int getNumRooms() {
 		return this.numRooms;
+	}
+	
+	public String getStartRoomID() {
+		return this.startRoomID;
+	}
+	
+	@Override
+	public String toString() {
+		String info = "";
+		
+		for (String s : this.roomIDs) {
+			info += "Room ID: " + s +
+					"\nRoom X Loc: " + this.accessRoomData(s)[0] +
+					"\nRoom Y Loc: " + this.accessRoomData(s)[1] + 
+					"\nRoom Height: " + this.accessRoomData(s)[2] +
+					"\nRoom Width: " + this.accessRoomData(s)[3] + 
+					"\nEnvironment Contents:\n";
+		
+			for (Game1Model m : this.accessRoomEnvs(s)) {
+				info += "\n\t" + m.toString() + "\n";
+			}
+			
+			info += "\nWest Room ID: " + this.accessRoomLinks(s)[0] +
+					"\nEast Room ID: " + this.accessRoomLinks(s)[1] +
+					"\nNorth Room ID: " + this.accessRoomLinks(s)[2] +
+					"\nSouth Room ID: " + this.accessRoomLinks(s)[3] +
+					"\n\n";
+		}
+		
+		return info;
 	}
 }

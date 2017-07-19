@@ -1,34 +1,28 @@
 package game1Models;
 
-public class Debris implements Game1Model {
-
-	private final int xloc;
-	private final int yloc;
-	private final int height = 30;
-	private final int width = 100;
+public class Debris extends Game1Model {
+	private final int debrisHeight = 30;
+	private final int debrisWidth = 100;
 	
 	public Debris(int x, int y) {
-		this.xloc = x;
-		this.yloc = y;
-	}
-	
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(this.debrisHeight);
+		this.setWidth(this.debrisWidth);
 	}
 	
 	@Override
 	public int getHeight() {
-		return this.height;
+		return this.debrisHeight;
 	}
 	
 	@Override
 	public int getWidth() {
-		return this.width;
+		return this.debrisWidth;
+	}
+	
+	@Override
+	public String toString() {
+		return this.getInfo();
 	}
 }

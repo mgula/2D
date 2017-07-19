@@ -1,23 +1,10 @@
 package game1Models;
 
-public class Marker implements Game1Model {
+public class Marker extends Game1Model {
 
-	private int xloc;
-	private int yloc;
-	
 	public Marker(int x, int y) {
-		this.xloc = x;
-		this.yloc = y;
-	}
-	
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
+		this.setXLoc(x);
+		this.setYLoc(y);
 	}
 
 	@Override
@@ -29,5 +16,9 @@ public class Marker implements Game1Model {
 	public int getWidth() {
 		return 0;
 	}
-
+	
+	@Override
+	public String toString() {
+		return this.getInfo();
+	}
 }

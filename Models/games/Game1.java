@@ -19,10 +19,13 @@ public class Game1 implements Game {
 	private boolean jumping = false;
 	private boolean roomChangeEvent = false;
 	
+	private final int RoomDataArrayLength = 4;
+	private final int RoomLinksArrayLength = 4;
+	
 	private AreaMap map1;
 	private String[] map1RoomIDs = {"base", "east", "west"};
-	private int[][] roomData;
 	
+	private AreaMap currMap;
 	private Room currRoom;
 	private String currRoomID = "base";
 	private String lastRoomID = "base";
@@ -32,53 +35,79 @@ public class Game1 implements Game {
 		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
 		
 		this.map1 = new AreaMap(4000, 2000, this.map1RoomIDs, "base", this.map1RoomIDs.length);
-		this.makeCurrRoom();
+		
+		int[] roomDims = new int[this.RoomDataArrayLength];
+		ArrayList<Game1Model> env = new ArrayList<Game1Model>();
+		String[] roomLinks = new String[this.RoomLinksArrayLength];
+		
+		for (int i = 0; i < this.map1.getRoomIDs().length; i++) {
+			switch (this.map1.getRoomIDs()[i]) {
+				case "base":
+					roomDims[0] = 1000;
+					roomDims[1] = this.groundLevel;
+					roomDims[2] = 2000;
+					roomDims[3] = 2000;
+					
+					env.add(new Rock(1500, -100, 70, 70));
+					env.add(new Rock(1600, -200, 30, 70));
+					env.add(new Rock(2500, -100, 70, 70));
+					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
+					
+					roomLinks[0] = "west";
+					roomLinks[1] = "east";
+					roomLinks[2] = null;
+					roomLinks[3] = null;
+					break;
+					
+				case "east":
+					roomDims[0] = 3000;
+					roomDims[1] = this.groundLevel;
+					roomDims[2] = 2000;
+					roomDims[3] = 1000;
+					
+					env.add(new Rock(3500, -100, 70, 70));
+					
+					roomLinks[0] = "base";
+					roomLinks[1] = null;
+					roomLinks[2] = null;
+					roomLinks[3] = null;
+					break;
+					
+				case "west":
+					roomDims[0] = 0;
+					roomDims[1] = this.groundLevel;
+					roomDims[2] = 2000;
+					roomDims[3] = 1000;
+					
+					env.add(new Rock(500, -100, 70, 70));
+					
+					roomLinks[0] = null;
+					roomLinks[1] = "base";
+					roomLinks[2] = null;
+					roomLinks[3] = null;
+					break;
+					
+				default:
+					break;
+			}
+			this.map1.addRoomData(this.map1.getRoomIDs()[i], roomDims);
+			this.map1.addRoomEnv(this.map1.getRoomIDs()[i], env);
+			this.map1.addRoomLinks(this.map1.getRoomIDs()[i], roomLinks);
+			
+			roomDims = new int[this.RoomDataArrayLength];
+			env = new ArrayList<Game1Model>();
+			roomLinks = new String[this.RoomLinksArrayLength];
+		}
 	}
 	
 	public void makeCurrRoom() {
-		ArrayList<Game1Model> env = new ArrayList<Game1Model>();
-		int roomHeight = 0;
-		int roomWidth = 0;
-		int roomX = 0;
-		int roomY = this.groundLevel;
-		switch (this.currRoomID) {
-			case "base":
-				env.add(new Rock(1500, -100, 70, 70));
-				env.add(new Rock(1600, -200, 30, 70));
-				env.add(new Rock(2500, -100, 70, 70));
-				
-				env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
-				
-				roomX = 1000;
-				roomHeight = 2000;
-				roomWidth = 2000;
-				break;
-				
-			case "east":
-				env.add(new Rock(3500, -100, 70, 70));
-				
-				roomX = 3000;
-				roomHeight = 2000;
-				roomWidth = 1000;
-				break;
-				
-			case "west":
-				env.add(new Rock(500, -100, 70, 70));
-				
-				roomX = 0;
-				roomHeight = 2000;
-				roomWidth = 1000;
-				break;
-				
-			default:
-				break;
-		}
-		this.currRoom = new Room(this.currRoomID, roomX, roomY, roomHeight, roomWidth, env);
+		this.currRoom = new Room(this.currRoomID, this.map1.accessRoomData(this.currRoomID)[0], this.map1.accessRoomData(this.currRoomID)[1], this.map1.accessRoomData(this.currRoomID)[2], this.map1.accessRoomData(this.currRoomID)[3], this.map1.accessRoomEnvs(this.currRoomID), this.map1.accessRoomLinks(this.currRoomID)[0], this.map1.accessRoomLinks(this.currRoomID)[1], this.map1.accessRoomLinks(this.currRoomID)[2], this.map1.accessRoomLinks(this.currRoomID)[3]);
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
 	
 	public void makeBaseRoom() {
-		this.currRoomID = "base";
+		this.currMap = this.map1;
+		this.currRoomID = this.map1.getStartRoomID();
 		this.makeCurrRoom();
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
@@ -87,33 +116,11 @@ public class Game1 implements Game {
 		this.lastRoomID = this.currRoomID;
 		switch (d) {
 			case EAST:
-				switch (this.currRoomID) {
-					case "west":
-						this.currRoomID = "base";
-						break;
-						
-					case "base":
-						this.currRoomID = "east";
-						break;
-						
-					default:
-						break;
-				}
+				this.currRoomID = this.currRoom.getRoomEast();
 				break;
 				
 			case WEST:
-				switch (this.currRoomID) {
-					case "east":
-						this.currRoomID = "base";
-						break;
-					
-					case "base":
-						this.currRoomID = "west";
-						break;
-					
-					default:
-						break;
-				}
+				this.currRoomID = this.currRoom.getRoomWest();
 				break;
 				
 			default:
@@ -123,40 +130,32 @@ public class Game1 implements Game {
 		this.roomChangeEvent = false;
 	}
 	
-	public void checkRoomBoundaries(int curr, int last) {
-		if (curr == last) {
-			return;
-		} else {
-			if (last <= 1000 && curr > 1000) {
+	public void checkRoomBoundaries() {
+		if (this.player.getXLoc() < this.currRoom.getXLoc()) {
+			if (this.map1.accessRoomLinks(this.currRoomID)[0] != null) {
 				this.roomChangeEvent = true;
-			} else if (last > 1000 && last <= 3000) {
-				if (curr < 1000 || curr > 3000) {
-					this.roomChangeEvent = true;
-				}
-			} else if (last > 3000 && curr <= 3000) {
+			}
+		} else if (this.player.getXLoc() > (this.currRoom.getXLoc() + this.currRoom.getWidth())) {
+			if (this.map1.accessRoomLinks(this.currRoomID)[1] != null) {
 				this.roomChangeEvent = true;
 			}
 		}
 	}
 	
 	public void moveRight() {
-		int lastX = this.player.getXloc();
-		
 		this.player.checkRightEdgeCollisions(this.map1.getWidth(), this.currEnvironment);
 		this.player.moveRight(this.map1.getWidth(), this.currEnvironment);
 		this.player.checkLeavingSurface(this.currEnvironment);
 		
-		this.checkRoomBoundaries(this.player.getXloc(), lastX);
+		this.checkRoomBoundaries();
 	}
 	
 	public void moveLeft() {
-		int lastX = this.player.getXloc();
-		
 		this.player.checkLeftEdgeCollisions(0, this.currEnvironment);
 		this.player.moveLeft(0, this.currEnvironment);
 		this.player.checkLeavingSurface(this.currEnvironment);
 		
-		this.checkRoomBoundaries(this.player.getXloc(), lastX);
+		this.checkRoomBoundaries();
 	}
 	
 	public void assertGravity() {

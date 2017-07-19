@@ -1,36 +1,16 @@
 package game1Models;
 
-public class Rock implements Game1Model {
-
-	private final int xloc;
-	private final int yloc;
-	private int height;
-	private int width;
+public class Rock extends Game1Model {
 	
 	public Rock(int x, int y, int h, int w) {
-		this.xloc = x;
-		this.yloc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 	}
 	
 	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
-	}
-	
-	@Override
-	public int getHeight() {
-		return this.height;
-	}
-	
-	@Override
-	public int getWidth() {
-		return this.width;
+	public String toString() {
+		return this.getInfo();
 	}
 }

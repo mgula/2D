@@ -4,12 +4,8 @@ import java.util.ArrayList;
 
 import enums.Direction;
 
-public class Player implements Game1Model {
+public class Player extends Game1Model {
 
-	private int xloc;
-	private int yloc;
-	private final int width;
-	private final int height;
 	private int xIncr = 6;
 	private int yIncr = 5;
 	private int currXSegment = 0;
@@ -50,31 +46,10 @@ public class Player implements Game1Model {
 	 * @param w crab width
 	 */
 	public Player(int x, int y, int h, int w) {
-		this.xloc = x;
-		this.yloc = y;
-		this.height = h;
-		this.width = w;
-	}
-	
-	/*Getters*/
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
-	}
-	
-	@Override
-	public int getHeight() {
-		return this.height;
-	}
-
-	@Override
-	public int getWidth() {
-		return this.width;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 	}
 	
 	/**
@@ -116,28 +91,28 @@ public class Player implements Game1Model {
 	
 	public void incrX() {
 		if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
-			this.xloc++;
+			this.setXLoc(this.getXLoc() + 1);
 		}
 		this.currXSegment++;
 	}
 	
 	public void decrX() {
 		if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
-			this.xloc--;
+			this.setXLoc(this.getXLoc() - 1);
 		}
 		this.currXSegment++;
 	}
 	
 	void incrY() {
 		if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
-			this.yloc--;
+			this.setYLoc(this.getYLoc() - 1);
 		}
 		this.currYSegment++;
 	}
 	
 	public void decrY() {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
-			this.yloc++;
+			this.setYLoc(this.getYLoc() + 1);
 		}
 		this.currYSegment++;
 	}
@@ -211,7 +186,7 @@ public class Player implements Game1Model {
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
 			for (Game1Model m : e) {
-				if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Sand) {
+				if (m instanceof game1Models.Rock || m instanceof game1Models.Debris) {
 					if (this.checkBottomSurface(m)) {
 						contact = true;
 					}
@@ -243,16 +218,16 @@ public class Player implements Game1Model {
 		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
 		 *the same while loop scheme to move (move a pixel and then check for collisions).*/
 		if (this.againstMovingSurfaceLeft && this.inContactWith.getDirection() == Direction.EAST) {
-			this.xloc++;
+			this.setXLoc(this.getXLoc() + 1);
 		}
 		if (this.againstMovingSurfaceRight && this.inContactWith.getDirection() == Direction.WEST) {
-			this.xloc--;
+			this.setXLoc(this.getXLoc() - 1);
 		}	
 		if (this.againstMovingSurfaceTop && this.inContactWith.getDirection() == Direction.SOUTH) {
-			this.yloc++;
+			this.setYLoc(this.getYLoc() + 1);
 		}
 		if (this.againstMovingSurfaceBottom && this.inContactWith.getDirection() == Direction.NORTH) {
-			this.yloc--;
+			this.setYLoc(this.getYLoc() - 1);
 			this.againstMovingSurfaceBottom = false;
 		}
 		/*If resting on a moving surface, the crab will move in the same direction as the 
@@ -261,19 +236,19 @@ public class Player implements Game1Model {
 			if (!calledByInteractable) {
 				switch (this.inContactWith.getDirection()) {
 					case EAST:
-						this.xloc += this.inContactWith.getIncr();
+						this.setXLoc(this.getXLoc() + this.inContactWith.getIncr());
 						break;
 						
 					case WEST:
-						this.xloc -= this.inContactWith.getIncr();
+						this.setXLoc(this.getXLoc() - this.inContactWith.getIncr());
 						break;
 						
 					case NORTH:
-						this.yloc -= this.inContactWith.getIncr();
+						this.setYLoc(this.getYLoc() - this.inContactWith.getIncr());
 						break;
 						
 					case SOUTH:
-						this.yloc += this.inContactWith.getIncr();
+						this.setYLoc(this.getYLoc() + this.inContactWith.getIncr());
 						break;
 						
 					default:
@@ -285,14 +260,14 @@ public class Player implements Game1Model {
 	
 	public void checkBottomEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (this.yloc >= r.getYLoc()) {
+		if (this.getYLoc() >= r.getYLoc()) {
 			this.jumpingCounter = 0;
 			this.jumpCount = 0;
 			this.onSurfaceBottom = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
 				if (this.checkBottomSurface(m)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
@@ -324,20 +299,20 @@ public class Player implements Game1Model {
 		boolean newCollision = false;
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
 		 *to map.getGroundLevel() - map.getHeight(), since y = 0 is the top of the screen.*/
-		if (this.yloc <= r.getYLoc() - r.getHeight()) {
+		if (this.getYLoc() <= r.getYLoc() - r.getHeight()) {
 			this.againstSurfaceTop = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
-				int x = m.getXloc();
-				int y = m.getYloc();
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+				int x = m.getXLoc();
+				int y = m.getYLoc();
 				int w = m.getWidth();
 				int h = m.getHeight();
-				if (this.yloc <= y + h && this.yloc >= y) {
-					for (int i = x - this.width + 1; i < x + w; i++) {
-						if (this.xloc == i) {
+				if (this.getYLoc() <= y + h && this.getYLoc() >= y) {
+					for (int i = x - this.getWidth() + 1; i < x + w; i++) {
+						if (this.getXLoc() == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
@@ -360,19 +335,19 @@ public class Player implements Game1Model {
 	public void checkRightEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (this.xloc >= mapBound) {
+		if (this.getXLoc() >= mapBound) {
 			this.againstSurfaceRight = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
-				int x = m.getXloc();
-				int y = m.getYloc();
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+				int x = m.getXLoc();
+				int y = m.getYLoc();
 				int h = m.getHeight();
-				if (this.xloc + this.width == x) {
-					for (int i = y - this.height + 1; i < y + h; i++) {
-						if (this.yloc == i) {
+				if (this.getXLoc() + this.getWidth() == x) {
+					for (int i = y - this.getHeight() + 1; i < y + h; i++) {
+						if (this.getYLoc() == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
@@ -395,20 +370,20 @@ public class Player implements Game1Model {
 	public void checkLeftEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (this.xloc <= mapBound) {
+		if (this.getXLoc() <= mapBound) {
 			this.againstSurfaceLeft = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable || m instanceof game1Models.Sand) {
-				int x = m.getXloc();
-				int y = m.getYloc();
+			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+				int x = m.getXLoc();
+				int y = m.getYLoc();
 				int w = m.getWidth();
 				int h = m.getHeight();
-				if (this.xloc == x + w) {
-					for (int i = y - this.height + 1; i < y + h; i++) {
-						if (this.yloc == i) {
+				if (this.getXLoc() == x + w) {
+					for (int i = y - this.getHeight() + 1; i < y + h; i++) {
+						if (this.getYLoc() == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Interactable) {
 								this.inContactWith = (Interactable) m;
@@ -432,15 +407,15 @@ public class Player implements Game1Model {
 		this.currentCollision = false; // innocent until proven guilty policy
 		for (Game1Model m : e) {
 			if (m instanceof game1Models.Enemy || m instanceof game1Models.RegenArea || m instanceof game1Models.Current) {
-				int x = m.getXloc();
-				int y = m.getYloc();
+				int x = m.getXLoc();
+				int y = m.getYLoc();
 				int w = m.getWidth();
 				int h = m.getHeight();
 				/*Check every point of the hitbox against every point of the model.*/
 				for (int i = x; i < x + w; i++) {
 					for (int j = y; j < y + h; j++) {
-						for (int k = this.xloc; k < this.xloc + this.width; k++) {
-							for (int l = this.yloc; l < this.yloc + this.height; l++) {
+						for (int k = this.getXLoc(); k < this.getXLoc() + this.getWidth(); k++) {
+							for (int l = this.getYLoc(); l < this.getYLoc() + this.getHeight(); l++) {
 								if (i == k && j == l) {
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
@@ -467,12 +442,12 @@ public class Player implements Game1Model {
 	}
 	
 	public boolean checkBottomSurface(Game1Model m) {
-		int x = m.getXloc();
-		int y = m.getYloc();
+		int x = m.getXLoc();
+		int y = m.getYLoc();
 		int w = m.getWidth();
-		if (this.yloc + this.height == y) {
-			for (int i = x - this.width + 1; i < x + w; i++) {
-				if (this.xloc == i) {
+		if (this.getYLoc() + this.getHeight() == y) {
+			for (int i = x - this.getWidth() + 1; i < x + w; i++) {
+				if (this.getXLoc() == i) {
 					return true;
 				}
 			}
@@ -513,28 +488,28 @@ public class Player implements Game1Model {
 				case EAST:
 					this.checkRightEdgeCollisions(upperXBound, e);
 					if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
-						this.xloc += this.incrFromCurrent;
+						this.setXLoc(this.getXLoc() + this.incrFromCurrent);
 					}
 					break;
 					
 				case WEST:
 					this.checkLeftEdgeCollisions(lowerXBound, e);
 					if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
-						this.xloc -= this.incrFromCurrent;
+						this.setXLoc(this.getXLoc() - this.incrFromCurrent);
 					}
 					break;
 					
 				case NORTH:
 					this.checkTopEdgeCollisions(r, e);
 					if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
-						this.yloc -= this.incrFromCurrent;
+						this.setYLoc(this.getYLoc() - this.incrFromCurrent);
 					}
 					break;
 					
 				case SOUTH:
 					this.checkBottomEdgeCollisions(r, e);
 					if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
-						this.yloc += this.incrFromCurrent;
+						this.setYLoc(this.getYLoc() + this.incrFromCurrent);
 					}
 					break;
 				

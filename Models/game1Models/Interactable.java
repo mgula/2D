@@ -4,12 +4,7 @@ import java.util.ArrayList;
 
 import enums.Direction;
 
-public class Interactable implements Game1Model {
-
-	private int xloc;
-	private int yloc;
-	private int height;
-	private int width;
+public class Interactable extends Game1Model {
 	private int incr;
 	private int currSegment;
 	private int waitCounter = 0;
@@ -22,36 +17,16 @@ public class Interactable implements Game1Model {
 	private Direction lastDir;
 	
 	public Interactable(int x, int y, int h, int w, Direction d, int moveVariance, int incr) {
-		this.xloc = x;
-		this.yloc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 		this.currDir = d;
 		this.moveThreshL = x - moveVariance;
 		this.moveThreshR = x + moveVariance;
 		this.moveThreshU = y - moveVariance;
 		this.moveThreshD = y + moveVariance;
 		this.incr = incr;
-	}
-	
-	@Override
-	public int getXloc() {
-		return this.xloc;
-	}
-
-	@Override
-	public int getYloc() {
-		return this.yloc;
-	}
-
-	@Override
-	public int getHeight() {
-		return this.height;
-	}
-
-	@Override
-	public int getWidth() {
-		return this.width;
 	}
 	
 	public Direction getDirection() {
@@ -66,12 +41,12 @@ public class Interactable implements Game1Model {
 		switch (this.currDir) {
 			case EAST:
 				while (this.currSegment < this.incr) {
-					this.xloc++;
+					this.setXLoc(this.getXLoc() + 1);
 					this.currSegment++;
 					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
-				if (this.xloc >= this.moveThreshR) {
+				if (this.getXLoc() >= this.moveThreshR) {
 					this.lastDir = this.currDir;
 					this.currDir = Direction.IDLE;
 				}
@@ -79,12 +54,12 @@ public class Interactable implements Game1Model {
 				
 			case WEST:
 				while (this.currSegment < this.incr) {
-					this.xloc--;
+					this.setXLoc(this.getXLoc() - 1);
 					this.currSegment++;
 					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
-				if (this.xloc <= this.moveThreshL) {
+				if (this.getXLoc() <= this.moveThreshL) {
 					this.lastDir = this.currDir;
 					this.currDir = Direction.IDLE;
 				}
@@ -92,12 +67,12 @@ public class Interactable implements Game1Model {
 				
 			case NORTH:
 				while (this.currSegment < this.incr) {
-					this.yloc--;
+					this.setYLoc(this.getYLoc() - 1);
 					this.currSegment++;
 					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
-				if (this.yloc <= this.moveThreshU) {
+				if (this.getYLoc() <= this.moveThreshU) {
 					this.lastDir = this.currDir;
 					this.currDir = Direction.IDLE;
 				}
@@ -105,12 +80,12 @@ public class Interactable implements Game1Model {
 				
 			case SOUTH:
 				while (this.currSegment < this.incr) {
-					this.yloc++;
+					this.setYLoc(this.getYLoc() + 1);
 					this.currSegment++;
 					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
 				}
 				this.currSegment = 0;
-				if (this.yloc >= this.moveThreshD) {
+				if (this.getYLoc() >= this.moveThreshD) {
 					this.lastDir = this.currDir;
 					this.currDir = Direction.IDLE;
 				}
@@ -147,5 +122,14 @@ public class Interactable implements Game1Model {
 			default:
 				break;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		String info = this.getInfo() + 
+				"\nX Increase: " + this.incr +
+				"\nCurrent Direction: " + this.currDir +
+				"\nLast Direction: " + this.lastDir;
+		return info;
 	}
 }
