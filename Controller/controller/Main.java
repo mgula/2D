@@ -279,7 +279,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			case UNINITIALIZED:
 				this.game1 = new Game1();
 				this.game1.setGameState(GameState.PLAY);
-				this.game1.makeBaseRoom();
 				break;
 			
 			case PAUSE:

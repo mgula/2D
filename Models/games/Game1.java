@@ -5,6 +5,8 @@ import java.util.HashSet;
 
 import enums.Direction;
 import enums.GameState;
+import enums.MapID;
+import enums.RoomID;
 import game1Models.*;
 
 public class Game1 implements Game {
@@ -23,25 +25,34 @@ public class Game1 implements Game {
 	private final int RoomLinksArrayLength = 4;
 	
 	private AreaMap map1;
-	private String[] map1RoomIDs = {"base", "east", "west"};
+	private RoomID[] map1Rooms = {RoomID.SPAWN, RoomID.EAST1, RoomID.WEST1};
 	
 	private AreaMap currMap;
+	private MapID currMapID = MapID.MAP1;
 	private Room currRoom;
-	private String currRoomID = "base";
-	private String lastRoomID = "base";
+	private RoomID currRoomID = RoomID.SPAWN;
+	private RoomID lastRoomID = RoomID.SPAWN;
 	private ArrayList<Game1Model> currEnvironment;
 	
 	public Game1() {
+		this.makeCurrMap();
+		
 		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
 		
-		this.map1 = new AreaMap(4000, 2000, this.map1RoomIDs, "base", this.map1RoomIDs.length);
+		this.populateMap();
 		
-		for (int i = 0; i < this.map1.getRoomIDs().length; i++) {
+		this.makeCurrRoom();
+	}
+	
+	public void populateMap() {
+		for (RoomID r : this.currMap.getRoomIDs()) {
+			
 			int[] roomDims = new int[this.RoomDataArrayLength];
 			ArrayList<Game1Model> env = new ArrayList<Game1Model>();
-			String[] roomLinks = new String[this.RoomLinksArrayLength];
-			switch (this.map1.getRoomIDs()[i]) {
-				case "base":
+			RoomID[] roomLinks = new RoomID[this.RoomLinksArrayLength];
+			
+			switch (r) {
+				case SPAWN:
 					roomDims[0] = 1000;
 					roomDims[1] = this.groundLevel;
 					roomDims[2] = 2000;
@@ -52,13 +63,13 @@ public class Game1 implements Game {
 					env.add(new Rock(2500, -100, 70, 70));
 					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 					
-					roomLinks[0] = "west";
-					roomLinks[1] = "east";
+					roomLinks[0] = RoomID.WEST1;
+					roomLinks[1] = RoomID.EAST1;
 					roomLinks[2] = null;
 					roomLinks[3] = null;
 					break;
 					
-				case "east":
+				case EAST1:
 					roomDims[0] = 3000;
 					roomDims[1] = this.groundLevel;
 					roomDims[2] = 500;
@@ -67,13 +78,13 @@ public class Game1 implements Game {
 					env.add(new Rock(3500, -100, 70, 70));
 					env.add(new Rock(3250, -250, 50, 50));
 					
-					roomLinks[0] = "base";
+					roomLinks[0] = RoomID.SPAWN;
 					roomLinks[1] = null;
 					roomLinks[2] = null;
 					roomLinks[3] = null;
 					break;
 					
-				case "west":
+				case WEST1:
 					roomDims[0] = 0;
 					roomDims[1] = this.groundLevel;
 					roomDims[2] = 500;
@@ -83,7 +94,7 @@ public class Game1 implements Game {
 					env.add(new Rock(750, -250, 50, 50));
 					
 					roomLinks[0] = null;
-					roomLinks[1] = "base";
+					roomLinks[1] = RoomID.SPAWN;
 					roomLinks[2] = null;
 					roomLinks[3] = null;
 					break;
@@ -91,21 +102,25 @@ public class Game1 implements Game {
 				default:
 					break;
 			}
-			this.map1.addRoomData(this.map1.getRoomIDs()[i], roomDims);
-			this.map1.addRoomEnv(this.map1.getRoomIDs()[i], env);
-			this.map1.addRoomLinks(this.map1.getRoomIDs()[i], roomLinks);
+			this.currMap.addRoomData(r, roomDims);
+			this.currMap.addRoomEnv(r, env);
+			this.currMap.addRoomLinks(r, roomLinks);
+		}
+	}
+	
+	public void makeCurrMap() {
+		switch (this.currMapID) {
+			case MAP1:
+				this.map1 = new AreaMap(MapID.MAP1, 4000, 2000, this.map1Rooms);
+				this.currMap = this.map1;
+				break;
+			default:
+				break;
 		}
 	}
 	
 	public void makeCurrRoom() {
-		this.currRoom = new Room(this.currRoomID, this.map1.accessRoomData(this.currRoomID)[0], this.map1.accessRoomData(this.currRoomID)[1], this.map1.accessRoomData(this.currRoomID)[2], this.map1.accessRoomData(this.currRoomID)[3], this.map1.accessRoomEnvs(this.currRoomID), this.map1.accessRoomLinks(this.currRoomID)[0], this.map1.accessRoomLinks(this.currRoomID)[1], this.map1.accessRoomLinks(this.currRoomID)[2], this.map1.accessRoomLinks(this.currRoomID)[3]);
-		this.currEnvironment = this.currRoom.getEnvironment();
-	}
-	
-	public void makeBaseRoom() {
-		this.currMap = this.map1;
-		this.currRoomID = this.map1.getStartRoomID();
-		this.makeCurrRoom();
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID)[0], this.currMap.accessRoomLinks(this.currRoomID)[1], this.currMap.accessRoomLinks(this.currRoomID)[2], this.currMap.accessRoomLinks(this.currRoomID)[3]);
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
 	
@@ -224,11 +239,11 @@ public class Game1 implements Game {
 		return this.map1;
 	}
 	
-	public String getCurrRoomID() {
+	public RoomID getCurrRoomID() {
 		return this.currRoomID;
 	}
 	
-	public String getLastRoomID() {
+	public RoomID getLastRoomID() {
 		return this.lastRoomID;
 	}
 	
