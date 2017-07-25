@@ -63,8 +63,8 @@ public class Game1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 1120, 1120, 10, 10, 350, 350, 550, 10, 10, 10, 10};
-	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 690, 705, 690, 705, 690, 705, 705, 185, 200, 215, 230};
+	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280};
 	
 	public Game1View(int w, int h) {
 		super(w, h);
@@ -133,7 +133,7 @@ public class Game1View extends GameView {
 		this.updateOffsets();
 		
 		/*Draw the current room*/
-		g.drawRect(this.currRoom.getXLoc() - this.playerOffsetX, this.currRoom.getYLoc() + this.player.getHeight() - this.playerOffsetY - this.currRoom.getHeight(), this.currRoom.getWidth() + this.player.getWidth(), this.currRoom.getHeight());
+		g.drawRect(this.currRoom.getXLoc() - this.playerOffsetX, this.currRoom.getYLoc() - this.playerOffsetY - this.currRoom.getHeight(), this.currRoom.getWidth(), this.currRoom.getHeight());
 		
 		this.drawEnvironment(g);
 		this.drawPlayer(g);
@@ -169,6 +169,9 @@ public class Game1View extends GameView {
 			} else if (m instanceof game1Models.Interactable) {
 				g.setColor(Color.YELLOW);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
+			} else if (m instanceof game1Models.Platform) {
+				g.setColor(Color.BLACK);
+				g.drawLine(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getXLoc() + m.getWidth() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY);
 			}
 		}
 		g.setColor(Color.BLACK);
@@ -202,11 +205,16 @@ public class Game1View extends GameView {
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
 		message = "damaged: " + this.player.getEnemyCollision();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
-		String[] debugMessages = {"Stat bool (X): " + this.viewStationaryX, "Left bool: " + this.viewMovingLeft, "Right bool: " + this.viewMovingRight,
-				"Stat bool (Y): " + this.viewStationaryY, "Up bool: " + this.viewMovingUp, "Down bool: " + this.viewMovingDown, "Y Thresh (U): " + this.thresholdYU,
-				"Y Thresh (D): " + this.thresholdYD, "X Thresh (R): " + this.thresholdXR, "X Thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
+		String[] debugMessages = {"Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, "Screen moving right bool: " + this.viewMovingRight,
+				"Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, "Y screen thresh (U): " + this.thresholdYU,
+				"Y screen thresh (D): " + this.thresholdYD, "X screen thresh (R): " + this.thresholdXR, "X screen thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
 				"Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getID(), "Initial X Threshold (R): " + this.initialThresholdXR,
-				"Initial X Threshold (L): " + this.initialThresholdXL, "Initial Y Threshold (U): " + this.initialThresholdYU, "Initial Y Threshold (D): " + this.initialThresholdYD};
+				"Initial X Threshold (L): " + this.initialThresholdXL, "Initial Y Threshold (U): " + this.initialThresholdYU, "Initial Y Threshold (D): " + this.initialThresholdYD, "On surface bottom: " + 
+				this.player.getOnSurfaceBottom(), "Against surface top: " + this.player.getAgainstSurfaceTop(), "Against surface right: " + this.player.getAgainstSurfaceRight(), "Against surface left: " +
+				this.player.getAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.getOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.getAgainstMovingSurfaceBottom(), 
+				"Against moving surface top: " + this.player.getAgainstMovingSurfaceTop(), "Against moving surface right: " + this.player.getAgainstMovingSurfaceRight(), "Against moving surface left: " +
+				this.player.getAgainstMovingSurfaceLeft(), "On platform: " + this.player.getOnPlatform(), "Jump duration (final): " + this.player.getJumpDuration(), "Jump counter: " + this.player.getJumpCounter(),
+				"Jump number: " + this.player.getJumpNumber()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}

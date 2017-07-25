@@ -29,8 +29,8 @@ import java.util.ArrayList;
  * -migrate from hearts to health bar
  * -redo pause menu
  * -room transitions
- * -platforms (no top edge collision detection, only bottom edge)
  * -sound
+ * -slopes/stairs
  * 
  * BUGS
  * -new game button (after 1st click)

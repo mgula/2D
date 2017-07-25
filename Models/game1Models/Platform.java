@@ -1,11 +1,11 @@
 package game1Models;
 
-public class Rock extends SolidObject {
-	
-	public Rock(int x, int y, int h, int w) {
+public class Platform extends Game1Model {
+
+	public Platform(int x, int y, int w) {
 		this.setXLoc(x);
 		this.setYLoc(y);
-		this.setHeight(h);
+		this.setHeight(0);
 		this.setWidth(w);
 	}
 	

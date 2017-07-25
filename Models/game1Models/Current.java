@@ -2,7 +2,7 @@ package game1Models;
 
 import enums.Direction;
 
-public class Current extends Game1Model {
+public class Current extends EventArea {
 	private Direction flowDir;
 	private int incr;
 	

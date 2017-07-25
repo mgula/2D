@@ -1,6 +1,6 @@
 package game1Models;
 
-public class RegenArea extends Game1Model {
+public class RegenArea extends EventArea {
 	
 	public RegenArea(int x, int y, int h, int w) {
 		this.setXLoc(x);

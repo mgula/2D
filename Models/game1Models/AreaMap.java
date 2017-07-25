@@ -8,9 +8,6 @@ import enums.MapID;
 import enums.RoomID;
 
 public class AreaMap {
-	private int width;
-	private int height;
-	
 	private MapID mapID;
 	private RoomID[] roomIDs;
 	
@@ -21,10 +18,8 @@ public class AreaMap {
 	
 	private int numRooms;
 	
-	public AreaMap(MapID ID, int width, int height, RoomID[] rooms) {
+	public AreaMap(MapID ID, RoomID[] rooms) {
 		this.mapID = ID;
-		this.width = width;
-		this.height = height;
 		this.roomIDs = rooms;
 		this.numRooms = rooms.length;
 		
@@ -63,30 +58,8 @@ public class AreaMap {
 		this.roomLinks.put(roomID, links);
 	}
 	
-	/*public boolean mapCheck() {
-		int totalArea = 0;
-		
-		for (Room r : this.rooms) {
-			totalArea += (r.getWidth() * r.getHeight());
-		}
-		
-		if (totalArea == (this.width * this.height)) {
-			return true;
-		} else {
-			return false;
-		}
-	}*/
-	
 	public MapID getMapID() {
 		return this.mapID;
-	}
-	
-	public int getWidth() {
-		return this.width;
-	}
-	
-	public int getHeight() {
-		return this.height;
 	}
 	
 	public RoomID[] getRoomIDs() {

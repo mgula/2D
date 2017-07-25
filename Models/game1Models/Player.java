@@ -12,23 +12,24 @@ public class Player extends Game1Model {
 	private int currYSegment = 0;
 	private int floatingCounter = 0;
 	private final int floatingThreshold = 10; // used to make the player float for a moment after jumping, as if underwater
-	private boolean onSurfaceBottom = false; // boolean used for checking if the crab's bottom edge is in contact with an object
-	private boolean againstSurfaceTop = false; // boolean used for checking if the crab's top edge is in contact with another object
+	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
+	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
 	private boolean againstSurfaceRight = false; // etc
 	private boolean againstSurfaceLeft = false;
 	private Interactable inContactWith;
-	private boolean onMovingSurfaceBottom = false; // boolean used for checking if the crab's bottom edge is in contact with a moving object
-	private boolean againstMovingSurfaceBottom = false; // similar to above variable, except used in the case where the crab is falling and the moving object is rising
-	private boolean againstMovingSurfaceTop = false; // boolean used for checking if the crab's top edge is in contact with a moving object
+	private boolean onMovingSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with a moving object
+	private boolean againstMovingSurfaceBottom = false; // similar to above variable, except used in the case where the player is falling and the moving object is rising
+	private boolean againstMovingSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with a moving object
 	private boolean againstMovingSurfaceRight = false; // etc
 	private boolean againstMovingSurfaceLeft = false;
-	private boolean enemyCollision = false; // true if crab is occupying same area as an enemy
-	private boolean regenCollision = false; // true if crab is occupying same area as a regen area
-	private boolean currentCollision = false; // true if crab is occupying same area as a current (Current.java)
+	private boolean onPlatform = false;
+	private boolean enemyCollision = false; // true if player is occupying same area as an enemy
+	private boolean regenCollision = false; // true if player is occupying same area as a regen area
+	private boolean currentCollision = false; // true if player is occupying same area as a current (Current.java)
 	private int jumpingCounter = 0;
 	private final int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
-	private final int maxJumps = 1; // maximum number of jumps allowed
+	private final int maxJumps = 2; // maximum number of jumps allowed
 	private final int maxHealth = 3;
 	private int currHealth = 3;
 	private final int damageCooldownThresh = 80;
@@ -38,13 +39,6 @@ public class Player extends Game1Model {
 	private Direction dirOfCurrent; // direction of current (Current.java)
 	private int incrFromCurrent; // magnitude of push from currents (Current.java)
 	
-	/**
-	 * Create a new crab instance with the specified parameters.
-	 * @param x x loc
-	 * @param y y loc
-	 * @param h crab height
-	 * @param w crab width
-	 */
 	public Player(int x, int y, int h, int w) {
 		this.setXLoc(x);
 		this.setYLoc(y);
@@ -80,14 +74,59 @@ public class Player extends Game1Model {
 		return this.enemyCollision;
 	}
 	
-	public boolean getOnASurface() {
-		return this.onSurfaceBottom || this.onMovingSurfaceBottom;
+	//debug view display suite
+	public boolean getOnSurfaceBottom() {
+		return this.onSurfaceBottom;
 	}
 	
-	/*public void loadEnvironmentAndMap(ArrayList<Game1Model> e, Room m) {
-		this.environment = e;
-		this.currRoom = m;
-	}*/
+	public boolean getAgainstSurfaceTop() {
+		return this.againstSurfaceTop;
+	}
+	
+	public boolean getAgainstSurfaceRight() {
+		return this.againstSurfaceRight;
+	}
+	
+	public boolean getAgainstSurfaceLeft() {
+		return this.againstSurfaceLeft;
+	}
+	
+	public boolean getOnMovingSurfaceBottom() {
+		return this.onMovingSurfaceBottom;
+	}
+	
+	public boolean getAgainstMovingSurfaceBottom() {
+		return this.againstMovingSurfaceBottom;
+	}
+	
+	public boolean getAgainstMovingSurfaceTop() {
+		return this.againstMovingSurfaceTop;
+	}
+	
+	public boolean getAgainstMovingSurfaceRight() {
+		return this.againstMovingSurfaceRight;
+	}
+	
+	public boolean getAgainstMovingSurfaceLeft() {
+		return this.againstMovingSurfaceLeft;
+	}
+	
+	public boolean getOnPlatform() {
+		return this.onPlatform;
+	}
+	
+	public int getJumpCounter() {
+		return this.jumpingCounter;
+	}
+	
+	public int getJumpDuration() {
+		return this.jumpDuration;
+	}
+	
+	public int getJumpNumber() {
+		return this.jumpCount;
+	}
+	//end debug view display suite
 	
 	public void incrX() {
 		if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
@@ -117,18 +156,18 @@ public class Player extends Game1Model {
 		this.currYSegment++;
 	}
 	
-	public void moveRight(int upperXBound, ArrayList<Game1Model> e) {
+	public void moveRight(Room r, ArrayList<Game1Model> e) {
 		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (this.currXSegment < this.xIncr) {
-			this.checkRightEdgeCollisions(upperXBound, e);
+			this.checkRightEdgeCollisions(r, e);
 			this.incrX();
 		}
 		this.currXSegment = 0;
 	}
 	
-	public void moveLeft(int lowerXBound, ArrayList<Game1Model> e) {
+	public void moveLeft(Room r, ArrayList<Game1Model> e) {
 		while (this.currXSegment < this.xIncr) {
-			this.checkLeftEdgeCollisions(lowerXBound, e);
+			this.checkLeftEdgeCollisions(r, e);
 			this.decrX();
 		}
 		this.currXSegment = 0;
@@ -138,6 +177,7 @@ public class Player extends Game1Model {
 		if (!this.againstSurfaceTop && !this.againstMovingSurfaceTop) {
 			this.onSurfaceBottom = false;
 			this.onMovingSurfaceBottom = false;
+			this.onPlatform = false;
 			this.againstMovingSurfaceBottom = false;
 			this.floatingCounter = 0;
 			while (this.currYSegment < this.yIncr) {
@@ -153,26 +193,26 @@ public class Player extends Game1Model {
 	public boolean initiateJumpArc(Room r, ArrayList<Game1Model> e) {
 		if (this.jumpCount < this.maxJumps) {
 			if (this.jumpingCounter < this.jumpDuration) {
-				this.raiseY(r, e);
 				this.jumpingCounter++;
-				return false;
+				this.raiseY(r, e);
+				return true;
 			} else {
 				this.jumpCount++;
 				this.jumpingCounter = 0;
-				return true;
+				return false;
 			}
 		} else {
-			return true;
+			return false;
 		}
 	}
 	
-	public void assertGravity(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e) {
+	public void assertGravity(Room r, ArrayList<Game1Model> e) {
 		if (!this.onSurfaceBottom && !this.onMovingSurfaceBottom) {
 			if (this.floatingCounter < this.floatingThreshold) {
 				this.floatingCounter++;
 			} else {
 				while (this.currYSegment < this.yIncr) {
-					this.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					this.checkMovingSurfaces(r, e, true);
 					this.decrY();
 				}
 				this.currYSegment = 0;
@@ -186,18 +226,19 @@ public class Player extends Game1Model {
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
 			for (Game1Model m : e) {
-				if (m instanceof game1Models.Rock || m instanceof game1Models.Debris) {
-					if (this.checkBottomSurface(m)) {
-						contact = true;
-					}
-				} else if (m instanceof game1Models.Interactable) {
+				if (m instanceof game1Models.Interactable) {
 					if (this.checkBottomSurface(m)) {
 						movingContact = true;
 					}
-				}
+				} else if (m instanceof SolidObject || m instanceof Platform) {
+					if (this.checkBottomSurface(m)) {
+						contact = true;
+					}
+				} 
 			}
 			/*If there were no environmental collisions, reset floating counter and update the appropriate boolean.*/
 			if (!contact) {
+				this.onPlatform = false;
 				this.floatingCounter = 0;
 				this.onSurfaceBottom = false;
 			}
@@ -209,10 +250,10 @@ public class Player extends Game1Model {
 		}
 	}
 	
-	public void checkMovingSurfaces(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e, boolean calledByInteractable) {
+	public void checkMovingSurfaces(Room r, ArrayList<Game1Model> e, boolean calledByInteractable) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
-		this.checkLeftEdgeCollisions(lowerXBound, e);
-		this.checkRightEdgeCollisions(upperXBound, e);
+		this.checkLeftEdgeCollisions(r, e);
+		this.checkRightEdgeCollisions(r, e);
 		this.checkBottomEdgeCollisions(r, e);
 		this.checkTopEdgeCollisions(r, e);
 		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
@@ -260,19 +301,15 @@ public class Player extends Game1Model {
 	
 	public void checkBottomEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (this.getYLoc() >= r.getYLoc()) {
-			this.jumpingCounter = 0;
-			this.jumpCount = 0;
+		if (this.getYLoc() + this.getHeight() >= r.getYLoc()) {
 			this.onSurfaceBottom = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+			if (m instanceof SolidObject || m instanceof Platform) {
 				if (this.checkBottomSurface(m)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
-					this.jumpingCounter = 0;
-					this.jumpCount = 0;
 					this.floatingCounter = 0;
 					if (m instanceof game1Models.Interactable) {
 						this.inContactWith = (Interactable) m;
@@ -288,10 +325,16 @@ public class Player extends Game1Model {
 						}
 					} else {
 						this.onSurfaceBottom = true;
+						if (m instanceof Platform) {
+							this.onPlatform = true;
+						}
 					}
-					return;
 				}
 			}
+		}
+		
+		if (this.onSurfaceBottom && this.jumpingCounter == 0) {
+			this.jumpCount = 0;
 		}
 	}
 	
@@ -305,13 +348,13 @@ public class Player extends Game1Model {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
 				int h = m.getHeight();
 				if (this.getYLoc() <= y + h && this.getYLoc() >= y) {
-					for (int i = x - this.getWidth() + 1; i < x + w; i++) {
+					for (int i = m.getXLoc() - this.getWidth() + 1; i < x + w; i++) {
 						if (this.getXLoc() == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Interactable) {
@@ -332,16 +375,16 @@ public class Player extends Game1Model {
 		}
 	}
 	
-	public void checkRightEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
+	public void checkRightEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (this.getXLoc() >= mapBound) {
+		if (this.getXLoc() + this.getWidth() >= r.getXLoc() + r.getWidth() && !r.hasRoomEast()) {
 			this.againstSurfaceRight = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int h = m.getHeight();
@@ -367,16 +410,16 @@ public class Player extends Game1Model {
 		}
 	}
 	
-	public void checkLeftEdgeCollisions(int mapBound, ArrayList<Game1Model> e) {
+	public void checkLeftEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (this.getXLoc() <= mapBound) {
+		if (this.getXLoc() <= r.getXLoc() && !r.hasRoomWest()) {
 			this.againstSurfaceLeft = true;
 			newCollision = true;
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Rock || m instanceof game1Models.Debris || m instanceof game1Models.Interactable) {
+			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -406,7 +449,7 @@ public class Player extends Game1Model {
 	public void checkAreaCollisions(ArrayList<Game1Model> e) {
 		this.currentCollision = false; // innocent until proven guilty policy
 		for (Game1Model m : e) {
-			if (m instanceof game1Models.Enemy || m instanceof game1Models.RegenArea || m instanceof game1Models.Current) {
+			if (m instanceof EventArea) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -455,7 +498,7 @@ public class Player extends Game1Model {
 		return false;
 	}
 	
-	public void evaluateAreaCollisions(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e) {
+	public void evaluateAreaCollisions(Room r, ArrayList<Game1Model> e) {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
@@ -472,6 +515,7 @@ public class Player extends Game1Model {
 				this.enemyCollision = false;
 			}
 		}
+		
 		if (this.regenCollision) {
 			/*Don't give the player more than the maximum health.*/
 			if (this.currHealth < this.maxHealth) {
@@ -482,18 +526,19 @@ public class Player extends Game1Model {
 				this.regenCollision = false;
 			}
 		}
+		
 		/*If a current collision has been detected, move the player in the corresponding direction.*/
 		if (this.currentCollision) {
 			switch (this.dirOfCurrent) {
 				case EAST:
-					this.checkRightEdgeCollisions(upperXBound, e);
+					this.checkRightEdgeCollisions(r, e);
 					if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {
 						this.setXLoc(this.getXLoc() + this.incrFromCurrent);
 					}
 					break;
 					
 				case WEST:
-					this.checkLeftEdgeCollisions(lowerXBound, e);
+					this.checkLeftEdgeCollisions(r, e);
 					if (!this.againstSurfaceLeft && !this.againstMovingSurfaceLeft) {
 						this.setXLoc(this.getXLoc() - this.incrFromCurrent);
 					}

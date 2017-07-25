@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import enums.Direction;
 
-public class Interactable extends Game1Model {
+public class Interactable extends SolidObject {
 	private int incr;
 	private int currSegment;
 	private int waitCounter = 0;
@@ -37,13 +37,13 @@ public class Interactable extends Game1Model {
 		return this.incr;
 	}
 	
-	public void move(int upperXBound, int lowerXBound, Room r, ArrayList<Game1Model> e, Player p) {
+	public void move(Room r, ArrayList<Game1Model> e, Player p) {
 		switch (this.currDir) {
 			case EAST:
 				while (this.currSegment < this.incr) {
 					this.setXLoc(this.getXLoc() + 1);
 					this.currSegment++;
-					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.getXLoc() >= this.moveThreshR) {
@@ -56,7 +56,7 @@ public class Interactable extends Game1Model {
 				while (this.currSegment < this.incr) {
 					this.setXLoc(this.getXLoc() - 1);
 					this.currSegment++;
-					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.getXLoc() <= this.moveThreshL) {
@@ -69,7 +69,7 @@ public class Interactable extends Game1Model {
 				while (this.currSegment < this.incr) {
 					this.setYLoc(this.getYLoc() - 1);
 					this.currSegment++;
-					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.getYLoc() <= this.moveThreshU) {
@@ -82,7 +82,7 @@ public class Interactable extends Game1Model {
 				while (this.currSegment < this.incr) {
 					this.setYLoc(this.getYLoc() + 1);
 					this.currSegment++;
-					p.checkMovingSurfaces(upperXBound, lowerXBound, r, e, true);
+					p.checkMovingSurfaces(r, e, true);
 				}
 				this.currSegment = 0;
 				if (this.getYLoc() >= this.moveThreshD) {

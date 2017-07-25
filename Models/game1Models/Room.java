@@ -78,6 +78,22 @@ public class Room {
 		return this.roomSouthID;
 	}
 	
+	public boolean hasRoomWest() {
+		return this.roomWestID != null;
+	}
+	
+	public boolean hasRoomEast() {
+		return this.roomEastID != null;
+	}
+	
+	public boolean hasRoomNorth() {
+		return this.roomNorthID != null;
+	}
+	
+	public boolean hasRoomSouth() {
+		return this.roomSouthID != null;
+	}
+	
 	@Override
 	public String toString() {
 		String info = "Room ID: " + this.ID +

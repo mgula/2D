@@ -1,6 +1,6 @@
 package game1Models;
 
-public class Debris extends Game1Model {
+public class Debris extends SolidObject {
 	private final int debrisHeight = 30;
 	private final int debrisWidth = 100;
 	
