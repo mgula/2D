@@ -10,7 +10,7 @@ import enums.GameState;
 
 public abstract class GameView extends View {
 	private final int pauseMenuHeight = 500;
-	private final int pauseMenuWidth = 500;
+	private final int pauseMenuWidth = 700;
 	private final int pauseMenuYloc = 50;
 	private final int TEXT_OFFSET = 20;
 	private JButton backButton;

@@ -24,17 +24,20 @@ public class Player extends Game1Model {
 	private boolean againstMovingSurfaceLeft = false;
 	private boolean onPlatform = false;
 	private boolean enemyCollision = false; // true if player is occupying same area as an enemy
+	private boolean damageCollision = false;
 	private boolean regenCollision = false; // true if player is occupying same area as a regen area
 	private boolean currentCollision = false; // true if player is occupying same area as a current (Current.java)
 	private int jumpingCounter = 0;
 	private final int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
 	private final int maxJumps = 2; // maximum number of jumps allowed
-	private final int maxHealth = 3;
-	private int currHealth = 3;
+	private final int maxHealth = 100;
+	private int currHealth = 100;
 	private final int damageCooldownThresh = 80;
 	private int damageCooldown = this.damageCooldownThresh;
-	private int healthDecrease;
+	private int healthIncrease;
+	private int healthDecreaseEnemy;
+	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
 	private Direction dirOfCurrent; // direction of current (Current.java)
 	private int incrFromCurrent; // magnitude of push from currents (Current.java)
@@ -63,6 +66,10 @@ public class Player extends Game1Model {
 	 */
 	public int getHealth() {
 		return this.currHealth;
+	}
+	
+	public int getMaxHealth() {
+		return this.maxHealth;
 	}
 	
 	/**
@@ -333,7 +340,7 @@ public class Player extends Game1Model {
 			}
 		}
 		
-		if (this.onSurfaceBottom && this.jumpingCounter == 0) {
+		if ((this.onSurfaceBottom || this.onMovingSurfaceBottom) && this.jumpingCounter == 0) {
 			this.jumpCount = 0;
 		}
 	}
@@ -464,10 +471,15 @@ public class Player extends Game1Model {
 									 *enemy takes precedence.*/
 									if (m instanceof game1Models.Enemy) {
 										this.enemyCollision = true;
-										this.healthDecrease = ((game1Models.Enemy)m).getDamage();
+										this.healthDecreaseEnemy = ((game1Models.Enemy)m).getDamage();
+										return;
+									} else if (m instanceof game1Models.DamageArea) {
+										this.damageCollision = true;
+										this.healthDecreaseDamArea = ((game1Models.DamageArea)m).getHealthDecr();
 										return;
 									} else if (m instanceof game1Models.RegenArea) {
 										this.regenCollision = true;
+										this.healthIncrease = ((game1Models.RegenArea)m).getHealthIncr();
 										return;
 									} else if (m instanceof game1Models.Current) {
 										this.currentCollision = true;
@@ -502,7 +514,7 @@ public class Player extends Game1Model {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
-				this.currHealth -= this.healthDecrease;
+				this.currHealth -= this.healthDecreaseEnemy;
 				this.damageDealt = true;
 			}
 			/*Give the player some time before being open to taking damage again.*/
@@ -516,11 +528,23 @@ public class Player extends Game1Model {
 			}
 		}
 		
+		if (this.damageCollision) {
+			if (this.currHealth >= 0) {
+				this.currHealth -= this.healthDecreaseDamArea;
+				this.damageCollision = false;
+			} else {
+				this.damageCollision = false;
+			}
+		}
+		
 		if (this.regenCollision) {
 			/*Don't give the player more than the maximum health.*/
 			if (this.currHealth < this.maxHealth) {
-				/*There is no health cooldown; restore health immediately.*/
-				this.currHealth++;
+				if (this.currHealth + this.healthIncrease > this.maxHealth) {
+					this.currHealth = this.maxHealth;
+				} else {
+					this.currHealth += this.healthIncrease;
+				}
 				this.regenCollision = false;
 			} else {
 				this.regenCollision = false;

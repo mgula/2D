@@ -63,6 +63,8 @@ public class Game1 implements Game {
 					env.add(new Rock(2500, -125, 70, 70));
 					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 					env.add(new Platform(1700, -125, 50));
+					env.add(new RegenArea(2250, -50, 50, 50, 1));
+					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					
 					roomLinks[0] = RoomID.WEST1;
 					roomLinks[1] = RoomID.EAST1;

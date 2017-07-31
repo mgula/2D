@@ -26,7 +26,7 @@ import java.util.ArrayList;
 /*TODO:
  * -implement serializable
  * -file system (no new game button, just save slots)
- * -migrate from hearts to health bar
+ * -implement losing/dying
  * -redo pause menu
  * -room transitions
  * -sound

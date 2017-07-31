@@ -26,11 +26,10 @@ public class Game1View extends GameView {
 	
 	private boolean roomChangeEvent = false;
 	
-	private BufferedImage heart;
-	private final int heartXloc = 40;
-	private final int heartYloc = 5;
-	private final int heartOffset = 10;
-	private BufferedImage arrow;
+	private final int healthXloc = 5;
+	private final int healthtYloc = 5;
+	private final int pixelsPerHealth = 2;
+	private int healthBarHeight = 20;
 	private boolean playerDrawable = true;
 	private int flash = 0;
 	private final int flashMod = 10;
@@ -63,8 +62,8 @@ public class Game1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
-	private final int[] debugMsgYlocs = {70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280};
+	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280};
 	
 	public Game1View(int w, int h) {
 		super(w, h);
@@ -124,8 +123,13 @@ public class Game1View extends GameView {
 	
 	public void paint(Graphics g) {
 		this.drawScreen(g);
+		
 		if (this.getDebugMode()) {
 			this.drawDebugOutput(g);
+		}
+		
+		if (this.getGame1State() == GameState.PAUSE){
+			this.drawPauseMenu(g, AppState.GAME1);
 		}
 	}
 	
@@ -137,14 +141,13 @@ public class Game1View extends GameView {
 		
 		this.drawEnvironment(g);
 		this.drawPlayer(g);
+		
 		/*Draw HUD components: start with life*/
-		for (int i = 0; i < this.player.getHealth(); i++) {
-			g.drawImage(this.heart, this.heartOffset + (i*this.heartXloc), this.heartYloc, null, this);
-		}
-		/*Draw pause menu on top everything else, if paused*/ 
-		if (this.getGame1State() == GameState.PAUSE){
-			this.drawPauseMenu(g, AppState.GAME1);
-		}
+		g.setColor(Color.RED);
+		g.fillRect(this.healthXloc, this.healthtYloc, this.pixelsPerHealth * this.player.getHealth(), this.healthBarHeight);
+		g.setColor(Color.BLACK);
+		g.fillRect(this.healthXloc + (this.pixelsPerHealth * this.player.getHealth()), this.healthtYloc, this.pixelsPerHealth * (this.player.getMaxHealth() - this.player.getHealth()), this.healthBarHeight);
+		
 		/*Update last y location, in order to know when to use falling animation*/
 		this.lastYloc = this.player.getYLoc();
 	}
@@ -159,9 +162,12 @@ public class Game1View extends GameView {
 				g.setColor(Color.RED);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof game1Models.Marker) {
-				//img = this.arrow;
+				
 			} else if (m instanceof game1Models.RegenArea) {
 				g.setColor(Color.GREEN);
+				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
+			} else if (m instanceof game1Models.DamageArea) {
+				g.setColor(Color.MAGENTA);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof game1Models.CurrentDrawable) {
 				g.setColor(Color.CYAN);
@@ -205,10 +211,10 @@ public class Game1View extends GameView {
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
 		message = "damaged: " + this.player.getEnemyCollision();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
-		String[] debugMessages = {"Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, "Screen moving right bool: " + this.viewMovingRight,
-				"Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, "Y screen thresh (U): " + this.thresholdYU,
-				"Y screen thresh (D): " + this.thresholdYD, "X screen thresh (R): " + this.thresholdXR, "X screen thresh (L): " + this.thresholdXL, "Player offset X: " + this.playerOffsetX,
-				"Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getID(), "Initial X Threshold (R): " + this.initialThresholdXR,
+		String[] debugMessages = {"Health: " + this.player.getHealth() + "/" + this.player.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
+				"Screen moving right bool: " + this.viewMovingRight, "Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, 
+				"Y screen thresh (U): " + this.thresholdYU, "Y screen thresh (D): " + this.thresholdYD, "X screen thresh (R): " + this.thresholdXR, "X screen thresh (L): " + this.thresholdXL, 
+				"Player offset X: " + this.playerOffsetX, "Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getID(), "Initial X Threshold (R): " + this.initialThresholdXR,
 				"Initial X Threshold (L): " + this.initialThresholdXL, "Initial Y Threshold (U): " + this.initialThresholdYU, "Initial Y Threshold (D): " + this.initialThresholdYD, "On surface bottom: " + 
 				this.player.getOnSurfaceBottom(), "Against surface top: " + this.player.getAgainstSurfaceTop(), "Against surface right: " + this.player.getAgainstSurfaceRight(), "Against surface left: " +
 				this.player.getAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.getOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.getAgainstMovingSurfaceBottom(), 
@@ -270,9 +276,7 @@ public class Game1View extends GameView {
 	
 	@Override
 	public void loadImgs() {
-		/*BufferedImage im = ImageIO.read(new File(getClass().getResource("/resources/image.jpg").toURI()));*/
-		this.heart = this.createImage("images/heart40x40.png");
-		this.arrow = this.createImage("images/arrow.png");
+		
 	}
 	
 	public void updateOffsets() {
