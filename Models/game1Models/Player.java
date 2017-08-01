@@ -30,7 +30,7 @@ public class Player extends Game1Model {
 	private int jumpingCounter = 0;
 	private final int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
-	private final int maxJumps = 2; // maximum number of jumps allowed
+	private int maxJumps = 2; // maximum number of jumps allowed
 	private final int maxHealth = 100;
 	private int currHealth = 100;
 	private final int damageCooldownThresh = 80;
@@ -133,7 +133,15 @@ public class Player extends Game1Model {
 	public int getJumpNumber() {
 		return this.jumpCount;
 	}
-	//end debug view display suite
+
+	public int getMaxJumps() {
+		return this.maxJumps;
+	}
+ 	//end debug view display suite
+	
+	public void setMaxJumps(int j) {
+		this.maxJumps = j;
+	}
 	
 	public void incrX() {
 		if (!this.againstSurfaceRight && !this.againstMovingSurfaceRight) {

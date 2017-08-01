@@ -3,6 +3,7 @@ package controller;
 import enums.AppState;
 import enums.Direction;
 import enums.GameState;
+import enums.PauseState;
 import games.*;
 import views.*;
 
@@ -27,7 +28,6 @@ import java.util.ArrayList;
  * -implement serializable
  * -file system (no new game button, just save slots)
  * -implement losing/dying
- * -redo pause menu
  * -room transitions
  * -sound
  * -slopes/stairs
@@ -183,10 +183,32 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			}
     	});
 		/*Game 1*/
+		this.game1View.getPlayerInfoButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game1View.setPauseState(PauseState.PLAYERINFO);
+				screenHandled = false;
+			}
+    	});
+		this.game1View.getSystemButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game1View.setPauseState(PauseState.SYSTEM);
+				screenHandled = false;
+			}
+    	});
+		this.game1View.getDebugButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game1View.setPauseState(PauseState.DEBUG);
+				screenHandled = false;
+			}
+    	});
 		this.game1View.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				intendedState = AppState.SELECT;
+				game1View.setPauseState(PauseState.PLAYERINFO);
 				screenHandled = false;
 			}
     	});
@@ -194,6 +216,12 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				unpauseGame(game1, game1View);
+			}
+    	});
+		this.game1View.getEditJumpsButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeMaxJumps(game1View.getEditJumpsField().getText());
 			}
     	});
 		this.game1View.getWinButton().addActionListener(new ActionListener() {
@@ -314,8 +342,32 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				if (!this.screenHandled) {
 					this.screenHandled = true;
 					this.frame.getContentPane().removeAll();
-					this.frame.add(this.game1View.getBackButton());
-					this.frame.add(this.game1View.getResumeButton());
+					
+					//Add tabs
+					this.frame.add(this.game1View.getPlayerInfoButton());
+					this.frame.add(this.game1View.getSystemButton());
+					if (this.game1View.getDebugMode()) {
+						this.frame.add(this.game1View.getDebugButton());
+					}
+					
+					switch (this.game1View.getPauseState()) {
+						case PLAYERINFO:
+							
+							break;
+						
+						case SYSTEM:
+							this.frame.add(this.game1View.getBackButton());
+							this.frame.add(this.game1View.getResumeButton());
+							break;
+							
+						case DEBUG:
+							this.frame.add(this.game1View.getEditJumpsField());
+							this.frame.add(this.game1View.getEditJumpsButton());
+							break;
+							
+						default:
+							break;
+					}
 					this.addViewToFrame(this.game1View);
 				}
 				break;
@@ -378,6 +430,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		game.setLastState(GameState.PAUSE);
 		this.frame.getContentPane().removeAll();
 		this.screenHandled = false;
+		this.game1View.setPauseState(PauseState.PLAYERINFO);
 		addViewToFrame(view);
 	}
 	
@@ -413,6 +466,11 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		for (View v : this.allViews) {
 			v.updateStates(this.currentState, this.game1.getGameState(), this.game1.getLastState());
 		}
+	}
+	
+	public void changeMaxJumps(String input) {
+		int num = Integer.parseInt(input);
+		this.game1.getPlayer().setMaxJumps(num);
 	}
 	
 	public class ArrowKeyEvent extends AbstractAction {

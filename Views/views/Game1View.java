@@ -62,8 +62,8 @@ public class Game1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
-	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280};
+	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280, 295};
 	
 	public Game1View(int w, int h) {
 		super(w, h);
@@ -130,6 +130,23 @@ public class Game1View extends GameView {
 		
 		if (this.getGame1State() == GameState.PAUSE){
 			this.drawPauseMenu(g, AppState.GAME1);
+		}
+	}
+	
+	@Override
+	public void drawPauseMenu(Graphics g, AppState appState) {
+		super.drawPauseMenu(g, appState);
+		
+		switch (this.getPauseState()) {
+		case PLAYERINFO:
+			g.drawString("Health: " + this.player.getHealth() + "/" + this.player.getMaxHealth(), 500, 200);
+			break;
+		case SYSTEM:
+			
+			break;
+		case DEBUG:
+			g.drawString("Set max jumps: ", 500, 200);
+			break;
 		}
 	}
 	
@@ -219,8 +236,8 @@ public class Game1View extends GameView {
 				this.player.getOnSurfaceBottom(), "Against surface top: " + this.player.getAgainstSurfaceTop(), "Against surface right: " + this.player.getAgainstSurfaceRight(), "Against surface left: " +
 				this.player.getAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.getOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.getAgainstMovingSurfaceBottom(), 
 				"Against moving surface top: " + this.player.getAgainstMovingSurfaceTop(), "Against moving surface right: " + this.player.getAgainstMovingSurfaceRight(), "Against moving surface left: " +
-				this.player.getAgainstMovingSurfaceLeft(), "On platform: " + this.player.getOnPlatform(), "Jump duration (final): " + this.player.getJumpDuration(), "Jump counter: " + this.player.getJumpCounter(),
-				"Jump number: " + this.player.getJumpNumber()};
+				this.player.getAgainstMovingSurfaceLeft(), "On platform: " + this.player.getOnPlatform(), "Jump duration (final): " + this.player.getJumpDuration(), "Max jumps: " + this.player.getMaxJumps(), 
+				"Jump counter: " + this.player.getJumpCounter(), "Jump number: " + this.player.getJumpNumber()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
