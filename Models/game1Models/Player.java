@@ -33,12 +33,12 @@ public class Player extends Game1Model {
 	private boolean regenCollision = false; // true if player is occupying same area as a regen area
 	private boolean currentCollision = false; // true if player is occupying same area as a current (Current.java)
 	private int jumpingCounter = 0;
-	private final int jumpDuration = 30;
+	private int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
 	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
-	private final int maxHealth = 100;
-	private int currHealth = 100;
-	private final int damageCooldownThresh = 80;
+	private int maxHealth = 100;
+	private int currHealth = this.maxHealth;
+	private int damageCooldownThresh = 80;
 	private int damageCooldown = this.damageCooldownThresh;
 	private int healthIncrease;
 	private int healthDecreaseEnemy;
@@ -183,6 +183,16 @@ public class Player extends Game1Model {
 		this.yIncr = this.defaultYIncr;
 		this.floatingThreshold = this.defaultFloatingThreshold;
 		this.maxJumps = this.defaultMaxJumps;
+	}
+	
+	public void respawn(int x, int y) {
+		this.setXLoc(x);
+		this.setYLoc(y);
+		
+		this.currHealth = this.maxHealth;
+		this.jumpCount = 0;
+		this.jumpingCounter = 0;
+		this.floatingCounter = 0;
 	}
 	
 	public void incrX() {

@@ -5,12 +5,12 @@ import enums.Direction;
 /*X loc must be within moveThreshL and moveThreshR!*/
 public class EnemyA extends Enemy {
 	private final int xIncr;
-	private final int damage = 1;
+	private final int damage;
 	private int moveThreshL;
 	private int moveThreshR;
 	private Direction currDir;
 
-	public EnemyA(int x, int y, int h, int w, Direction d, int moveVariance, int xIncr) {
+	public EnemyA(int x, int y, int h, int w, Direction d, int moveVariance, int xIncr, int dam) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);
@@ -19,6 +19,7 @@ public class EnemyA extends Enemy {
 		this.moveThreshL = x - moveVariance;
 		this.moveThreshR = x + moveVariance;
 		this.xIncr = xIncr;
+		this.damage = dam;
 	}
 	
 	public Direction getCurrDir() {

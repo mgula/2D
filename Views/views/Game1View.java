@@ -15,10 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 public class Game1View extends GameView {
-	private JButton winButton;
-	private JButton loseButton;
-	private JButton playAgainButton;
-	
 	private Player player;
 	private AreaMap currMap;
 	private Room currRoom;
@@ -37,10 +33,8 @@ public class Game1View extends GameView {
 	private boolean leftArrow = false;
 	private boolean spaceBar = false;
 	private int lastYloc;
-	private final int staticScreenAreaX;
-	private final int staticScreenAreaY;
-	private final int extraSand = 6;
-	private final int sandLayers = 4;
+	private int staticScreenAreaX;
+	private int staticScreenAreaY;
 	private final int initialThresholdXR;
 	private final int initialThresholdXL;
 	private final int initialThresholdYU;
@@ -68,12 +62,17 @@ public class Game1View extends GameView {
 	public Game1View(int w, int h) {
 		super(w, h);
 		this.initialThresholdXR = (int)((double)w * this.upperRatio);
-		this.thresholdXR = this.initialThresholdXR;
 		this.initialThresholdXL = (int)((double)w * this.lowerRatio);
-		this.thresholdXL = this.initialThresholdXL;
 		this.initialThresholdYU = (int)((double)h * this.lowerRatio);
-		this.thresholdYU = this.initialThresholdYU;
 		this.initialThresholdYD = (int)((double)h * this.upperRatio);
+		
+		this.setStartingOffsets();
+	}
+	
+	public void setStartingOffsets() {
+		this.thresholdXR = this.initialThresholdXR;
+		this.thresholdXL = this.initialThresholdXL;
+		this.thresholdYU = this.initialThresholdYU;
 		this.thresholdYD = this.initialThresholdYD;
 		
 		/*???*/
@@ -91,18 +90,6 @@ public class Game1View extends GameView {
 	
 	public ArrayList<Game1Model> getDraw() {
 		return this.environment;
-	}
-	
-	public JButton getWinButton() {
-		return this.winButton;
-	}
-	
-	public JButton getLoseButton() {
-		return this.loseButton;
-	}
-	
-	public JButton getPlayAgainButton() {
-		return this.playAgainButton;
 	}
 	
 	public void setRightArrow(boolean b) {
@@ -253,17 +240,6 @@ public class Game1View extends GameView {
 			message = "X: " + m.getXLoc() + ", Y: " + m.getYLoc();
 			g.drawString(message, m.getXLoc() - this.playerOffsetX - 20, m.getYLoc() - 5 - this.playerOffsetY);
 		}
-	}
-	
-	@Override
-	public void initButtons() {
-		super.initButtons();
-		this.winButton = new JButton("Continue to the next level");
-		this.winButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth() + 2 * this.getExtraTextOffset(), this.getButtonHeight());
-		this.loseButton = new JButton("Try again");
-		this.loseButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
-		this.playAgainButton = new JButton("Play again");
-		this.playAgainButton.setBounds(this.getButtonXloc(), this.getButtonSlot2Y(), this.getButtonWidth(), this.getButtonHeight());
 	}
 	
 	public void load(Game1 game) {

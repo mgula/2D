@@ -27,7 +27,6 @@ import java.util.ArrayList;
 /*TODO:
  * -implement serializable
  * -file system (no new game button, just save slots)
- * -implement losing/dying
  * -room transitions
  * -sound
  * -slopes/stairs
@@ -253,30 +252,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				game1View.getEditYIncrField().setText("");
 			}
     	});
-		this.game1View.getWinButton().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				game1.setGameState(GameState.LOAD);
-				frame.getContentPane().removeAll();
-				screenHandled = false;
-			}
-    	});
-		this.game1View.getLoseButton().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				game1.setGameState(GameState.LOAD);
-				frame.getContentPane().removeAll();
-				screenHandled = false;
-			}
-    	});
-		this.game1View.getPlayAgainButton().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				game1.setGameState(GameState.LOAD);
-				frame.getContentPane().removeAll();
-				screenHandled = false;
-			}
-    	});
 	}
 	
 	public void updateCurrentState() {
@@ -409,13 +384,13 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				break;
 				
 			case DEATH:
-				if (!this.screenHandled) {
-					this.screenHandled = true;
-					this.frame.getContentPane().removeAll();
-					this.frame.add(this.game1View.getLoseButton());
-					this.frame.add(this.game1View.getBackButton());
-					this.addViewToFrame(this.game1View);
-				}
+				this.game1.respawn();
+				
+				this.game1.setJumping(false);
+				
+				this.game1View.setStartingOffsets();
+				
+				this.game1.setGameState(GameState.PLAY);
 				break;
 				
 			case LOAD:

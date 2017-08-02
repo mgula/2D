@@ -68,6 +68,7 @@ public class Game1 implements Game {
 					env.add(new Platform(1400, -400, 1000));
 					env.add(new RegenArea(2250, -50, 50, 50, 1));
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
+					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 5, 25));
 					
 					roomLinks[0] = RoomID.WEST1;
 					roomLinks[1] = RoomID.EAST1;
@@ -142,6 +143,12 @@ public class Game1 implements Game {
 			this.currMap.addRoomEnv(r, env);
 			this.currMap.addRoomLinks(r, roomLinks);
 		}
+	}
+	
+	public void respawn() {
+		this.currRoomID = RoomID.SPAWN;
+		this.makeCurrRoom();
+		this.player.respawn(this.playerStartingXloc, this.playerStartingYloc);
 	}
 	
 	public void initCurrMap() {
