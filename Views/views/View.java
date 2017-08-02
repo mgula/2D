@@ -23,6 +23,7 @@ public abstract class View extends JPanel {
 	private GameState game1State;
 	private GameState lastGame1State;
 	private int buttonWidth = 150;
+	private int setButtonWidth = 50; //width for debug setter buttons
 	private int buttonHeight = 35;
 	private int buttonXloc;
 	private int buttonYloc;
@@ -66,6 +67,10 @@ public abstract class View extends JPanel {
 	
 	public int getButtonWidth() {
 		return this.buttonWidth;
+	}
+	
+	public int getSetButtonWidth() {
+		return this.setButtonWidth;
 	}
 	
 	public int getButtonHeight() {

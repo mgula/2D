@@ -6,12 +6,17 @@ import enums.Direction;
 
 public class Player extends Game1Model {
 
-	private int xIncr = 6;
-	private int yIncr = 5;
+	private final int defaultXIncr = 6;
+	private final int defaultYIncr = 5;
+	private final int defaultFloatingThreshold = 10;
+	private final int defaultMaxJumps = 2;
+	
+	private int xIncr = this.defaultXIncr;
+	private int yIncr = this.defaultYIncr;
 	private int currXSegment = 0;
 	private int currYSegment = 0;
 	private int floatingCounter = 0;
-	private final int floatingThreshold = 10; // used to make the player float for a moment after jumping, as if underwater
+	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
 	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
 	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
 	private boolean againstSurfaceRight = false; // etc
@@ -30,7 +35,7 @@ public class Player extends Game1Model {
 	private int jumpingCounter = 0;
 	private final int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
-	private int maxJumps = 2; // maximum number of jumps allowed
+	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
 	private final int maxHealth = 100;
 	private int currHealth = 100;
 	private final int damageCooldownThresh = 80;
@@ -82,6 +87,14 @@ public class Player extends Game1Model {
 	}
 	
 	//debug view display suite
+	public int getXIncr() {
+		return this.xIncr;
+	}
+	
+	public int getYIncr() {
+		return this.yIncr;
+	}
+	
 	public boolean getOnSurfaceBottom() {
 		return this.onSurfaceBottom;
 	}
@@ -137,10 +150,39 @@ public class Player extends Game1Model {
 	public int getMaxJumps() {
 		return this.maxJumps;
 	}
+	
+	public int getFloatingCounter() {
+		return this.floatingCounter;
+	}
+	
+	public int getFloatingThreshold() {
+		return this.floatingThreshold;
+	}
  	//end debug view display suite
 	
+	//start debug setter suite
 	public void setMaxJumps(int j) {
 		this.maxJumps = j;
+	}
+	
+	public void setFloatingThreshold(int t) {
+		this.floatingThreshold = t;
+	}
+	
+	public void setXIncr(int x) {
+		this.xIncr = x;
+	}
+	
+	public void setYIncr(int y) {
+		this.yIncr = y;
+	}
+	//end debug setter suite
+	
+	public void restoreDefaultAttributes() {
+		this.xIncr = this.defaultXIncr;
+		this.yIncr = this.defaultYIncr;
+		this.floatingThreshold = this.defaultFloatingThreshold;
+		this.maxJumps = this.defaultMaxJumps;
 	}
 	
 	public void incrX() {
@@ -232,6 +274,15 @@ public class Player extends Game1Model {
 				}
 				this.currYSegment = 0;
 			}
+		}
+	}
+	
+	public void phaseThroughPlatform(Room r, ArrayList<Game1Model> e) {
+		if (this.onPlatform) {
+			this.setYLoc(this.getYLoc() + 1);
+			this.onPlatform = false;
+			this.onSurfaceBottom = false;
+			this.floatingCounter = this.floatingThreshold;
 		}
 	}
 	

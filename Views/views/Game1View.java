@@ -62,8 +62,8 @@ public class Game1View extends GameView {
 	private final int debugMsgOffset1X = 20;
 	private final int debugMsgOffset1Y = 5;
 	private final int debugMsgOffset2 = 20;
-	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
-	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280, 295};
+	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
+	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280, 295, 320, 335};
 	
 	public Game1View(int w, int h) {
 		super(w, h);
@@ -146,6 +146,13 @@ public class Game1View extends GameView {
 			break;
 		case DEBUG:
 			g.drawString("Set max jumps: ", 500, 200);
+			g.drawString("Current: " + this.player.getMaxJumps(), 700, 200);
+			g.drawString("Set floating threshold: ", 450, 230);
+			g.drawString("Current: " + this.player.getFloatingThreshold(), 700, 230);
+			g.drawString("Set X increase: ", 480, 260);
+			g.drawString("Current: " + this.player.getXIncr(), 700, 260);
+			g.drawString("Set Y increase: ", 480, 290);
+			g.drawString("Current: " + this.player.getYIncr(), 700, 290);
 			break;
 		}
 	}
@@ -237,7 +244,7 @@ public class Game1View extends GameView {
 				this.player.getAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.getOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.getAgainstMovingSurfaceBottom(), 
 				"Against moving surface top: " + this.player.getAgainstMovingSurfaceTop(), "Against moving surface right: " + this.player.getAgainstMovingSurfaceRight(), "Against moving surface left: " +
 				this.player.getAgainstMovingSurfaceLeft(), "On platform: " + this.player.getOnPlatform(), "Jump duration (final): " + this.player.getJumpDuration(), "Max jumps: " + this.player.getMaxJumps(), 
-				"Jump counter: " + this.player.getJumpCounter(), "Jump number: " + this.player.getJumpNumber()};
+				"Jump counter: " + this.player.getJumpCounter(), "Jump number: " + this.player.getJumpNumber(), "Floating threshold: " + this.player.getFloatingThreshold(), "Floating counter: " + this.player.getFloatingCounter()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}

@@ -61,8 +61,11 @@ public class Game1 implements Game {
 					env.add(new Rock(1500, -125, 70, 70));
 					env.add(new Rock(1600, -200, 30, 70));
 					env.add(new Rock(2500, -125, 70, 70));
+					env.add(new Rock(1500, -550, 70, 70));
+					env.add(new Rock(2500, -550, 70, 70));
 					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 					env.add(new Platform(1700, -125, 50));
+					env.add(new Platform(1400, -400, 1000));
 					env.add(new RegenArea(2250, -50, 50, 50, 1));
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					
@@ -210,6 +213,12 @@ public class Game1 implements Game {
 	public void assertGravity() {
 		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
 		this.player.assertGravity(this.currRoom, this.currEnvironment);
+	}
+	
+	public void phaseThroughPlatform() {
+		this.player.phaseThroughPlatform(this.currRoom, this.currEnvironment);
+		this.checkMovingSurfaces();
+		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
 	}
 	
 	public void moveAll() {

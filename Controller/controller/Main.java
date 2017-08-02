@@ -52,6 +52,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private boolean rightPressed = false;
 	private boolean leftPressed = false;
 	private boolean spacePressed = false;
+	private boolean downPressed = false;
 	private boolean clicked = false; //used to handle click events
 	private int clickX;
 	private int clickY;
@@ -218,10 +219,38 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				unpauseGame(game1, game1View);
 			}
     	});
+		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				game1.getPlayer().restoreDefaultAttributes();
+			}
+    	});
 		this.game1View.getEditJumpsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeMaxJumps(game1View.getEditJumpsField().getText());
+				game1View.getEditJumpsField().setText("");
+			}
+    	});
+		this.game1View.getEditFloatButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeFloatingThreshold(game1View.getEditFloatField().getText());
+				game1View.getEditFloatField().setText("");
+			}
+    	});
+		this.game1View.getEditXIncrButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeXIncr(game1View.getEditXIncrField().getText());
+				game1View.getEditXIncrField().setText("");
+			}
+    	});
+		this.game1View.getEditYIncrButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeYIncr(game1View.getEditYIncrField().getText());
+				game1View.getEditYIncrField().setText("");
 			}
     	});
 		this.game1View.getWinButton().addActionListener(new ActionListener() {
@@ -361,8 +390,15 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 							break;
 							
 						case DEBUG:
+							this.frame.add(this.game1View.getRestoreDefaultsButton());
 							this.frame.add(this.game1View.getEditJumpsField());
 							this.frame.add(this.game1View.getEditJumpsButton());
+							this.frame.add(this.game1View.getEditFloatField());
+							this.frame.add(this.game1View.getEditFloatButton());
+							this.frame.add(this.game1View.getEditXIncrField());
+							this.frame.add(this.game1View.getEditXIncrButton());
+							this.frame.add(this.game1View.getEditYIncrField());
+							this.frame.add(this.game1View.getEditYIncrButton());
 							break;
 							
 						default:
@@ -407,6 +443,9 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				}
 				if (this.spacePressed) {
 					this.game1.setJumping(true);
+				}
+				if (this.downPressed) {
+					this.game1.phaseThroughPlatform();
 				}
 				this.game1.evaluateJumping();
 				this.game1.gameStateCheck();
@@ -473,6 +512,21 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.game1.getPlayer().setMaxJumps(num);
 	}
 	
+	public void changeFloatingThreshold(String input) {
+		int num = Integer.parseInt(input);
+		this.game1.getPlayer().setFloatingThreshold(num);
+	}
+	
+	public void changeXIncr(String input) {
+		int num = Integer.parseInt(input);
+		this.game1.getPlayer().setXIncr(num);
+	}
+	
+	public void changeYIncr(String input) {
+		int num = Integer.parseInt(input);
+		this.game1.getPlayer().setYIncr(num);
+	}
+	
 	public class ArrowKeyEvent extends AbstractAction {
 		private String command;
 		public ArrowKeyEvent(String command) {
@@ -497,6 +551,10 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					game1View.setSpaceBar(true);
 					break;
 					
+				case "DownPressed":
+					downPressed = true;
+					break;
+					
 				/*Key releases set their respective booleans to false*/
 				case "LeftReleased":
 					leftPressed = false;
@@ -511,6 +569,10 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				case "SpaceReleased":
 					spacePressed = false;
 					game1View.setSpaceBar(false);
+					break;
+					
+				case "DownReleased":
+					downPressed = false;
 					break;
 					
 				/*P key activates pause menu*/	
@@ -542,16 +604,20 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RightPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SpacePressed");
+				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "DownPressed");
 				v.getActionMap().put("RightPressed", new ArrowKeyEvent("RightPressed"));
 				v.getActionMap().put("LeftPressed", new ArrowKeyEvent("LeftPressed"));
 				v.getActionMap().put("SpacePressed", new ArrowKeyEvent("SpacePressed"));
+				v.getActionMap().put("DownPressed", new ArrowKeyEvent("DownPressed"));
 				
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "RightReleased");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "LeftReleased");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "SpaceReleased");
+				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "DownReleased");
 				v.getActionMap().put("RightReleased", new ArrowKeyEvent("RightReleased"));
 				v.getActionMap().put("LeftReleased", new ArrowKeyEvent("LeftReleased"));
 				v.getActionMap().put("SpaceReleased", new ArrowKeyEvent("SpaceReleased"));
+				v.getActionMap().put("DownReleased", new ArrowKeyEvent("DownReleased"));
 				
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "Pause");
 				v.getActionMap().put("Pause", new ArrowKeyEvent("Pause"));

@@ -27,9 +27,19 @@ public abstract class GameView extends View {
 	/*Buttons and fields*/
 	private JButton backButton;
 	private JButton resumeButton;
+	private JButton restoreDefaultsButton;
 	
 	private JTextField editJumps;
 	private JButton editJumpsButton;
+	
+	private JTextField editFloat;
+	private JButton editFloatButton;
+	
+	private JTextField editXIncr;
+	private JButton editXIncrButton;
+	
+	private JTextField editYIncr;
+	private JButton editYIncrButton;
 	
 	public GameView(int w, int h) {
 		super(w, h);
@@ -55,12 +65,40 @@ public abstract class GameView extends View {
 		return this.resumeButton;
 	}
 	
+	public JButton getRestoreDefaultsButton() {
+		return this.restoreDefaultsButton;
+	}
+	
 	public JTextField getEditJumpsField() {
 		return this.editJumps;
 	}
 	
 	public JButton getEditJumpsButton() {
 		return this.editJumpsButton;
+	}
+	
+	public JTextField getEditFloatField() {
+		return this.editFloat;
+	}
+	
+	public JButton getEditFloatButton() {
+		return this.editFloatButton;
+	}
+	
+	public JTextField getEditXIncrField() {
+		return this.editXIncr;
+	}
+	
+	public JButton getEditYIncrButton() {
+		return this.editYIncrButton;
+	}
+	
+	public JTextField getEditYIncrField() {
+		return this.editYIncr;
+	}
+	
+	public JButton getEditXIncrButton() {
+		return this.editXIncrButton;
 	}
 	
 	public PauseState getPauseState() {
@@ -88,11 +126,32 @@ public abstract class GameView extends View {
 		this.backButton = new JButton("back to main menu");
 		this.backButton.setBounds(this.getButtonXloc(), this.getButtonSlot3Y(), this.getButtonWidth() + this.getExtraTextOffset(), this.getButtonHeight());
 		
+		this.restoreDefaultsButton = new JButton("restore defaults");
+		this.restoreDefaultsButton.setBounds(500, 140, this.getButtonWidth() + this.getExtraTextOffset(), this.getButtonHeight());
+		
 		this.editJumps = new JTextField("");
-		this.editJumps.setBounds(600, 200, 100, 20);
+		this.editJumps.setBounds(600, 187, 50, 20);
 		
 		this.editJumpsButton = new JButton("set");
-		this.editJumpsButton.setBounds(700, 200, this.getButtonWidth(), this.getButtonHeight());
+		this.editJumpsButton.setBounds(650, 180, this.getSetButtonWidth(), this.getButtonHeight());
+		
+		this.editFloat = new JTextField("");
+		this.editFloat.setBounds(600, 217, 50, 20);
+		
+		this.editFloatButton = new JButton("set");
+		this.editFloatButton.setBounds(650, 210, this.getSetButtonWidth(), this.getButtonHeight());
+		
+		this.editXIncr = new JTextField("");
+		this.editXIncr.setBounds(600, 247, 50, 20);
+		
+		this.editXIncrButton = new JButton("set");
+		this.editXIncrButton.setBounds(650, 240, this.getSetButtonWidth(), this.getButtonHeight());
+		
+		this.editYIncr = new JTextField("");
+		this.editYIncr.setBounds(600, 277, 50, 20);
+		
+		this.editYIncrButton = new JButton("set");
+		this.editYIncrButton.setBounds(650, 270, this.getSetButtonWidth(), this.getButtonHeight());
 	}
 	
 	public void drawPauseMenu(Graphics g, AppState appState) {
