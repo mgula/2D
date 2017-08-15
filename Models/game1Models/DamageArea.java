@@ -18,6 +18,13 @@ public class DamageArea extends EventArea {
 	
 	@Override
 	public String toString() {
-		return this.getInfo();
+		return this.getString() + 
+				"\nHealth Decrease: " + this.healthDecr;
+	}
+	
+	@Override
+	public String toStringForAreaMap() {
+		return this.getStringForAreaMap() + 
+				"\n\t\tHealth Decrease: " + this.healthDecr;
 	}
 }

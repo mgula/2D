@@ -287,12 +287,24 @@ public class Player extends Game1Model {
 		}
 	}
 	
-	public void phaseThroughPlatform(Room r, ArrayList<Game1Model> e) {
+	public void phaseThroughPlatformOrExit(Room r, ArrayList<Game1Model> e) {
 		if (this.onPlatform) {
 			this.setYLoc(this.getYLoc() + 1);
 			this.onPlatform = false;
 			this.onSurfaceBottom = false;
 			this.floatingCounter = this.floatingThreshold;
+		} else {
+			for (Exit ex : r.getRoomLinks()) {
+				if (ex.getDirection() == Direction.SOUTH) {
+					if (this.getYLoc() <= ex.getYLoc()) {
+						if (this.getXLoc() >= ex.getXLoc() && this.getXLoc() + this.getWidth() <= ex.getXLoc() + ex.getWidth()) {
+							this.setYLoc(this.getYLoc() + 1);
+							this.onSurfaceBottom = false;
+							this.floatingCounter = this.floatingThreshold;
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -421,6 +433,14 @@ public class Player extends Game1Model {
 		if (this.getYLoc() <= r.getYLoc() - r.getHeight()) {
 			this.againstSurfaceTop = true;
 			newCollision = true;
+			for (Exit ex : r.getRoomLinks()) {
+				if (this.getYLoc() <= ex.getYLoc()) {
+					if (this.getXLoc() >= ex.getXLoc() && this.getXLoc() + this.getWidth() <= ex.getXLoc() + ex.getWidth()) {
+						this.againstSurfaceTop = false;
+						newCollision = false;
+					}
+				}
+			}
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
@@ -454,9 +474,17 @@ public class Player extends Game1Model {
 	public void checkRightEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (this.getXLoc() + this.getWidth() >= r.getXLoc() + r.getWidth() && !r.hasRoomEast()) {
+		if (this.getXLoc() + this.getWidth() >= r.getXLoc() + r.getWidth()) {
 			this.againstSurfaceRight = true;
 			newCollision = true;
+			for (Exit ex : r.getRoomLinks()) {
+				if (this.getXLoc() + this.getWidth() >= ex.getXLoc()) {
+					if (this.getYLoc() >= ex.getYLoc() && this.getYLoc() <= ex.getYLoc() + ex.getHeight()) {
+						this.againstSurfaceRight = false;
+						newCollision = false;
+					}
+				}
+			}
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {
@@ -489,9 +517,17 @@ public class Player extends Game1Model {
 	public void checkLeftEdgeCollisions(Room r, ArrayList<Game1Model> e) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (this.getXLoc() <= r.getXLoc() && !r.hasRoomWest()) {
+		if (this.getXLoc() <= r.getXLoc()) {
 			this.againstSurfaceLeft = true;
 			newCollision = true;
+			for (Exit ex : r.getRoomLinks()) {
+				if (this.getXLoc() <= ex.getXLoc()) {
+					if (this.getYLoc() >= ex.getYLoc() && this.getYLoc() <= ex.getYLoc() + ex.getHeight()) {
+						this.againstSurfaceLeft = false;
+						newCollision = false;
+					}
+				}
+			}
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : e) {

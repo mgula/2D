@@ -32,9 +32,15 @@ public class Current extends EventArea {
 	
 	@Override
 	public String toString() {
-		String info = this.getInfo() + 
+		return this.getString() + 
 				"\nFlow Direction: " + this.flowDir +
 				"\nFlow Increase: " + this.incr;
-		return info;
+	}
+	
+	@Override
+	public String toStringForAreaMap() {
+		return this.getStringForAreaMap() + 
+				"\n\t\tFlow Direction: " + this.flowDir +
+				"\n\t\tFlow Increase: " + this.incr;
 	}
 }

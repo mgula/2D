@@ -11,6 +11,11 @@ public class Platform extends Game1Model {
 	
 	@Override
 	public String toString() {
-		return this.getInfo();
+		return this.getString();
+	}
+	
+	@Override
+	public String toStringForAreaMap() {
+		return this.getStringForAreaMap();
 	}
 }

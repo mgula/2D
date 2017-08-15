@@ -4,113 +4,58 @@ import java.util.ArrayList;
 
 import enums.RoomID;
 
-public class Room {
+public class Room extends Game1Model {
 	private RoomID ID;
-	private int xLoc; //x coord of the SOUTH WEST most corner of the room
-	private int yLoc; //y coord of the SOUTH WEST most corner of the room
-	private int height;
-	private int width;
 	private ArrayList<Game1Model> environment;
-	private RoomID roomWestID;
-	private RoomID roomEastID;
-	private RoomID roomNorthID;
-	private RoomID roomSouthID;
+	private ArrayList<Exit> roomLinks;
 	
 	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Game1Model> e) {
 		this.ID = n;
-		this.xLoc = x;
-		this.yLoc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 		this.environment = e;
 	}
 	
-	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Game1Model> e, RoomID west, RoomID east, RoomID north, RoomID south) {
+	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Game1Model> e, ArrayList<Exit> rl) {
 		this.ID = n;
-		this.xLoc = x;
-		this.yLoc = y;
-		this.height = h;
-		this.width = w;
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(h);
+		this.setWidth(w);
 		this.environment = e;
-		this.roomWestID = west;
-		this.roomEastID = east;
-		this.roomNorthID = north;
-		this.roomSouthID = south;
+		this.roomLinks = rl;
 	}
 	
 	public RoomID getID() {
 		return this.ID;
 	}
 	
-	public int getXLoc() {
-		return this.xLoc;
-	}
-	
-	public int getYLoc() {
-		return this.yLoc;
-	}
-	
-	public int getHeight() {
-		return this.height;
-	}
-	
-	public int getWidth() {
-		return this.width;
-	}
-	
 	public ArrayList<Game1Model> getEnvironment() {
 		return this.environment;
 	}
 	
-	public RoomID getRoomWest() {
-		return this.roomWestID;
-	}
-	
-	public RoomID getRoomEast() {
-		return this.roomEastID;
-	}
-	
-	public RoomID getRoomNorth() {
-		return this.roomNorthID;
-	}
-	
-	public RoomID getRoomSouth() {
-		return this.roomSouthID;
-	}
-	
-	public boolean hasRoomWest() {
-		return this.roomWestID != null;
-	}
-	
-	public boolean hasRoomEast() {
-		return this.roomEastID != null;
-	}
-	
-	public boolean hasRoomNorth() {
-		return this.roomNorthID != null;
-	}
-	
-	public boolean hasRoomSouth() {
-		return this.roomSouthID != null;
+	public ArrayList<Exit> getRoomLinks() {
+		return this.roomLinks;
 	}
 	
 	@Override
 	public String toString() {
 		String info = "Room ID: " + this.ID +
-				"\nX Loc: " + this.xLoc + 
-				"\nY Loc: " + this.yLoc + 
-				"\nHeight: " + this.height +
-				"\nWidth: " + this.width +
-				"\nEnvironment Contents:\n";
+				"\n" + this.getString();
+		
+		info += "\nEnvironment Info: \n";
 		
 		for (Game1Model m : this.environment) {
-			info += "\t" + m.toString() + "\n";
+			info += m.toString() + "\n";
 		}
 		
-		info += "\nWest Room ID: " + this.roomWestID +
-				"\nEast Room ID: " + this.roomEastID +
-				"\nNorth Room ID: " + this.roomNorthID +
-				"\nSouth Room ID: " + this.roomSouthID;
+		info += "Exit Info: \n";
+		
+		for (Exit e : this.roomLinks) {
+			info += e.toString() + "\n";
+		}
 		return info;
 	}
 }

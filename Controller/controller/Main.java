@@ -28,11 +28,11 @@ import java.util.ArrayList;
  * -implement serializable
  * -file system (no new game button, just save slots)
  * -room transitions
+ * -squishing
  * -sound
  * -slopes/stairs
  * 
  * BUGS
- * -new game button (after 1st click)
  * -WASD keys
  */
 
@@ -64,7 +64,8 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private Dimension screenSize;
 	private boolean screenHandled = false;
 	private boolean fullScreen = true;
-	private static final int sleepTime = 30; //Time in milliseconds to wait each cycle of the main loop
+	private static final int defaultSleepTime = 30;
+	private static int sleepTime = defaultSleepTime; //Time in milliseconds to wait each cycle of the main loop
 	
 	public static void main(String[] args) {
 		Main main = new Main();
@@ -222,6 +223,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game1.getPlayer().restoreDefaultAttributes();
+				sleepTime = defaultSleepTime;
 			}
     	});
 		this.game1View.getEditJumpsButton().addActionListener(new ActionListener() {
@@ -250,6 +252,13 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			public void actionPerformed(ActionEvent e) {
 				changeYIncr(game1View.getEditYIncrField().getText());
 				game1View.getEditYIncrField().setText("");
+			}
+    	});
+		this.game1View.getEditSleepTimeButton().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeSleepTime(game1View.getEditSleepTimeField().getText());
+				game1View.getEditSleepTimeField().setText("");
 			}
     	});
 	}
@@ -326,6 +335,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	
 	public void tick() {
 		this.updateViewStates();
+		this.game1View.updateSleepTime(sleepTime);
 		switch (this.currentState) {
 			case GAME1:
 				this.handleGame1();
@@ -374,6 +384,8 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 							this.frame.add(this.game1View.getEditXIncrButton());
 							this.frame.add(this.game1View.getEditYIncrField());
 							this.frame.add(this.game1View.getEditYIncrButton());
+							this.frame.add(this.game1View.getEditSleepTimeField());
+							this.frame.add(this.game1View.getEditSleepTimeButton());
 							break;
 							
 						default:
@@ -397,33 +409,32 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				this.loadGame1();
 				break;
 				
-			default:
+			case PLAY:
 				this.game1.assertGravity();
 				this.game1.checkMovingSurfaces();
 				this.game1.moveAll();
 				this.game1.checkAreaCollisions();
 				if (this.rightPressed) {
 					this.game1.moveRight();
-					if (this.game1.getRoomChangeEvent()) {
-						this.game1.changeRoom(Direction.EAST);
-						this.game1View.updateView(this.game1);
-					}
 				}
 				if (this.leftPressed) {
 					this.game1.moveLeft();
-					if (this.game1.getRoomChangeEvent()) {
-						this.game1.changeRoom(Direction.WEST);
-						this.game1View.updateView(this.game1);
-					}
 				}
 				if (this.spacePressed) {
 					this.game1.setJumping(true);
 				}
 				if (this.downPressed) {
-					this.game1.phaseThroughPlatform();
+					this.game1.phaseThroughPlatformOrExit();
+				}
+				if (this.game1.getRoomChangeEvent()) {
+					this.game1.changeRoom();
+					this.game1View.updateView(this.game1);
 				}
 				this.game1.evaluateJumping();
 				this.game1.gameStateCheck();
+				break;
+				
+			default:
 				break;
 		}
 	}
@@ -500,6 +511,11 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	public void changeYIncr(String input) {
 		int num = Integer.parseInt(input);
 		this.game1.getPlayer().setYIncr(num);
+	}
+	
+	public static void changeSleepTime(String input) {
+		int num = Integer.parseInt(input);
+		sleepTime = num;
 	}
 	
 	public class ArrowKeyEvent extends AbstractAction {

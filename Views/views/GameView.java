@@ -41,6 +41,9 @@ public abstract class GameView extends View {
 	private JTextField editYIncr;
 	private JButton editYIncrButton;
 	
+	private JTextField editSleepTime;
+	private JButton editSleepTimeButton;
+	
 	public GameView(int w, int h) {
 		super(w, h);
 	}
@@ -89,16 +92,24 @@ public abstract class GameView extends View {
 		return this.editXIncr;
 	}
 	
-	public JButton getEditYIncrButton() {
-		return this.editYIncrButton;
+	public JButton getEditXIncrButton() {
+		return this.editXIncrButton;
 	}
 	
 	public JTextField getEditYIncrField() {
 		return this.editYIncr;
 	}
 	
-	public JButton getEditXIncrButton() {
-		return this.editXIncrButton;
+	public JButton getEditYIncrButton() {
+		return this.editYIncrButton;
+	}
+	
+	public JTextField getEditSleepTimeField() {
+		return this.editSleepTime;
+	}
+	
+	public JButton getEditSleepTimeButton() {
+		return this.editSleepTimeButton;
 	}
 	
 	public PauseState getPauseState() {
@@ -152,6 +163,12 @@ public abstract class GameView extends View {
 		
 		this.editYIncrButton = new JButton("set");
 		this.editYIncrButton.setBounds(650, 270, this.getSetButtonWidth(), this.getButtonHeight());
+		
+		this.editSleepTime = new JTextField("");
+		this.editSleepTime.setBounds(600, 307, 50, 20);
+		
+		this.editSleepTimeButton = new JButton("set");
+		this.editSleepTimeButton.setBounds(650, 300, this.getSetButtonWidth(), this.getButtonHeight());
 	}
 	
 	public void drawPauseMenu(Graphics g, AppState appState) {

@@ -22,10 +22,13 @@ public class Game1 implements Game {
 	private boolean roomChangeEvent = false;
 	
 	private final int RoomDataArrayLength = 4;
-	private final int RoomLinksArrayLength = 4;
+	
+	private RoomID destinationRoomID;
+	private int changeRoomOffsetX;
+	private int changeRoomOffsetY;
 	
 	private AreaMap map1;
-	private RoomID[] map1Rooms = {RoomID.SPAWN, RoomID.EAST1, RoomID.WEST1, RoomID.EAST2, RoomID.WEST2};
+	private RoomID[] map1Rooms = {RoomID.SPAWN, RoomID.EAST1, RoomID.WEST1, RoomID.EAST2, RoomID.WEST2, RoomID.NORTHEAST1};
 	
 	private AreaMap currMap;
 	private MapID currMapID = MapID.MAP1;
@@ -49,7 +52,7 @@ public class Game1 implements Game {
 			
 			int[] roomDims = new int[this.RoomDataArrayLength];
 			ArrayList<Game1Model> env = new ArrayList<Game1Model>();
-			RoomID[] roomLinks = new RoomID[this.RoomLinksArrayLength];
+			ArrayList<Exit> roomLinks = new ArrayList<Exit>();
 			
 			switch (r) {
 				case SPAWN:
@@ -66,14 +69,14 @@ public class Game1 implements Game {
 					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 					env.add(new Platform(1700, -125, 50));
 					env.add(new Platform(1400, -400, 1000));
+					env.add(new Platform(2925, -500, 75));
 					env.add(new RegenArea(2250, -50, 50, 50, 1));
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 5, 25));
 					
-					roomLinks[0] = RoomID.WEST1;
-					roomLinks[1] = RoomID.EAST1;
-					roomLinks[2] = null;
-					roomLinks[3] = null;
+					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.WEST1, Direction.WEST, 1000, this.groundLevel, 50));
+					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.EAST1, Direction.EAST, 1000 + 2000, this.groundLevel, 50));
+					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.NORTHEAST1, Direction.EAST, 1000 + 2000, -500, 50));
 					break;
 					
 				case EAST1:
@@ -85,10 +88,10 @@ public class Game1 implements Game {
 					env.add(new Rock(3500, -125, 70, 70));
 					env.add(new Rock(3250, -250, 50, 50));
 					
-					roomLinks[0] = RoomID.SPAWN;
-					roomLinks[1] = RoomID.EAST2;
-					roomLinks[2] = null;
-					roomLinks[3] = null;
+					
+					roomLinks.add(new Exit(RoomID.EAST1, RoomID.SPAWN, Direction.WEST, 3000, this.groundLevel, 50));
+					roomLinks.add(new Exit(RoomID.EAST1, RoomID.EAST2, Direction.EAST, 3000 + 1000, this.groundLevel, 50));
+					roomLinks.add(new Exit(RoomID.EAST1, RoomID.NORTHEAST1, Direction.NORTH, 3250, -500, 50));
 					break;
 					
 				case WEST1:
@@ -100,10 +103,8 @@ public class Game1 implements Game {
 					env.add(new Rock(500, -125, 70, 70));
 					env.add(new Rock(750, -250, 50, 50));
 					
-					roomLinks[0] = RoomID.WEST2;
-					roomLinks[1] = RoomID.SPAWN;
-					roomLinks[2] = null;
-					roomLinks[3] = null;
+					roomLinks.add(new Exit(RoomID.WEST1, RoomID.SPAWN, Direction.EAST, 1000, this.groundLevel, 50));
+					roomLinks.add(new Exit(RoomID.WEST1, RoomID.WEST2, Direction.WEST, 0, this.groundLevel, 50));
 					break;
 					
 				case EAST2:
@@ -115,10 +116,7 @@ public class Game1 implements Game {
 					env.add(new Rock(4500, -125, 70, 70));
 					env.add(new Rock(4750, -250, 50, 50));
 					
-					roomLinks[0] = RoomID.EAST1;
-					roomLinks[1] = null;
-					roomLinks[2] = null;
-					roomLinks[3] = null;
+					roomLinks.add(new Exit(RoomID.EAST2, RoomID.EAST1, Direction.WEST, 4000, this.groundLevel, 50));
 					break;
 					
 				case WEST2:
@@ -130,12 +128,21 @@ public class Game1 implements Game {
 					env.add(new Rock(-500, -125, 70, 70));
 					env.add(new Rock(-750, -250, 50, 50));
 					
-					roomLinks[0] = null;
-					roomLinks[1] = RoomID.WEST1;
-					roomLinks[2] = null;
-					roomLinks[3] = null;
+					roomLinks.add(new Exit(RoomID.WEST2, RoomID.WEST1, Direction.EAST, 0, this.groundLevel, 50));
 					break;
 					
+				case NORTHEAST1:
+					roomDims[0] = 3000;
+					roomDims[1] = -500;
+					roomDims[2] = 500;
+					roomDims[3] = 1000;
+					
+					env.add(new Rock(3200, -750, 70, 70));
+					
+					roomLinks.add(new Exit(RoomID.NORTHEAST1, RoomID.SPAWN, Direction.WEST, 3000, -500, 50));
+					roomLinks.add(new Exit(RoomID.NORTHEAST1, RoomID.EAST1, Direction.SOUTH, 3250, -500, 50));
+					
+					break;
 				default:
 					break;
 			}
@@ -163,36 +170,76 @@ public class Game1 implements Game {
 	}
 	
 	public void makeCurrRoom() {
-		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID)[0], this.currMap.accessRoomLinks(this.currRoomID)[1], this.currMap.accessRoomLinks(this.currRoomID)[2], this.currMap.accessRoomLinks(this.currRoomID)[3]);
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
 		this.currEnvironment = this.currRoom.getEnvironment();
 	}
 	
-	public void changeRoom(Direction d) {
-		this.lastRoomID = this.currRoomID;
-		switch (d) {
-			case EAST:
-				this.currRoomID = this.currRoom.getRoomEast();
-				break;
-				
-			case WEST:
-				this.currRoomID = this.currRoom.getRoomWest();
-				break;
-				
-			default:
-				break;
-		}
+	public void changeRoom() {
+		this.currRoomID = this.destinationRoomID;
 		this.makeCurrRoom();
+		
+		this.player.setXLoc(this.player.getXLoc() + this.changeRoomOffsetX);
+		this.player.setYLoc(this.player.getYLoc() + this.changeRoomOffsetY);
+		
 		this.roomChangeEvent = false;
 	}
 	
 	public void checkRoomBoundaries() {
-		if (this.player.getXLoc() < this.currRoom.getXLoc()) {
-			if (this.map1.accessRoomLinks(this.currRoomID)[0] != null) {
-				this.roomChangeEvent = true;
-			}
-		} else if (this.player.getXLoc() > (this.currRoom.getXLoc() + this.currRoom.getWidth())) {
-			if (this.map1.accessRoomLinks(this.currRoomID)[1] != null) {
-				this.roomChangeEvent = true;
+		int px = this.player.getXLoc();
+		int py = this.player.getYLoc();
+		
+		for (Exit e : this.currMap.accessRoomLinks(this.currRoomID)) {
+			int x = e.getXLoc();
+			int y = e.getYLoc();
+			int h = e.getHeight();
+			int w = e.getWidth();
+			switch (e.getDirection()) {
+				case NORTH:
+					if (px >= x && px + this.player.getWidth() <= x + w) {
+						if (py < y) {
+							this.roomChangeEvent = true;
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = 0;
+							this.changeRoomOffsetY = -1 * (this.player.getHeight() + 1); //push rest of player through door (to avoid erroneously triggering more room change events)
+						}
+					}
+					break;
+					
+				case SOUTH:
+					if (px >= x && px + this.player.getWidth() <= x + w) {
+						if (py + this.player.getHeight() > y) {
+							this.roomChangeEvent = true;
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = 0;
+							this.changeRoomOffsetY = this.player.getHeight() + 1;
+						}
+					}
+					break;
+					
+				case EAST:
+					if (py <= y && py > y - h) {
+						if (px + this.player.getWidth() >= x) {
+							this.roomChangeEvent = true;
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = this.player.getWidth() + 1;
+							this.changeRoomOffsetY = 0;
+						}
+					}
+					break;
+					
+				case WEST:
+					if (py <= y && py > y - h) {
+						if (px <= x) {
+							this.roomChangeEvent = true;
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = -1 * (this.player.getWidth() + 1);
+							this.changeRoomOffsetY = 0;
+						}
+					}
+					break;
+				
+				default:
+					break;
 			}
 		}
 	}
@@ -222,10 +269,12 @@ public class Game1 implements Game {
 		this.player.assertGravity(this.currRoom, this.currEnvironment);
 	}
 	
-	public void phaseThroughPlatform() {
-		this.player.phaseThroughPlatform(this.currRoom, this.currEnvironment);
+	public void phaseThroughPlatformOrExit() {
+		this.player.phaseThroughPlatformOrExit(this.currRoom, this.currEnvironment);
 		this.checkMovingSurfaces();
 		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
+		
+		this.checkRoomBoundaries();
 	}
 	
 	public void moveAll() {
@@ -244,8 +293,6 @@ public class Game1 implements Game {
 		this.player.checkTopEdgeCollisions(this.currRoom, this.currEnvironment);
 		
 		this.player.checkLeavingSurface(this.currEnvironment);
-		
-		this.checkRoomBoundaries();
 	}
 	
 	public void evaluateJumping() {
@@ -254,6 +301,7 @@ public class Game1 implements Game {
 			if (!this.player.initiateJumpArc(this.currRoom, this.currEnvironment)) {
 				this.jumping = false;
 			}
+			this.checkRoomBoundaries();
 		}
 	}
 	
@@ -279,6 +327,10 @@ public class Game1 implements Game {
 	
 	public void setJumping(boolean b) {
 		this.jumping = b;
+	}
+	
+	public void setRoomChangeEvent(boolean b) {
+		this.roomChangeEvent = b;
 	}
 	
 	/*Getters*/

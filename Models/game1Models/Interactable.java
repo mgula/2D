@@ -126,10 +126,17 @@ public class Interactable extends SolidObject {
 	
 	@Override
 	public String toString() {
-		String info = this.getInfo() + 
-				"\nX Increase: " + this.incr +
+		return this.getString() + 
+				"\nIncrease: " + this.incr +
 				"\nCurrent Direction: " + this.currDir +
 				"\nLast Direction: " + this.lastDir;
-		return info;
+	}
+	
+	@Override
+	public String toStringForAreaMap() {
+		return this.getStringForAreaMap() + 
+				"\n\t\tIncrease: " + this.incr +
+				"\n\t\tCurrent Direction: " + this.currDir +
+				"\n\t\tLast Direction: " + this.lastDir;
 	}
 }

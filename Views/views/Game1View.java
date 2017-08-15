@@ -20,6 +20,8 @@ public class Game1View extends GameView {
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;
 	
+	private int mainSleepTime;
+	
 	private boolean roomChangeEvent = false;
 	
 	private final int healthXloc = 5;
@@ -140,6 +142,8 @@ public class Game1View extends GameView {
 			g.drawString("Current: " + this.player.getXIncr(), 700, 260);
 			g.drawString("Set Y increase: ", 480, 290);
 			g.drawString("Current: " + this.player.getYIncr(), 700, 290);
+			g.drawString("Set Sleep Time: ", 480, 320);
+			g.drawString("Current: " + this.mainSleepTime, 700, 320);
 			break;
 		}
 	}
@@ -150,6 +154,7 @@ public class Game1View extends GameView {
 		/*Draw the current room*/
 		g.drawRect(this.currRoom.getXLoc() - this.playerOffsetX, this.currRoom.getYLoc() - this.playerOffsetY - this.currRoom.getHeight(), this.currRoom.getWidth(), this.currRoom.getHeight());
 		
+		this.drawExits(g);
 		this.drawEnvironment(g);
 		this.drawPlayer(g);
 		
@@ -163,11 +168,17 @@ public class Game1View extends GameView {
 		this.lastYloc = this.player.getYLoc();
 	}
 	
+	public void drawExits(Graphics g) {
+		g.setColor(Color.ORANGE);
+		for (Exit e : this.currRoom.getRoomLinks()) {
+			g.drawLine(e.getXLoc() - this.playerOffsetX, e.getYLoc() - this.playerOffsetY, e.getXLoc() + e.getWidth() - this.playerOffsetX, e.getYLoc() - e.getHeight() - this.playerOffsetY);
+		}
+		g.setColor(Color.BLACK);
+	}
+	
 	public void drawEnvironment(Graphics g) {
 		for (Game1Model m : this.environment) {
 			if (m instanceof game1Models.Rock) {
-				g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Debris) {
 				g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof game1Models.Enemy) {
 				g.setColor(Color.RED);
@@ -258,6 +269,10 @@ public class Game1View extends GameView {
 		this.currRoom = game.getCurrRoom();
 		this.environment = game.getEnvironment();
 		this.lastYloc = this.player.getYLoc();
+	}
+	
+	public void updateSleepTime(int s) {
+		this.mainSleepTime = s;
 	}
 	
 	public void restoreInitialOffsets() {

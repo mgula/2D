@@ -39,11 +39,26 @@ public abstract class Game1Model {
 		this.width = w;
 	}
 	
-	public String getInfo() {
+	//each child will use this method in their toString()
+	public String getString() {
 		return "Model name: " + this.getClass() + 
 				"\nX Loc: " + this.xloc + 
 				"\nY Loc: " + this.yloc + 
 				"\nHeight: " + this.height +
 				"\nWidth: " + this.width;
+	}
+	
+	//each child will use this method in their toStringForAreaMap() that they will override.
+	public String getStringForAreaMap() {
+		return "\n\t\tModel name: " + this.getClass() + 
+				"\n\t\tX Loc: " + this.xloc + 
+				"\n\t\tY Loc: " + this.yloc + 
+				"\n\t\tHeight: " + this.height +
+				"\n\t\tWidth: " + this.width;
+	}
+	
+	//method for each child to override that AreaMap will use in its toString()
+	public String toStringForAreaMap(){
+		return null;
 	}
 }

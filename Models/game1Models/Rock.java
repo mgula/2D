@@ -11,6 +11,11 @@ public class Rock extends SolidObject {
 	
 	@Override
 	public String toString() {
-		return this.getInfo();
+		return this.getString();
+	}
+	
+	@Override
+	public String toStringForAreaMap() {
+		return this.getStringForAreaMap();
 	}
 }

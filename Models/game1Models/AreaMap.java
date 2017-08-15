@@ -14,7 +14,7 @@ public class AreaMap {
 	/*Better way then 3 maps?*/
 	private HashMap<RoomID, int[]> roomData;
 	private HashMap<RoomID, ArrayList<Game1Model>> roomEnvs;
-	private HashMap<RoomID, RoomID[]> roomLinks;
+	private HashMap<RoomID, ArrayList<Exit>> roomLinks;
 	
 	private int numRooms;
 	
@@ -25,7 +25,7 @@ public class AreaMap {
 		
 		this.roomData = new HashMap<RoomID, int[]>();
 		this.roomEnvs = new HashMap<RoomID, ArrayList<Game1Model>>();
-		this.roomLinks = new HashMap<RoomID, RoomID[]>();
+		this.roomLinks = new HashMap<RoomID, ArrayList<Exit>>();
 	}
 	
 	public int[] accessRoomData(RoomID key) {
@@ -36,7 +36,7 @@ public class AreaMap {
 		return this.roomEnvs.get(key);
 	}
 	
-	public RoomID[] accessRoomLinks(RoomID key) {
+	public ArrayList<Exit> accessRoomLinks(RoomID key) {
 		return this.roomLinks.get(key);
 	}
 	
@@ -54,7 +54,7 @@ public class AreaMap {
 	/* String[] links data structure:
 	 * [west room, east room, north room, south room]
 	 */
-	public void addRoomLinks(RoomID roomID, RoomID[] links) {
+	public void addRoomLinks(RoomID roomID, ArrayList<Exit> links) {
 		this.roomLinks.put(roomID, links);
 	}
 	
@@ -72,25 +72,26 @@ public class AreaMap {
 	
 	@Override
 	public String toString() {
-		String info = "";
+		String info = "Map ID: " + this.mapID + "\n";
 		
 		for (RoomID r : this.roomIDs) {
-			info += "Room ID: " + r +
-					"\nRoom X Loc: " + this.accessRoomData(r)[0] +
-					"\nRoom Y Loc: " + this.accessRoomData(r)[1] + 
-					"\nRoom Height: " + this.accessRoomData(r)[2] +
-					"\nRoom Width: " + this.accessRoomData(r)[3] + 
-					"\nEnvironment Contents:\n";
-		
+			info += "\nRoom ID: " + r +
+					"\n\tX Location: " + this.accessRoomData(r)[0] +
+					"\n\tY Location: " + this.accessRoomData(r)[1] +
+					"\n\tHeight: " + this.accessRoomData(r)[2] +
+					"\n\tWidth: " + this.accessRoomData(r)[3];
+			
+			info += "\n\tEnvironment Info: ";
+			
 			for (Game1Model m : this.accessRoomEnvs(r)) {
-				info += "\n\t" + m.toString() + "\n";
+				info += m.toStringForAreaMap() + "\n";
 			}
 			
-			info += "\nWest Room ID: " + this.accessRoomLinks(r)[0] +
-					"\nEast Room ID: " + this.accessRoomLinks(r)[1] +
-					"\nNorth Room ID: " + this.accessRoomLinks(r)[2] +
-					"\nSouth Room ID: " + this.accessRoomLinks(r)[3] +
-					"\n\n";
+			info += "\n\tExit Info: ";
+			
+			for (Exit e : this.accessRoomLinks(r)) {
+				info += e.toStringForAreaMap() + "\n";
+			}
 		}
 		
 		return info;
