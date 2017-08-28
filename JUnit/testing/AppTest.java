@@ -60,7 +60,7 @@ public class AppTest {
 		
 		/*Create a new main*/
 		this.main = new Main();
-		this.main.init();
+		//this.main.init();
 		this.simulate(this.initialCycles);  // duration = 150 here because there's a bit of loading to do
 		try {
 			this.robot = new Robot();

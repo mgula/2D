@@ -6,7 +6,8 @@ public enum GameState {
 	DEBUG,
 	DEATH,
 	PLAY,
-	PAUSE; // all 3 games can be paused
+	PAUSE, // all 3 games can be paused
+	QUIT;
 	
 	private GameState(){};
 }

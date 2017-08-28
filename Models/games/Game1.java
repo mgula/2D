@@ -1,7 +1,7 @@
 package games;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.io.Serializable;
 
 import enums.Direction;
 import enums.GameState;
@@ -9,9 +9,10 @@ import enums.MapID;
 import enums.RoomID;
 import game1Models.*;
 
-public class Game1 implements Game {
-	private GameState gameState = GameState.UNINITIALIZED;
-	private GameState lastState = GameState.UNINITIALIZED;
+public class Game1 implements Game, Serializable {
+	private static final long serialVersionUID = 5953620154360831955L;
+	private GameState gameState;
+	private GameState lastState;
 	private Player player;
 	private int playerStartingXloc = 2000; 
 	private int playerStartingYloc = -100;

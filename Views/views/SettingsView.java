@@ -14,6 +14,11 @@ public class SettingsView extends MainView {
 	private ButtonGroup windowedToggle;
 	private JRadioButton windowedOn;
 	private JRadioButton windowedOff;
+	
+	private JButton clearDataButton1;
+	private JButton clearDataButton2;
+	private JButton clearDataButton3;
+	
 	private final int YLOC = 300;
 	private final int Y_OFFSET = 30;
 	private final int Y_OFFSET_2 = 20;
@@ -27,6 +32,18 @@ public class SettingsView extends MainView {
 	
 	public SettingsView(int w, int h) {
 		super(w, h);
+	}
+	
+	public JButton getClearDataButton1() {
+		return this.clearDataButton1;
+	}
+	
+	public JButton getClearDataButton2() {
+		return this.clearDataButton2;
+	}
+	
+	public JButton getClearDataButton3() {
+		return this.clearDataButton3;
 	}
 	
 	public JRadioButton getDebugToggleOn() {
@@ -80,5 +97,11 @@ public class SettingsView extends MainView {
 		this.windowedOff.setBounds(this.getButtonXloc() + 130, this.YLOC + (this.Y_OFFSET * 5) - this.Y_OFFSET_2, this.debugToggleSize, this.debugToggleSize);
 		this.windowedToggle.add(this.windowedOn);
 		this.windowedToggle.add(this.windowedOff);
+		this.clearDataButton1 = new JButton("clear data 1");
+		this.clearDataButton1.setBounds(400, 500, this.getButtonWidth(), this.getButtonHeight());
+		this.clearDataButton2 = new JButton("clear data 2");
+		this.clearDataButton2.setBounds(600, 500, this.getButtonWidth(), this.getButtonHeight());
+		this.clearDataButton3 = new JButton("clear data 3");
+		this.clearDataButton3.setBounds(800, 500, this.getButtonWidth(), this.getButtonHeight());
 	}
 }

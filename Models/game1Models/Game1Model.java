@@ -1,7 +1,9 @@
 package game1Models;
 
-public abstract class Game1Model {
-	
+import java.io.Serializable;
+
+public abstract class Game1Model implements Serializable {
+	private static final long serialVersionUID = 2452479368975808182L;
 	private int xloc;
 	private int yloc;
 	private int height;

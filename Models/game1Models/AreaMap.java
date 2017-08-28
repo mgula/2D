@@ -1,5 +1,6 @@
 package game1Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 import enums.MapID;
 import enums.RoomID;
 
-public class AreaMap {
+public class AreaMap implements Serializable{
 	private MapID mapID;
 	private RoomID[] roomIDs;
 	
