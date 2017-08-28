@@ -41,6 +41,7 @@ import java.util.ArrayList;
  * -squishing
  * -sound
  * -slopes/stairs
+ * -JUnit ... ? :/
  * 
  * BUGS
  * -WASD keys
@@ -102,7 +103,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
     		try {
     			Thread.sleep(sleepTime);
     		} catch (InterruptedException e) {
-    			System.out.println(e.getMessage());
+    			System.out.println("From main(String[] args): Interrupted Exception (" + e.getMessage() + ")");
     		}
     	}
     	main.frame.setVisible(false);
@@ -122,7 +123,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					files[i].createNewFile();
 					this.clearSaveData(files[i]);
 				} catch (IOException e) {
-					System.out.println(e.getMessage());
+					System.out.println("From Main(): IO Exception (" + e.getMessage() + ")");
 				}
 			}
 		}
@@ -584,9 +585,9 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			this.objectOut.close();
 			this.fileOut.close();
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From writeSaveDataToFile(File save): File Not Found Exception (" + e.getMessage() + ")");
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From writeSaveDataToFile(File save): IO Exception (" + e.getMessage() + ")");
 		}
 	}
 	
@@ -615,11 +616,11 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			this.objectIn.close();
 			this.fileIn.close();
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From loadSaveDataFromFile(File save): File Not Found Exception (" + e.getMessage() + ")");
 		} catch (IOException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From loadSaveDataFromFile(File save): IO Exception (" + e.getMessage() + ")");
 		} catch (ClassNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From loadSaveDataFromFile(File save): Class Not Found Exception (" + e.getMessage() + ")");
 		}
 	}
 	
@@ -629,7 +630,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			w.print("");
 			w.close();
 		} catch (FileNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.out.println("From clearSaveData(File file): File Not Found Exception (" + e.getMessage() + ")");
 		}
 	}
 	
