@@ -7,7 +7,6 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 
 import enums.AppState;
-import enums.GameState;
 import enums.PauseState;
 
 public abstract class GameView extends View {

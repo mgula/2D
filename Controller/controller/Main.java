@@ -1,7 +1,6 @@
 package controller;
 
 import enums.AppState;
-import enums.Direction;
 import enums.GameState;
 import enums.PauseState;
 import enums.SaveFile;
@@ -34,6 +33,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
+ * -makefile/script
  * -magic numbers in views
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
@@ -74,7 +74,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private AppState currentState = AppState.START;
 	private AppState intendedState = AppState.SATISFIED;
 	private JFrame frame = new JFrame();
-	private boolean firstPlay = true;
 	private boolean rightPressed = false;
 	private boolean leftPressed = false;
 	private boolean spacePressed = false;

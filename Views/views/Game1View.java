@@ -1,17 +1,15 @@
 package views;
 
 import enums.AppState;
-import enums.Direction;
+
 import enums.GameState;
 import game1Models.*;
 import games.Game1;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 public class Game1View extends GameView {

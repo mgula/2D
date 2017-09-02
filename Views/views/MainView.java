@@ -1,7 +1,6 @@
 package views;
 
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import javax.swing.JButton;
 
 public class MainView extends View { 

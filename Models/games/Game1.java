@@ -10,7 +10,7 @@ import enums.RoomID;
 import game1Models.*;
 
 public class Game1 implements Game, Serializable {
-	private static final long serialVersionUID = 5953620154360831955L;
+	private static final long serialVersionUID = 1L;
 	private GameState gameState;
 	private GameState lastState;
 	private Player player;
