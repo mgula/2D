@@ -1,0 +1,15 @@
+package enums;
+
+public enum KeyCommand {
+	LEFTPRESSED,
+	RIGHTPRESSED,
+	SPACEPRESSED,
+	DOWNPRESSED,
+	LEFTRELEASED,
+	RIGHTRELEASED,
+	SPACERELEASED,
+	DOWNRELEASED,
+	PAUSE;
+	
+	private KeyCommand(){};
+}

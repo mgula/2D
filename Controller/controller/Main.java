@@ -2,6 +2,7 @@ package controller;
 
 import enums.AppState;
 import enums.GameState;
+import enums.KeyCommand;
 import enums.PauseState;
 import enums.SaveFile;
 import games.*;
@@ -728,55 +729,55 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	}
 	
 	public class ArrowKeyEvent extends AbstractAction {
-		private String command;
-		public ArrowKeyEvent(String command) {
+		private KeyCommand command;
+		public ArrowKeyEvent(KeyCommand command) {
 			this.command = command;
 		}
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			switch (this.command) {
 				/*Key presses set their respective booleans to true*/
-				case "LeftPressed":
+				case LEFTPRESSED:
 					leftPressed = true;
 					game1View.setLeftArrow(true);
 					break;
 					
-				case "RightPressed":
+				case RIGHTPRESSED:
 					rightPressed = true;
 					game1View.setRightArrow(true);
 					break;
 					
-				case "SpacePressed":
+				case SPACEPRESSED:
 					spacePressed = true;
 					game1View.setSpaceBar(true);
 					break;
 					
-				case "DownPressed":
+				case DOWNPRESSED:
 					downPressed = true;
 					break;
 					
 				/*Key releases set their respective booleans to false*/
-				case "LeftReleased":
+				case LEFTRELEASED:
 					leftPressed = false;
 					game1View.setLeftArrow(false);
 					break;
 					
-				case "RightReleased":
+				case RIGHTRELEASED:
 					rightPressed = false;
 					game1View.setRightArrow(false);
 					break;
 					
-				case "SpaceReleased":
+				case SPACERELEASED:
 					spacePressed = false;
 					game1View.setSpaceBar(false);
 					break;
 					
-				case "DownReleased":
+				case DOWNRELEASED:
 					downPressed = false;
 					break;
 					
 				/*P key activates pause menu*/	
-				case "Pause":
+				case PAUSE:
 					switch (currentState) {
 						case GAME1:
 							if (currentGame.getGameState() != GameState.PAUSE) {
@@ -805,22 +806,22 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SpacePressed");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "DownPressed");
-				v.getActionMap().put("RightPressed", new ArrowKeyEvent("RightPressed"));
-				v.getActionMap().put("LeftPressed", new ArrowKeyEvent("LeftPressed"));
-				v.getActionMap().put("SpacePressed", new ArrowKeyEvent("SpacePressed"));
-				v.getActionMap().put("DownPressed", new ArrowKeyEvent("DownPressed"));
+				v.getActionMap().put("RightPressed", new ArrowKeyEvent(KeyCommand.RIGHTPRESSED));
+				v.getActionMap().put("LeftPressed", new ArrowKeyEvent(KeyCommand.LEFTPRESSED));
+				v.getActionMap().put("SpacePressed", new ArrowKeyEvent(KeyCommand.SPACEPRESSED));
+				v.getActionMap().put("DownPressed", new ArrowKeyEvent(KeyCommand.DOWNPRESSED));
 				
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "RightReleased");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "LeftReleased");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "SpaceReleased");
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "DownReleased");
-				v.getActionMap().put("RightReleased", new ArrowKeyEvent("RightReleased"));
-				v.getActionMap().put("LeftReleased", new ArrowKeyEvent("LeftReleased"));
-				v.getActionMap().put("SpaceReleased", new ArrowKeyEvent("SpaceReleased"));
-				v.getActionMap().put("DownReleased", new ArrowKeyEvent("DownReleased"));
+				v.getActionMap().put("RightReleased", new ArrowKeyEvent(KeyCommand.RIGHTRELEASED));
+				v.getActionMap().put("LeftReleased", new ArrowKeyEvent(KeyCommand.LEFTRELEASED));
+				v.getActionMap().put("SpaceReleased", new ArrowKeyEvent(KeyCommand.SPACERELEASED));
+				v.getActionMap().put("DownReleased", new ArrowKeyEvent(KeyCommand.DOWNRELEASED));
 				
 				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "Pause");
-				v.getActionMap().put("Pause", new ArrowKeyEvent("Pause"));
+				v.getActionMap().put("Pause", new ArrowKeyEvent(KeyCommand.PAUSE));
 			}
 		}
 	}
