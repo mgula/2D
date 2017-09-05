@@ -1,5 +1,3 @@
 /bin/
 /data/
-.DS_store
-.classpath
-.project
+/exec/
