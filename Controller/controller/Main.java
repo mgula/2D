@@ -34,7 +34,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -makefile/script
+ * -add cleaning to launcher.sh
  * -magic numbers in views
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
