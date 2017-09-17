@@ -34,7 +34,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -add cleaning to launcher.sh
+ * -memory leaks
  * -magic numbers in views
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * -JUnit ... ? :/
  * 
  * BUGS
- * -WASD keys
+ * -most keys other than p
  */
 
 public class Main implements KeyListener, MouseListener, MouseMotionListener {
