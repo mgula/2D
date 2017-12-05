@@ -34,7 +34,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -memory leaks
+ * -BIG REFACTOR
  * -magic numbers in views
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
@@ -42,6 +42,8 @@ import java.util.ArrayList;
  * -squishing
  * -sound
  * -slopes/stairs
+ * -change body
+ * -pushable objects
  * -JUnit ... ? :/
  * 
  * BUGS
