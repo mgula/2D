@@ -3,7 +3,7 @@ package views;
 import enums.AppState;
 import enums.GameState;
 import game1Models.*;
-import games.Engine;
+import games.GameEngine;
 import games.Game1;
 
 import java.awt.Color;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import javax.swing.JLabel;
 
 public class Game1View extends GameView {
-	private Engine engine;
+	private GameEngine engine;
 	private AreaMap currMap;
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;

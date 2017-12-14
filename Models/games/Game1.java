@@ -16,7 +16,7 @@ public class Game1 implements Game, Serializable {
 	
 	private int groundLevel = 0;
 	
-	private Engine engine;
+	private GameEngine engine;
 	
 	private Controllable player;
 	
@@ -41,7 +41,7 @@ public class Game1 implements Game, Serializable {
 	public Game1() {
 		this.initCurrMap();
 		
-		this.engine = new Engine();
+		this.engine = new GameEngine();
 		
 		this.player = this.engine.getPlayer();
 		
@@ -282,7 +282,7 @@ public class Game1 implements Game, Serializable {
 		return this.roomChangeEvent;
 	}
 	
-	public Engine getEngine() {
+	public GameEngine getEngine() {
 		return this.engine;
 	}
 	

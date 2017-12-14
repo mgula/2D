@@ -7,7 +7,7 @@ import enums.Direction;
 import game1Models.*;
 
 /*TODO: get this functionally equivalent to how it was before*/
-public class Engine implements Serializable {
+public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private final int defaultXIncr = 6;
@@ -47,7 +47,7 @@ public class Engine implements Serializable {
 	
 	private final int interactableWaitTime = 50;
 	
-	public Engine() {
+	public GameEngine() {
 		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.maxHealth);
 	}
 	
