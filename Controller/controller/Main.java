@@ -319,7 +319,7 @@ public class Main implements KeyListener, MouseListener {
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentGame.getPlayer().restoreDefaultAttributes();
+				currentGame.getEngine().restoreDefaultAttributes();
 				sleepTime = defaultSleepTime;
 			}
     		});
@@ -421,7 +421,7 @@ public class Main implements KeyListener, MouseListener {
 	}
 	
 	public void loadGame1() {
-		this.currentGame.setJumping(false);
+		//this.currentGame.setJumping(false);
 		this.rightPressed = false;
 		this.spacePressed = false;
 		
@@ -506,8 +506,6 @@ public class Main implements KeyListener, MouseListener {
 			case DEATH:
 				this.currentGame.respawn();
 				
-				this.currentGame.setJumping(false);
-				
 				this.game1View.setStartingOffsets();
 				
 				this.currentGame.setGameState(GameState.PLAY);
@@ -518,28 +516,11 @@ public class Main implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
-				this.currentGame.assertGravity();
-				this.currentGame.checkMovingSurfaces();
-				this.currentGame.moveAll();
-				this.currentGame.checkAreaCollisions();
-				if (this.rightPressed) {
-					this.currentGame.moveRight();
-				}
-				if (this.leftPressed) {
-					this.currentGame.moveLeft();
-				}
-				if (this.spacePressed) {
-					this.currentGame.setJumping(true);
-				}
-				if (this.downPressed) {
-					this.currentGame.phaseThroughPlatformOrExit();
-				}
+				this.currentGame.tick(this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+				
 				if (this.currentGame.getRoomChangeEvent()) {
-					this.currentGame.changeRoom();
 					this.game1View.updateView(this.currentGame);
 				}
-				this.currentGame.evaluateJumping();
-				this.currentGame.gameStateCheck();
 				break;
 				
 			default:
@@ -696,12 +677,12 @@ public class Main implements KeyListener, MouseListener {
 	
 	public void changeMaxJumps(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getPlayer().setMaxJumps(num);
+		this.currentGame.getEngine().setMaxJumps(num);
 	}
 	
 	public void changeFloatingThreshold(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getPlayer().setFloatingThreshold(num);
+		this.currentGame.getEngine().setFloatingThreshold(num);
 	}
 	
 	public void changeXIncr(String input) {

@@ -13,13 +13,13 @@ public class Game1 implements Game, Serializable {
 	private static final long serialVersionUID = 1L;
 	private GameState gameState;
 	private GameState lastState;
-	private Player player;
-	private int playerStartingXloc = 2000; 
-	private int playerStartingYloc = -100;
-	private int playerHeight = 40;
-	private int playerWidth = 40;
+	
 	private int groundLevel = 0;
-	private boolean jumping = false;
+	
+	private Engine engine;
+	
+	private Controllable player;
+	
 	private boolean roomChangeEvent = false;
 	
 	private final int RoomDataArrayLength = 4;
@@ -41,7 +41,9 @@ public class Game1 implements Game, Serializable {
 	public Game1() {
 		this.initCurrMap();
 		
-		this.player = new Player(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth);
+		this.engine = new Engine();
+		
+		this.player = this.engine.getPlayer();
 		
 		this.initCurrentMapRooms();
 		
@@ -156,7 +158,7 @@ public class Game1 implements Game, Serializable {
 	public void respawn() {
 		this.currRoomID = RoomID.SPAWN;
 		this.makeCurrRoom();
-		this.player.respawn(this.playerStartingXloc, this.playerStartingYloc);
+		this.engine.respawn();
 	}
 	
 	public void initCurrMap() {
@@ -245,70 +247,15 @@ public class Game1 implements Game, Serializable {
 		}
 	}
 	
-	public void moveRight() {
-		this.player.checkRightEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.moveRight(this.currRoom, this.currEnvironment);
-		this.player.checkLeavingSurface(this.currEnvironment);
-		
+	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
+		this.engine.tick(this.currRoom, this.currEnvironment, rightPressed, leftPressed, spacePressed, downPressed);
 		this.checkRoomBoundaries();
-	}
-	
-	public void moveLeft() {
-		this.player.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.moveLeft(this.currRoom, this.currEnvironment);
-		this.player.checkLeavingSurface(this.currEnvironment);
 		
-		this.checkRoomBoundaries();
-	}
-	
-	public void checkMovingSurfaces() {
-		this.player.checkMovingSurfaces(this.currRoom, this.currEnvironment, false);
-	}
-	
-	public void assertGravity() {
-		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.assertGravity(this.currRoom, this.currEnvironment);
-	}
-	
-	public void phaseThroughPlatformOrExit() {
-		this.player.phaseThroughPlatformOrExit(this.currRoom, this.currEnvironment);
-		this.checkMovingSurfaces();
-		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
-		
-		this.checkRoomBoundaries();
-	}
-	
-	public void moveAll() {
-		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof game1Models.Enemy) {
-				((game1Models.Enemy) m).move();
-			} else if (m instanceof game1Models.Interactable) {
-				((game1Models.Interactable) m).move(this.currRoom, this.currEnvironment, this.player);
-			}
+		if (this.roomChangeEvent) {
+			this.changeRoom();
 		}
 		
-		/*Check player, an interactable may have moved them*/
-		this.player.checkRightEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment);
-		this.player.checkTopEdgeCollisions(this.currRoom, this.currEnvironment);
-		
-		this.player.checkLeavingSurface(this.currEnvironment);
-	}
-	
-	public void evaluateJumping() {
-		if (this.jumping) {
-			this.player.checkTopEdgeCollisions(this.currRoom, this.currEnvironment);
-			if (!this.player.initiateJumpArc(this.currRoom, this.currEnvironment)) {
-				this.jumping = false;
-			}
-			this.checkRoomBoundaries();
-		}
-	}
-	
-	public void checkAreaCollisions() {
-		this.player.checkAreaCollisions(this.currEnvironment);
-		this.player.evaluateAreaCollisions(this.currRoom, this.currEnvironment);
+		this.gameStateCheck();
 	}
 	
 	public void gameStateCheck() {
@@ -326,10 +273,6 @@ public class Game1 implements Game, Serializable {
 		this.lastState = state;
 	}
 	
-	public void setJumping(boolean b) {
-		this.jumping = b;
-	}
-	
 	public void setRoomChangeEvent(boolean b) {
 		this.roomChangeEvent = b;
 	}
@@ -339,7 +282,11 @@ public class Game1 implements Game, Serializable {
 		return this.roomChangeEvent;
 	}
 	
-	public Player getPlayer() {
+	public Engine getEngine() {
+		return this.engine;
+	}
+	
+	public Controllable getPlayer() {
 		return this.player;
 	}
 	
@@ -361,14 +308,6 @@ public class Game1 implements Game, Serializable {
 	
 	public ArrayList<Game1Model> getEnvironment() {
 		return this.currEnvironment;
-	}
-	
-	public int getPlayerStartingXloc() {
-		return this.playerStartingXloc;
-	}
-	
-	public int getPlayerStartingYloc() {
-		return this.playerStartingYloc;
 	}
 	
 	public GameState getGameState() {
