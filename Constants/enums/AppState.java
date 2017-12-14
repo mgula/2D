@@ -7,8 +7,7 @@ public enum AppState {
 	END,
 	LOAD,
 	INBETWEEN1,
-	SETTINGS,
-	SATISFIED; // only intended state can have this value; current state will never have this value
+	SETTINGS; // only intended state can have this value; current state will never have this value
 	
 	private AppState(){};
 }

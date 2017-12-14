@@ -28,7 +28,6 @@ public abstract class View extends JPanel {
 	private String flashingText;
 	private int flashingTextCounter = 0;
 	private int flashingTextThresh = 60;
-	private final int fontSize = 20;
 	private int buttonSlot1Y;
 	private int buttonSlot2Y;
 	private int buttonSlot3Y;

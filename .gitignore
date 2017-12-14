@@ -4,8 +4,9 @@
 /exec/
 
 # garbage
-*.DS_Store
+.DS_Store
 
 # eclipse stuff
+.metadata
 .classpath
 .project

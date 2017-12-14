@@ -50,7 +50,7 @@ import java.util.ArrayList;
  * -most keys other than p
  */
 
-public class Main implements KeyListener, MouseListener, MouseMotionListener {
+public class Main implements KeyListener, MouseListener {
 	private final String savePath1 = "data/game1data.txt";
 	private final String savePath2 = "data/game2data.txt";
 	private final String savePath3 = "data/game3data.txt";
@@ -75,21 +75,12 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 	private BetweenView betweenView;
 	private ArrayList<View> allViews  = new ArrayList<View>();
 	private AppState currentState = AppState.START;
-	private AppState intendedState = AppState.SATISFIED;
+	private AppState nextState = AppState.START;
 	private JFrame frame = new JFrame();
 	private boolean rightPressed = false;
 	private boolean leftPressed = false;
 	private boolean spacePressed = false;
 	private boolean downPressed = false;
-	private boolean clicked = false; //used to handle click events
-	private int clickX;
-	private int clickY;
-	private boolean dragged = false; //used to handle mouse drag events
-	private int dragX;
-	private int dragY;
-	private boolean released = false; //used to handle mouse release events
-	private int releaseX;
-	private int releaseY;
 	private Dimension screenSize;
 	private boolean screenHandled = false;
 	private boolean fullScreen = true;
@@ -163,83 +154,83 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 		this.mainView.getMg1Button().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.INBETWEEN1;
+				nextState = AppState.INBETWEEN1;
 			}
-    	});
+    		});
 		this.mainView.getControlsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.SETTINGS;
+				nextState = AppState.SETTINGS;
 			}
-    	});
+    		});
 		this.mainView.getExitButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.END;
+				nextState = AppState.END;
 			}
-    	});
+    		});
 		/*In between view 1*/
 		this.betweenView.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.SELECT;
+				nextState = AppState.SELECT;
 			}
-    	});
+    		});
 		this.betweenView.getNewGameButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE1;
 				currentGame.setGameState(GameState.UNINITIALIZED);
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		this.betweenView.getLoadGameButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE1;
 				loadingFromFile = true;
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		this.betweenView.getNewGameButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE2;
 				currentGame.setGameState(GameState.UNINITIALIZED);
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		this.betweenView.getLoadGameButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE2;
 				loadingFromFile = true;
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		this.betweenView.getNewGameButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE3;
 				currentGame.setGameState(GameState.UNINITIALIZED);
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		this.betweenView.getLoadGameButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE3;
 				loadingFromFile = true;
-				intendedState = AppState.GAME1;
+				nextState = AppState.GAME1;
 			}
-    	});
+    		});
 		/*Settings view*/
 		this.settingsView.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				intendedState = AppState.SELECT;
+				nextState = AppState.SELECT;
 			}
-    	});
+    		});
 		this.settingsView.getDebugToggleOn().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -247,7 +238,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					v.setDebugMode(true);
 				}
 			}
-    	});
+    		});
 		this.settingsView.getDebugToggleOff().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -255,37 +246,37 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 					v.setDebugMode(false);
 				}
 			}
-    	});
+    		});
 		this.settingsView.getWindowedOn().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				toggleWindowedMode(true);
 			}
-    	});
+    		});
 		this.settingsView.getWindowedOff().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				toggleWindowedMode(false);
 			}
-    	});
+    		});
 		this.settingsView.getClearDataButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save1);
 			}
-    	});
+    		});
 		this.settingsView.getClearDataButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save2);
 			}
-    	});
+    		});
 		this.settingsView.getClearDataButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save3);
 			}
-    	});
+    		});
 		/*Game 1*/
 		this.game1View.getPlayerInfoButton().addActionListener(new ActionListener() {
 			@Override
@@ -293,87 +284,87 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				game1View.setPauseState(PauseState.PLAYERINFO);
 				screenHandled = false;
 			}
-    	});
+    		});
 		this.game1View.getSystemButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game1View.setPauseState(PauseState.SYSTEM);
 				screenHandled = false;
 			}
-    	});
+    		});
 		this.game1View.getDebugButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game1View.setPauseState(PauseState.DEBUG);
 				screenHandled = false;
 			}
-    	});
+    		});
 		this.game1View.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				saveGame();
-				intendedState = AppState.SELECT;
+				nextState = AppState.SELECT;
 				currentGame.setGameState(GameState.QUIT);
 				currentGame.setLastState(GameState.PAUSE);
 				game1View.setPauseState(PauseState.PLAYERINFO);
 				screenHandled = false;
 			}
-    	});
+    		});
 		this.game1View.getResumeButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				unpauseGame(currentGame, game1View);
 			}
-    	});
+    		});
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentGame.getPlayer().restoreDefaultAttributes();
 				sleepTime = defaultSleepTime;
 			}
-    	});
+    		});
 		this.game1View.getEditJumpsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeMaxJumps(game1View.getEditJumpsField().getText());
 				game1View.getEditJumpsField().setText("");
 			}
-    	});
+    		});
 		this.game1View.getEditFloatButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeFloatingThreshold(game1View.getEditFloatField().getText());
 				game1View.getEditFloatField().setText("");
 			}
-    	});
+    		});
 		this.game1View.getEditXIncrButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeXIncr(game1View.getEditXIncrField().getText());
 				game1View.getEditXIncrField().setText("");
 			}
-    	});
+    		});
 		this.game1View.getEditYIncrButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeYIncr(game1View.getEditYIncrField().getText());
 				game1View.getEditYIncrField().setText("");
 			}
-    	});
+    		});
 		this.game1View.getEditSleepTimeButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeSleepTime(game1View.getEditSleepTimeField().getText());
 				game1View.getEditSleepTimeField().setText("");
 			}
-    	});
+    		});
 	}
 	
 	public void updateCurrentState() {
-		if (this.intendedState != AppState.SATISFIED) {
+		if (this.currentState != this.nextState) {
 			/*Reset the frame*/
 			this.frame.getContentPane().removeAll();
-			switch (this.intendedState) {
+			switch (this.nextState) {
 				case GAME1:
 					this.loadGame1();
 					this.addViewToFrame(this.game1View);
@@ -425,9 +416,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 				default:
 					break;
 			}
-			/*Set current state to the intended state, and set intended state to satisfied*/
-			this.currentState = this.intendedState;
-			this.intendedState = AppState.SATISFIED;
+			this.currentState = this.nextState;
 		}
 	}
 	
@@ -837,7 +826,7 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 			this.mainView.setSelect();
 			this.mainView.setFocusable(false);
 			this.mainView.removeKeyListener(this);
-			this.intendedState = AppState.SELECT;
+			this.nextState = AppState.SELECT;
 		}
 	}
 	
@@ -858,12 +847,6 @@ public class Main implements KeyListener, MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseReleased(MouseEvent release) {}
-	
-	@Override
-	public void mouseDragged(MouseEvent drag) {}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {}
 	
 	public AppState getAppState() {
 		return this.currentState;
