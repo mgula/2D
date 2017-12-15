@@ -34,8 +34,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -BIG REFACTOR
- * -magic numbers in views
+ * -BIG REFACTOR (tidy up import statements)
+ * -magic numbers in views --> ratios of screen size
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
  * -room transitions
@@ -319,7 +319,7 @@ public class Main implements KeyListener, MouseListener {
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentGame.getEngine().restoreDefaultAttributes();
+				currentGame.getEngine().restoreDefaultAttributes(currentGame.getPlayer());
 				sleepTime = defaultSleepTime;
 			}
     		});
@@ -520,6 +520,7 @@ public class Main implements KeyListener, MouseListener {
 				
 				if (this.currentGame.getRoomChangeEvent()) {
 					this.game1View.updateView(this.currentGame);
+					this.currentGame.setRoomChangeEvent(false);
 				}
 				break;
 				

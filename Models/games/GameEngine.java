@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import enums.Direction;
 import game1Models.*;
 
-/*TODO: get this functionally equivalent to how it was before*/
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -19,8 +18,6 @@ public class GameEngine implements Serializable {
 	private int playerStartingYloc = -100;
 	private int playerHeight = 40;
 	private int playerWidth = 40;
-	
-	private Controllable player;
 	
 	private boolean jumping = false;
 	
@@ -47,39 +44,39 @@ public class GameEngine implements Serializable {
 	
 	private final int interactableWaitTime = 50;
 	
-	public GameEngine() {
-		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.maxHealth);
+	public Controllable getPlayer() {
+		return new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.maxHealth);
 	}
 	
-	public void restoreDefaultAttributes() {
-		this.player.setXIncr(this.defaultXIncr);
-		this.player.setYIncr(this.defaultYIncr);
+	public void restoreDefaultAttributes(Controllable c) {
+		c.setXIncr(this.defaultXIncr);
+		c.setYIncr(this.defaultYIncr);
 		this.floatingThreshold = this.defaultFloatingThreshold;
 		this.maxJumps = this.defaultMaxJumps;
 	}
 	
-	public void respawn() {
-		this.player.setXLoc(this.playerStartingXloc);
-		this.player.setYLoc(this.playerStartingYloc);
+	public void respawn(Controllable c) {
+		c.setXLoc(this.playerStartingXloc);
+		c.setYLoc(this.playerStartingYloc);
+		c.setHealth(this.maxHealth);
 		
 		this.jumping = false;
-		this.player.setHealth(this.maxHealth);
 		this.jumpCount = 0;
 		this.jumpingCounter = 0;
 		this.floatingCounter = 0;
 	}
 	
 	/*Getters*/
-	public Controllable getPlayer() {
-		return this.player;
-	}
-	
 	public int getPlayerStartingXloc() {
 		return this.playerStartingXloc;
 	}
 	
 	public int getPlayerStartingYloc() {
 		return this.playerStartingYloc;
+	}
+	
+	public boolean getJumping() {
+		return this.jumping;
 	}
 	
 	public int getJumpCounter() {
@@ -115,6 +112,10 @@ public class GameEngine implements Serializable {
 	}
 	
 	/*Setters*/
+	public void setJumping(boolean b) {
+		this.jumping = b;
+	}
+	
 	public void setMaxJumps(int n) {
 		this.maxJumps = n;
 	}
@@ -707,69 +708,5 @@ public class GameEngine implements Serializable {
 			default:
 				break;
 		}
-	}
-	
-	/*React to input*/
-	
-	public void tick(Room r, ArrayList<Game1Model> e, boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
-		/*Assert gravity*/
-		this.checkBottomEdgeCollisions(r, e, this.player);
-		this.assertGravity(r, e, this.player);
-		
-		/*Check moving surfaces*/
-		this.checkMovingSurfaces(r, e, false, player);
-		
-		/*Move all non-player entities*/
-		for (Game1Model m : e) {
-			if (m instanceof game1Models.Enemy) {
-				((game1Models.Enemy) m).move();
-			} else if (m instanceof game1Models.Interactable) {
-				this.moveInteractable(r, e, (game1Models.Interactable) m, this.player);
-			}
-		}
-			
-		/*Check player, an interactable may have moved them*/
-		this.checkRightEdgeCollisions(r, e, this.player);
-		this.checkLeftEdgeCollisions(r, e, this.player);
-		this.checkBottomEdgeCollisions(r, e, this.player);
-		this.checkTopEdgeCollisions(r, e, this.player);
-		this.checkLeavingSurface(e, this.player); //check if interactable pushed player off surfce
-		
-		/*Check and evaluate area collisions*/
-		this.checkAreaCollisions(e, this.player);
-		this.evaluateAreaCollisions(r, e, player);
-		
-		/*Evaluate user input*/
-		if (rightPressed) {
-			this.checkRightEdgeCollisions(r, e, this.player);
-			this.moveRight(r, e, this.player);
-			this.checkLeavingSurface(e, this.player);
-		}
-		
-		if (leftPressed) {
-			this.checkLeftEdgeCollisions(r, e, this.player);
-			this.moveLeft(r, e, this.player);
-			this.checkLeavingSurface(e, this.player);
-		}
-		
-		if (spacePressed) {
-			this.jumping = true;
-		}
-		
-		if (downPressed) {
-			this.phaseThroughPlatformOrExit(r, e, this.player);
-			this.checkMovingSurfaces(r, e, false, player);
-			this.checkBottomEdgeCollisions(r, e, this.player);
-		}
-		
-		/*Evaluate jumping*/
-		if (this.jumping) {
-			this.checkTopEdgeCollisions(r, e, this.player);
-			if (!this.initiateJumpArc(r, e, this.player)) {
-				this.jumping = false;
-			}
-		}
-		
-		
 	}
 }

@@ -16,7 +16,7 @@ public class Game1 implements Game, Serializable {
 	
 	private int groundLevel = 0;
 	
-	private GameEngine engine;
+	private GameEngine engine = new GameEngine();
 	
 	private Controllable player;
 	
@@ -40,8 +40,6 @@ public class Game1 implements Game, Serializable {
 	
 	public Game1() {
 		this.initCurrMap();
-		
-		this.engine = new GameEngine();
 		
 		this.player = this.engine.getPlayer();
 		
@@ -158,7 +156,7 @@ public class Game1 implements Game, Serializable {
 	public void respawn() {
 		this.currRoomID = RoomID.SPAWN;
 		this.makeCurrRoom();
-		this.engine.respawn();
+		this.engine.respawn(this.player);
 	}
 	
 	public void initCurrMap() {
@@ -183,8 +181,6 @@ public class Game1 implements Game, Serializable {
 		
 		this.player.setXLoc(this.player.getXLoc() + this.changeRoomOffsetX);
 		this.player.setYLoc(this.player.getYLoc() + this.changeRoomOffsetY);
-		
-		this.roomChangeEvent = false;
 	}
 	
 	public void checkRoomBoundaries() {
@@ -248,13 +244,70 @@ public class Game1 implements Game, Serializable {
 	}
 	
 	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
-		this.engine.tick(this.currRoom, this.currEnvironment, rightPressed, leftPressed, spacePressed, downPressed);
-		this.checkRoomBoundaries();
+		/*Assert gravity*/
+		this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		this.engine.assertGravity(this.currRoom, this.currEnvironment, this.player);
 		
-		if (this.roomChangeEvent) {
-			this.changeRoom();
+		/*Check moving surfaces*/
+		this.engine.checkMovingSurfaces(this.currRoom, this.currEnvironment, false, player);
+		
+		/*Move all non-player entities*/
+		for (Game1Model m : this.currEnvironment) {
+			if (m instanceof game1Models.Enemy) {
+				((game1Models.Enemy) m).move();
+			} else if (m instanceof game1Models.Interactable) {
+				this.engine.moveInteractable(this.currRoom, this.currEnvironment, (game1Models.Interactable) m, this.player);
+			}
 		}
 		
+		/*Check player, an interactable may have moved them*/
+		this.engine.checkRightEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		this.engine.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		this.engine.checkTopEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		this.engine.checkLeavingSurface(this.currEnvironment, this.player); //check if interactable pushed player off surface
+		
+		/*Check and evaluate area collisions*/
+		this.engine.checkAreaCollisions(this.currEnvironment, this.player);
+		this.engine.evaluateAreaCollisions(this.currRoom, this.currEnvironment, player);
+		
+		/*Evaluate user input*/
+		if (rightPressed) {
+			this.engine.checkRightEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+			this.engine.moveRight(this.currRoom, this.currEnvironment, this.player);
+			this.engine.checkLeavingSurface(this.currEnvironment, this.player);
+		}
+		if (leftPressed) {
+			this.engine.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+			this.engine.moveLeft(this.currRoom, this.currEnvironment, this.player);
+			this.engine.checkLeavingSurface(this.currEnvironment, this.player);
+		}
+		if (spacePressed) {
+			this.engine.setJumping(true);
+		}
+		if (downPressed) {
+			this.engine.phaseThroughPlatformOrExit(this.currRoom, this.currEnvironment, this.player);
+			this.engine.checkMovingSurfaces(this.currRoom, this.currEnvironment, false, player);
+			this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+		}
+		
+		/*Evaluate jumping*/
+		if (this.engine.getJumping()) {
+			this.engine.checkTopEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+			if (!this.engine.initiateJumpArc(this.currRoom, this.currEnvironment, this.player)) {
+				this.engine.setJumping(false);
+			}
+		}
+		
+		/*Check for room changes*/
+		this.checkRoomBoundaries();
+		
+		/*Change room if room changed*/
+		if (this.roomChangeEvent) {
+			this.changeRoom(); // main sets roomChangeEvent back to false
+		}
+		
+		/*Check if player died*/
 		this.gameStateCheck();
 	}
 	

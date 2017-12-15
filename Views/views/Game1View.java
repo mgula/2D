@@ -17,6 +17,7 @@ public class Game1View extends GameView {
 	private AreaMap currMap;
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;
+	private Controllable player;
 	
 	private int mainSleepTime;
 	
@@ -122,7 +123,7 @@ public class Game1View extends GameView {
 		
 		switch (this.getPauseState()) {
 		case PLAYERINFO:
-			g.drawString("Health: " + this.engine.getPlayer().getHealth() + "/" + this.engine.getMaxHealth(), 500, 200);
+			g.drawString("Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), 500, 200);
 			break;
 		case SYSTEM:
 			
@@ -133,9 +134,9 @@ public class Game1View extends GameView {
 			g.drawString("Set floating threshold: ", 450, 230);
 			g.drawString("Current: " + this.engine.getFloatingThreshold(), 700, 230);
 			g.drawString("Set X increase: ", 480, 260);
-			g.drawString("Current: " + this.engine.getPlayer().getXIncr(), 700, 260);
+			g.drawString("Current: " + this.player.getXIncr(), 700, 260);
 			g.drawString("Set Y increase: ", 480, 290);
-			g.drawString("Current: " + this.engine.getPlayer().getYIncr(), 700, 290);
+			g.drawString("Current: " + this.player.getYIncr(), 700, 290);
 			g.drawString("Set Sleep Time: ", 480, 320);
 			g.drawString("Current: " + this.mainSleepTime, 700, 320);
 			break;
@@ -154,12 +155,12 @@ public class Game1View extends GameView {
 		
 		/*Draw HUD components: start with life*/
 		g.setColor(Color.RED);
-		g.fillRect(this.healthXloc, this.healthtYloc, this.pixelsPerHealth * this.engine.getPlayer().getHealth(), this.healthBarHeight);
+		g.fillRect(this.healthXloc, this.healthtYloc, this.pixelsPerHealth * this.player.getHealth(), this.healthBarHeight);
 		g.setColor(Color.BLACK);
-		//g.fillRect(this.healthXloc + (this.pixelsPerHealth * this.player.getHealth()), this.healthtYloc, this.pixelsPerHealth * (this.engine.getMaxHealth() - this.player.getHealth()), this.healthBarHeight);
+		g.fillRect(this.healthXloc + (this.pixelsPerHealth * this.player.getHealth()), this.healthtYloc, this.pixelsPerHealth * (this.engine.getMaxHealth() - this.player.getHealth()), this.healthBarHeight);
 		
 		/*Update last y location, in order to know when to use falling animation*/
-		this.lastYloc = this.engine.getPlayer().getYLoc();
+		this.lastYloc = this.player.getYLoc();
 	}
 	
 	public void drawExits(Graphics g) {
@@ -200,7 +201,7 @@ public class Game1View extends GameView {
 	}
 	
 	public void drawPlayer(Graphics g) {
-		if (this.engine.getPlayer().getEnemyCollision()) {
+		if (this.player.getEnemyCollision()) {
 			if (this.getGame1State() != GameState.PAUSE) {
 				this.flash = this.engine.getDamageCoolDown();
 			}
@@ -211,7 +212,7 @@ public class Game1View extends GameView {
 			this.flash = 0;
 		}
 		if (this.playerDrawable) {
-			g.drawRect(this.engine.getPlayer().getXLoc() - this.playerOffsetX, this.engine.getPlayer().getYLoc() - this.playerOffsetY, this.engine.getPlayer().getWidth(), this.engine.getPlayer().getHeight());
+			g.drawRect(this.player.getXLoc() - this.playerOffsetX, this.player.getYLoc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight());
 		}
 	}
 	
@@ -222,20 +223,20 @@ public class Game1View extends GameView {
 		/*Player info*/
 		g.setFont(new JLabel().getFont());
 		g.setColor(Color.BLACK);
-		g.drawRect(this.engine.getPlayer().getXLoc() - this.playerOffsetX, this.engine.getPlayer().getYLoc() - this.playerOffsetY, this.engine.getPlayer().getWidth(), this.engine.getPlayer().getHeight()); //hitbox
-		String message = "X: " + this.engine.getPlayer().getXLoc() + ", Y: " + this.engine.getPlayer().getYLoc();
-		g.drawString(message, this.engine.getPlayer().getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.engine.getPlayer().getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
-		message = "damaged: " + this.engine.getPlayer().getEnemyCollision();
-		g.drawString(message, this.engine.getPlayer().getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.engine.getPlayer().getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
-		String[] debugMessages = {"Health: " + this.engine.getPlayer().getHealth() + "/" + this.engine.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
+		g.drawRect(this.player.getXLoc() - this.playerOffsetX, this.player.getYLoc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight()); //hitbox
+		String message = "X: " + this.player.getXLoc() + ", Y: " + this.player.getYLoc();
+		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
+		message = "damaged: " + this.player.getEnemyCollision();
+		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
+		String[] debugMessages = {"Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
 				"Screen moving right bool: " + this.viewMovingRight, "Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, 
 				"Y screen thresh (U): " + this.thresholdYU, "Y screen thresh (D): " + this.thresholdYD, "X screen thresh (R): " + this.thresholdXR, "X screen thresh (L): " + this.thresholdXL, 
 				"Player offset X: " + this.playerOffsetX, "Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getID(), "Initial X Threshold (R): " + this.initialThresholdXR,
 				"Initial X Threshold (L): " + this.initialThresholdXL, "Initial Y Threshold (U): " + this.initialThresholdYU, "Initial Y Threshold (D): " + this.initialThresholdYD, "On surface bottom: " + 
-				this.engine.getPlayer().isOnSurfaceBottom(), "Against surface top: " + this.engine.getPlayer().isAgainstSurfaceTop(), "Against surface right: " + this.engine.getPlayer().isAgainstSurfaceRight(), "Against surface left: " +
-				this.engine.getPlayer().isAgainstSurfaceLeft(), "On moving surface bottom: " + this.engine.getPlayer().isOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.engine.getPlayer().isAgainstMovingSurfaceBottom(), 
-				"Against moving surface top: " + this.engine.getPlayer().isAgainstMovingSurfaceTop(), "Against moving surface right: " + this.engine.getPlayer().isAgainstMovingSurfaceRight(), "Against moving surface left: " +
-				this.engine.getPlayer().isAgainstMovingSurfaceLeft(), "On platform: " + this.engine.getPlayer().isOnPlatform(), "Jump duration (final): " + this.engine.getJumpDuration(), "Max jumps: " + this.engine.getMaxJumps(), 
+				this.player.isOnSurfaceBottom(), "Against surface top: " + this.player.isAgainstSurfaceTop(), "Against surface right: " + this.player.isAgainstSurfaceRight(), "Against surface left: " +
+				this.player.isAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.isOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.isAgainstMovingSurfaceBottom(), 
+				"Against moving surface top: " + this.player.isAgainstMovingSurfaceTop(), "Against moving surface right: " + this.player.isAgainstMovingSurfaceRight(), "Against moving surface left: " +
+				this.player.isAgainstMovingSurfaceLeft(), "On platform: " + this.player.isOnPlatform(), "Jump duration (final): " + this.engine.getJumpDuration(), "Max jumps: " + this.engine.getMaxJumps(), 
 				"Jump counter: " + this.engine.getJumpCounter(), "Jump number: " + this.engine.getJumpNumber(), "Floating threshold: " + this.engine.getFloatingThreshold(), "Floating counter: " + this.engine.getFloatingCounter()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
@@ -251,9 +252,10 @@ public class Game1View extends GameView {
 		this.playerDrawable = true;
 		this.flash = 0;
 		this.engine = game.getEngine();
+		this.player = game.getPlayer();
 		this.currMap = game.getCurrMap();
 		this.currRoom = game.getCurrRoom();
-		this.lastYloc = this.engine.getPlayer().getYLoc();
+		this.lastYloc = this.player.getYLoc();
 		this.environment = game.getEnvironment();
 		
 		this.updateOffsets();
@@ -262,7 +264,7 @@ public class Game1View extends GameView {
 	public void updateView(Game1 game) {
 		this.currRoom = game.getCurrRoom();
 		this.environment = game.getEnvironment();
-		this.lastYloc = this.engine.getPlayer().getYLoc();
+		this.lastYloc = this.player.getYLoc();
 	}
 	
 	public void updateSleepTime(int s) {
@@ -289,14 +291,17 @@ public class Game1View extends GameView {
 	}
 	
 	public void updateOffsets() {
+		int playerX = this.player.getXLoc();
+		int playerY = this.player.getYLoc();
+		
 		/*Update left/right booleans, x thresholds, and x object offset. First case: in between the two thresholds*/
-		if (this.engine.getPlayer().getXLoc() <= this.thresholdXR && this.engine.getPlayer().getXLoc() >= this.thresholdXL) {
+		if (playerX <= this.thresholdXR && playerX >= this.thresholdXL) {
 			/*Update player x offset only once when entering stationary view*/
 			if (!this.viewStationaryX) {
-				if (this.engine.getPlayer().getXLoc() > this.thresholdXR) {
-					this.playerOffsetX = this.engine.getPlayer().getXLoc() - this.initialThresholdXR;
-				} else if (this.engine.getPlayer().getXLoc() < this.thresholdXL){
-					this.playerOffsetX = this.engine.getPlayer().getXLoc() - this.initialThresholdXL;
+				if (playerX > this.thresholdXR) {
+					this.playerOffsetX = playerX - this.initialThresholdXR;
+				} else if (playerX < this.thresholdXL){
+					this.playerOffsetX = playerX - this.initialThresholdXL;
 				} else {
 					this.playerOffsetX = this.thresholdXR - this.initialThresholdXR;
 				}
@@ -306,22 +311,22 @@ public class Game1View extends GameView {
 			this.viewMovingLeft = false;
 			this.viewStationaryX = true;
 		/*Second case: greater than right threshold*/
-		} else if (this.engine.getPlayer().getXLoc() > this.thresholdXR) {
+		} else if (playerX > this.thresholdXR) {
 			/*Update player x offset*/
-			this.playerOffsetX = this.engine.getPlayer().getXLoc() - this.initialThresholdXR;
+			this.playerOffsetX = playerX - this.initialThresholdXR;
 			/*Shift both thresholds right*/
-			this.thresholdXR = this.engine.getPlayer().getXLoc();
+			this.thresholdXR = playerX;
 			this.thresholdXL = this.thresholdXR - this.staticScreenAreaX;
 			/*Update booleans*/
 			this.viewMovingRight = true;
 			this.viewMovingLeft = false;
 			this.viewStationaryX = false;
 		/*Third case: less than left threshold*/
-		} else if (this.engine.getPlayer().getXLoc() < this.thresholdXL) {
+		} else if (playerX < this.thresholdXL) {
 			/*Update player x offset*/
-			this.playerOffsetX = this.engine.getPlayer().getXLoc() - this.initialThresholdXL;
+			this.playerOffsetX = playerX - this.initialThresholdXL;
 			/*Shift both thresholds left*/
-			this.thresholdXL = this.engine.getPlayer().getXLoc();
+			this.thresholdXL = playerX;
 			this.thresholdXR = this.thresholdXL + this.staticScreenAreaX;
 			/*Update booleans*/
 			this.viewMovingLeft = true;
@@ -329,13 +334,13 @@ public class Game1View extends GameView {
 			this.viewStationaryX = false;
 		}
 		/*Update up/down booleans, y thresholds, and y object offset. First case: in between the two thresholds*/
-		if (this.engine.getPlayer().getYLoc() >= this.thresholdYU && this.engine.getPlayer().getYLoc() <= this.thresholdYD) {
+		if (playerY >= this.thresholdYU && playerY <= this.thresholdYD) {
 			/*Update player y offset only once when entering stationary view*/
 			if (!this.viewStationaryY) {
-				if (this.engine.getPlayer().getYLoc() < this.thresholdYU) {
-					this.playerOffsetY = this.engine.getPlayer().getYLoc() - this.initialThresholdYU;
-				} else if (this.engine.getPlayer().getYLoc() > this.thresholdYD){
-					this.playerOffsetY = this.engine.getPlayer().getYLoc() - this.initialThresholdYD;
+				if (playerY < this.thresholdYU) {
+					this.playerOffsetY = playerY - this.initialThresholdYU;
+				} else if (playerY > this.thresholdYD){
+					this.playerOffsetY = playerY - this.initialThresholdYD;
 				} else {
 					this.playerOffsetY = this.thresholdYU - this.initialThresholdYU;
 				}
@@ -345,22 +350,22 @@ public class Game1View extends GameView {
 			this.viewMovingDown = false;
 			this.viewStationaryY = true;
 		/*Second case: less than the upper threshold*/
-		} else if (this.engine.getPlayer().getYLoc() < this.thresholdYU) {
+		} else if (playerY < this.thresholdYU) {
 			/*Update player y offset*/
-			this.playerOffsetY = this.engine.getPlayer().getYLoc() - this.initialThresholdYU;
+			this.playerOffsetY = playerY - this.initialThresholdYU;
 			/*Shift both thresholds up*/
-			this.thresholdYU = this.engine.getPlayer().getYLoc();
+			this.thresholdYU = playerY;
 			this.thresholdYD = this.thresholdYU + this.staticScreenAreaY;
 			/*Update booleans*/
 			this.viewMovingUp = true;
 			this.viewMovingDown = false;
 			this.viewStationaryY = false;
 		/*Third case: greater than the lower threshold*/
-		} else if (this.engine.getPlayer().getYLoc() > this.thresholdYD) {
+		} else if (playerY > this.thresholdYD) {
 			/*Update player y offset*/
-			this.playerOffsetY = this.engine.getPlayer().getYLoc() - this.initialThresholdYD;
+			this.playerOffsetY = playerY - this.initialThresholdYD;
 			/*Shift both thresholds down*/
-			this.thresholdYD = this.engine.getPlayer().getYLoc();
+			this.thresholdYD = playerY;
 			this.thresholdYU = this.thresholdYD - this.staticScreenAreaY;
 			/*Update booleans*/
 			this.viewMovingDown = true;
