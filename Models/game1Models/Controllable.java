@@ -14,7 +14,7 @@ public class Controllable extends Game1Model {
 	
 	private int currHealth;
 	
-	private Interactable inContactWith;
+	private Autonomous inContactWith;
 	
 	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
 	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
@@ -66,7 +66,7 @@ public class Controllable extends Game1Model {
 		return this.currHealth;
 	}
 	
-	public Interactable getInContactWith() {
+	public Autonomous getInContactWith() {
 		return this.inContactWith;
 	}
 	
@@ -147,7 +147,7 @@ public class Controllable extends Game1Model {
 		this.currHealth = h;
 	}
 	
-	public void setInContactWith(Interactable i) {
+	public void setInContactWith(Autonomous i) {
 		this.inContactWith = i;
 	}
 	

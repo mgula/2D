@@ -27,6 +27,9 @@ public class GameEngine implements Serializable {
 	
 	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
 	
+	private ArrayList<Game1Model> currEnvironment;
+	private Room currRoom;
+	
 	private int jumpingCounter = 0;
 	private int jumpDuration = 30;
 	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
@@ -37,6 +40,7 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseEnemy;
 	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
+	
 	private Direction dirOfCurrent; // direction of current (Current.java)
 	private int incrFromCurrent; // magnitude of push from currents (Current.java)
 	
@@ -124,6 +128,14 @@ public class GameEngine implements Serializable {
 		this.floatingThreshold = n;
 	}
 	
+	public void setEnvironment(ArrayList<Game1Model> e) {
+		this.currEnvironment = e;
+	}
+	
+	public void setRoom(Room r) {
+		this.currRoom = r;
+	}
+	
 	/*Movement/collision detection*/
 	public void incrX(Controllable c) {
 		if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
@@ -153,24 +165,24 @@ public class GameEngine implements Serializable {
 		c.setCurrYSegment(c.getCurrYSegment() + 1);
 	}
 	
-	public void moveRight(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void moveRight(Controllable c) {
 		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (c.getCurrXSegment() < c.getXIncr()) {
-			this.checkRightEdgeCollisions(r, e, c);
+			this.checkRightEdgeCollisions(c);
 			this.incrX(c);
 		}
 		c.setCurrXSegment(0);
 	}
 	
-	public void moveLeft(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void moveLeft(Controllable c) {
 		while (c.getCurrXSegment() < c.getXIncr()) {
-			this.checkLeftEdgeCollisions(r, e, c);
+			this.checkLeftEdgeCollisions(c);
 			this.decrX(c);
 		}
 		c.setCurrXSegment(0);
 	}
 	
-	public void raiseY(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void raiseY(Controllable c) {
 		if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
 			c.setOnSurfaceBottom(false);
 			c.setOnMovingSurfaceBottom(false);
@@ -178,7 +190,7 @@ public class GameEngine implements Serializable {
 			c.setAgainstMovingSurfaceBottom(false);
 			this.floatingCounter = 0;
 			while (c.getCurrYSegment() < c.getYIncr()) {
-				this.checkTopEdgeCollisions(r, e, c);
+				this.checkTopEdgeCollisions(c);
 				this.incrY(c);
 			}
 			c.setCurrYSegment(0);
@@ -187,11 +199,11 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public boolean initiateJumpArc(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public boolean initiateJumpArc(Controllable c) {
 		if (this.jumpCount < this.maxJumps) {
 			if (this.jumpingCounter < this.jumpDuration) {
 				this.jumpingCounter++;
-				this.raiseY(r, e, c);
+				this.raiseY(c);
 				return true;
 			} else {
 				this.jumpCount++;
@@ -203,13 +215,13 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void assertGravity(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void assertGravity(Controllable c) {
 		if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
 			if (this.floatingCounter < this.floatingThreshold) {
 				this.floatingCounter++;
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
-					this.checkMovingSurfaces(r, e, true, c);
+					this.checkMovingSurfaces(true, c);
 					this.decrY(c);
 				}
 				c.setCurrYSegment(0);
@@ -217,14 +229,14 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void phaseThroughPlatformOrExit(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void phaseThroughPlatformOrExit(Controllable c) {
 		if (c.isOnPlatform()) {
 			c.setYLoc(c.getYLoc() + 1);
 			c.setOnPlatform(false);
 			c.setOnSurfaceBottom(false);
 			this.floatingCounter = this.floatingThreshold;
 		} else {
-			for (Exit ex : r.getRoomLinks()) {
+			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (ex.getDirection() == Direction.SOUTH) {
 					if (c.getYLoc() <= ex.getYLoc()) {
 						if (c.getXLoc() >= ex.getXLoc() && c.getXLoc() + c.getWidth() <= ex.getXLoc() + ex.getWidth()) {
@@ -238,13 +250,13 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkLeavingSurface(ArrayList<Game1Model> e, Controllable c) {
+	public void checkLeavingSurface(Controllable c) {
 		if (c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) {
 			boolean contact = false;
 			boolean movingContact = false;
 			/*Check against every model that acts as a surface.*/
-			for (Game1Model m : e) {
-				if (m instanceof game1Models.Interactable) {
+			for (Game1Model m : this.currEnvironment) {
+				if (m instanceof game1Models.Autonomous) {
 					if (this.checkBottomSurface(m, c)) {
 						movingContact = true;
 					}
@@ -268,12 +280,12 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkMovingSurfaces(Room r, ArrayList<Game1Model> e, boolean calledByInteractable, Controllable c) {
+	public void checkMovingSurfaces(boolean calledWithinEngine, Controllable c) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
-		this.checkLeftEdgeCollisions(r, e, c);
-		this.checkRightEdgeCollisions(r, e, c);
-		this.checkBottomEdgeCollisions(r, e, c);
-		this.checkTopEdgeCollisions(r, e, c);
+		this.checkLeftEdgeCollisions(c);
+		this.checkRightEdgeCollisions(c);
+		this.checkBottomEdgeCollisions(c);
+		this.checkTopEdgeCollisions(c);
 		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
 		 *the same while loop scheme to move (move a pixel and then check for collisions).*/
 		if (c.isAgainstMovingSurfaceLeft() && c.getInContactWith().getDirection() == Direction.EAST) {
@@ -292,7 +304,7 @@ public class GameEngine implements Serializable {
 		/*If resting on a moving surface, the crab will move in the same direction as the 
 		 *moving surface. This code should never be executed by Interactable.*/
 		if (c.isOnMovingSurfaceBottom()) {
-			if (!calledByInteractable) {
+			if (!calledWithinEngine) {
 				switch (c.getInContactWith().getDirection()) {
 					case EAST:
 						c.setXLoc(c.getXLoc() + c.getInContactWith().getIncr());
@@ -317,21 +329,21 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkBottomEdgeCollisions(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void checkBottomEdgeCollisions(Controllable c) {
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (c.getYLoc() + c.getHeight() >= r.getYLoc()) {
+		if (c.getYLoc() + c.getHeight() >= this.currRoom.getYLoc()) {
 			c.setOnSurfaceBottom(true);
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : e) {
+		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject || m instanceof Platform) {
 				if (this.checkBottomSurface(m, c)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
 					this.floatingCounter = 0;
-					if (m instanceof game1Models.Interactable) {
-						c.setInContactWith((Interactable) m);
-						switch (((game1Models.Interactable) m).getDirection()) {
+					if (m instanceof game1Models.Autonomous) {
+						c.setInContactWith((Autonomous) m);
+						switch (((game1Models.Autonomous) m).getDirection()) {
 							case NORTH:
 								c.setAgainstMovingSurfaceBottom(true);
 								c.setOnMovingSurfaceBottom(false);
@@ -356,14 +368,14 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkTopEdgeCollisions(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void checkTopEdgeCollisions(Controllable c) {
 		boolean newCollision = false;
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
 		 *to map.getGroundLevel() - map.getHeight(), since y = 0 is the top of the screen.*/
-		if (c.getYLoc() <= r.getYLoc() - r.getHeight()) {
+		if (c.getYLoc() <= this.currRoom.getYLoc() - this.currRoom.getHeight()) {
 			c.setAgainstSurfaceTop(true);
 			newCollision = true;
-			for (Exit ex : r.getRoomLinks()) {
+			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (c.getYLoc() <= ex.getYLoc()) {
 					if (c.getXLoc() >= ex.getXLoc() && c.getXLoc() + c.getWidth() <= ex.getXLoc() + ex.getWidth()) {
 						c.setAgainstSurfaceTop(false);
@@ -373,7 +385,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : e) {
+		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
@@ -383,8 +395,8 @@ public class GameEngine implements Serializable {
 					for (int i = m.getXLoc() - c.getWidth() + 1; i < x + w; i++) {
 						if (c.getXLoc() == i) {
 							newCollision = true;
-							if (m instanceof game1Models.Interactable) {
-								c.setInContactWith((Interactable) m);
+							if (m instanceof game1Models.Autonomous) {
+								c.setInContactWith((Autonomous) m);
 								c.setAgainstMovingSurfaceTop(true);
 							} else {
 								c.setAgainstSurfaceTop(true);
@@ -401,13 +413,13 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkRightEdgeCollisions(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void checkRightEdgeCollisions(Controllable c) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (c.getXLoc() + c.getWidth() >= r.getXLoc() + r.getWidth()) {
+		if (c.getXLoc() + c.getWidth() >= this.currRoom.getXLoc() + this.currRoom.getWidth()) {
 			c.setAgainstSurfaceRight(true);
 			newCollision = true;
-			for (Exit ex : r.getRoomLinks()) {
+			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (c.getXLoc() + c.getWidth() >= ex.getXLoc()) {
 					if (c.getYLoc() >= ex.getYLoc() && c.getYLoc() <= ex.getYLoc() + ex.getHeight()) {
 						c.setAgainstSurfaceRight(false);
@@ -417,7 +429,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : e) {
+		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
@@ -426,8 +438,8 @@ public class GameEngine implements Serializable {
 					for (int i = y - c.getHeight() + 1; i < y + h; i++) {
 						if (c.getYLoc() == i) {
 							newCollision = true;
-							if (m instanceof game1Models.Interactable) {
-								c.setInContactWith((Interactable) m);
+							if (m instanceof game1Models.Autonomous) {
+								c.setInContactWith((Autonomous) m);
 								c.setAgainstMovingSurfaceRight(true);
 							} else {
 								c.setAgainstSurfaceRight(true);
@@ -444,13 +456,13 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkLeftEdgeCollisions(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void checkLeftEdgeCollisions(Controllable c) {
 		boolean newCollision = false;
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (c.getXLoc() <= r.getXLoc()) {
+		if (c.getXLoc() <= this.currRoom.getXLoc()) {
 			c.setAgainstSurfaceLeft(true);
 			newCollision = true;
-			for (Exit ex : r.getRoomLinks()) {
+			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (c.getXLoc() <= ex.getXLoc()) {
 					if (c.getYLoc() >= ex.getYLoc() && c.getYLoc() <= ex.getYLoc() + ex.getHeight()) {
 						c.setAgainstSurfaceLeft(false);
@@ -460,7 +472,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Game1Model m : e) {
+		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
@@ -470,8 +482,8 @@ public class GameEngine implements Serializable {
 					for (int i = y - c.getHeight() + 1; i < y + h; i++) {
 						if (c.getYLoc() == i) {
 							newCollision = true;
-							if (m instanceof game1Models.Interactable) {
-								c.setInContactWith((Interactable) m);
+							if (m instanceof game1Models.Autonomous) {
+								c.setInContactWith((Autonomous) m);
 								c.setAgainstMovingSurfaceLeft(true);
 							} else {
 								c.setAgainstSurfaceLeft(true);
@@ -488,9 +500,9 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkAreaCollisions(ArrayList<Game1Model> e, Controllable c) {
+	public void checkAreaCollisions(Controllable c) {
 		c.setCurrentCollision(false); // innocent until proven guilty policy
-		for (Game1Model m : e) {
+		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof EventArea) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
@@ -545,7 +557,7 @@ public class GameEngine implements Serializable {
 		return false;
 	}
 	
-	public void evaluateAreaCollisions(Room r, ArrayList<Game1Model> e, Controllable c) {
+	public void evaluateAreaCollisions(Controllable c) {
 		if (c.getEnemyCollision()) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
@@ -590,28 +602,28 @@ public class GameEngine implements Serializable {
 		if (c.getCurrentCollision()) {
 			switch (this.dirOfCurrent) {
 				case EAST:
-					this.checkRightEdgeCollisions(r, e, c);
+					this.checkRightEdgeCollisions(c);
 					if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
 						c.setXLoc(c.getXLoc() + this.incrFromCurrent);
 					}
 					break;
 					
 				case WEST:
-					this.checkLeftEdgeCollisions(r, e, c);
+					this.checkLeftEdgeCollisions(c);
 					if (!c.isAgainstSurfaceLeft() && !c.isAgainstMovingSurfaceLeft()) {
 						c.setXLoc(c.getXLoc() - this.incrFromCurrent);
 					}
 					break;
 					
 				case NORTH:
-					this.checkTopEdgeCollisions(r, e, c);
+					this.checkTopEdgeCollisions(c);
 					if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
 						c.setYLoc(c.getYLoc() - this.incrFromCurrent);
 					}
 					break;
 					
 				case SOUTH:
-					this.checkBottomEdgeCollisions(r, e, c);
+					this.checkBottomEdgeCollisions(c);
 					if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
 						c.setYLoc(c.getYLoc() + this.incrFromCurrent);
 					}
@@ -623,81 +635,81 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void moveInteractable(Room r, ArrayList<Game1Model> e, Interactable i, Controllable c) {
-		switch (i.getDirection()) {
+	public void moveAutonomous(Autonomous a, Controllable c) {
+		switch (a.getDirection()) {
 			case EAST:
-				while (i.getCurrSegment() < i.getIncr()) {
-					i.setXLoc(i.getXLoc() + 1);
-					i.setCurrSegment(i.getCurrSegment() + 1);
-					this.checkMovingSurfaces(r, e, true, c);
+				while (a.getCurrSegment() < a.getIncr()) {
+					a.setXLoc(a.getXLoc() + 1);
+					a.setCurrSegment(a.getCurrSegment() + 1);
+					this.checkMovingSurfaces(true, c);
 				}
-				i.setCurrSegment(0);
-				if (i.getXLoc() >= i.getMoveThreshR()) {
-					i.setLastDirection(i.getDirection());
-					i.setDirection(Direction.IDLE);
+				a.setCurrSegment(0);
+				if (a.getXLoc() >= a.getMoveThreshR()) {
+					a.setLastDirection(a.getDirection());
+					a.setDirection(Direction.IDLE);
 				}
 				break;
 				
 			case WEST:
-				while (i.getCurrSegment() < i.getIncr()) {
-					i.setXLoc(i.getXLoc() - 1);
-					i.setCurrSegment(i.getCurrSegment() + 1);
-					this.checkMovingSurfaces(r, e, true, c);
+				while (a.getCurrSegment() < a.getIncr()) {
+					a.setXLoc(a.getXLoc() - 1);
+					a.setCurrSegment(a.getCurrSegment() + 1);
+					this.checkMovingSurfaces(true, c);
 				}
-				i.setCurrSegment(0);
-				if (i.getXLoc() <= i.getMoveThreshL()) {
-					i.setLastDirection(i.getDirection());
-					i.setDirection(Direction.IDLE);
+				a.setCurrSegment(0);
+				if (a.getXLoc() <= a.getMoveThreshL()) {
+					a.setLastDirection(a.getDirection());
+					a.setDirection(Direction.IDLE);
 				}
 				break;
 				
 			case NORTH:
-				while (i.getCurrSegment() < i.getIncr()) {
-					i.setYLoc(i.getYLoc() - 1);
-					i.setCurrSegment(i.getCurrSegment() + 1);
-					this.checkMovingSurfaces(r, e, true, c);
+				while (a.getCurrSegment() < a.getIncr()) {
+					a.setYLoc(a.getYLoc() - 1);
+					a.setCurrSegment(a.getCurrSegment() + 1);
+					this.checkMovingSurfaces(true, c);
 				}
-				i.setCurrSegment(0);
-				if (i.getYLoc() <= i.getMoveThreshU()) {
-					i.setLastDirection(i.getDirection());
-					i.setDirection(Direction.IDLE);
+				a.setCurrSegment(0);
+				if (a.getYLoc() <= a.getMoveThreshU()) {
+					a.setLastDirection(a.getDirection());
+					a.setDirection(Direction.IDLE);
 				}
 				break;
 				
 			case SOUTH:
-				while (i.getCurrSegment() < i.getIncr()) {
-					i.setYLoc(i.getYLoc() + 1);
-					i.setCurrSegment(i.getCurrSegment() + 1);
-					this.checkMovingSurfaces(r, e, true, c);
+				while (a.getCurrSegment() < a.getIncr()) {
+					a.setYLoc(a.getYLoc() + 1);
+					a.setCurrSegment(a.getCurrSegment() + 1);
+					this.checkMovingSurfaces(true, c);
 				}
-				i.setCurrSegment(0);
-				if (i.getYLoc() >= i.getMoveThreshD()) {
-					i.setLastDirection(i.getDirection());
-					i.setDirection(Direction.IDLE);
+				a.setCurrSegment(0);
+				if (a.getYLoc() >= a.getMoveThreshD()) {
+					a.setLastDirection(a.getDirection());
+					a.setDirection(Direction.IDLE);
 				}
 				break;
 				
 			/*Interactables wait for a moment before switching directions.*/
 			case IDLE:
-				if (i.getWaitCounter() < this.interactableWaitTime) {
-					i.setWaitCounter(i.getWaitCounter() + 1);
+				if (a.getWaitCounter() < this.interactableWaitTime) {
+					a.setWaitCounter(a.getWaitCounter() + 1);
 				} else {
-					i.setWaitCounter(0);
-					switch (i.getLastDirection()) {
+					a.setWaitCounter(0);
+					switch (a.getLastDirection()) {
 						case NORTH:
-							i.setDirection(Direction.SOUTH);
+							a.setDirection(Direction.SOUTH);
 							break;
 							
 						case SOUTH:
-							i.setDirection(Direction.NORTH);
+							a.setDirection(Direction.NORTH);
 							break;
 							
 						case EAST:
-							i.setDirection(Direction.WEST);
+							a.setDirection(Direction.WEST);
 							break;
 							
 						case WEST:
-							i.setDirection(Direction.EAST);
+							a.setDirection(Direction.EAST);
 							break;
 							
 						default:

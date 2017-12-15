@@ -10,7 +10,6 @@ public class Exit extends Game1Model {
 	
 	private Direction dir; //location of exit relative to room
 	
-	
 	public Exit(RoomID curr, RoomID next, Direction d, int x, int y, int dimension) {
 		this.thisRoom = curr;
 		this.nextRoom = next;

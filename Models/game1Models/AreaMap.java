@@ -8,7 +8,7 @@ import java.util.Map;
 import enums.MapID;
 import enums.RoomID;
 
-public class AreaMap implements Serializable{
+public class AreaMap implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private MapID mapID;
 	private RoomID[] roomIDs;

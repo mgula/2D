@@ -189,7 +189,7 @@ public class Game1View extends GameView {
 			} else if (m instanceof game1Models.CurrentDrawable) {
 				g.setColor(Color.CYAN);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Interactable) {
+			} else if (m instanceof game1Models.Autonomous) {
 				g.setColor(Color.YELLOW);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof game1Models.Platform) {

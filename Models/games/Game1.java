@@ -46,6 +46,10 @@ public class Game1 implements Game, Serializable {
 		this.initCurrentMapRooms();
 		
 		this.makeCurrRoom();
+		
+		/*Update the engine with the current room and environment*/
+		this.engine.setEnvironment(this.currEnvironment);
+		this.engine.setRoom(this.currRoom);
 	}
 	
 	public void initCurrentMapRooms() {
@@ -67,7 +71,7 @@ public class Game1 implements Game, Serializable {
 					env.add(new Rock(2500, -125, 70, 70));
 					env.add(new Rock(1500, -550, 70, 70));
 					env.add(new Rock(2500, -550, 70, 70));
-					env.add(new Interactable(2000, -250, 50, 50, Direction.WEST, 1000, 10));
+					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 1000, 10));
 					env.add(new Platform(1700, -125, 50));
 					env.add(new Platform(1400, -400, 1000));
 					env.add(new Platform(2925, -500, 75));
@@ -156,6 +160,11 @@ public class Game1 implements Game, Serializable {
 	public void respawn() {
 		this.currRoomID = RoomID.SPAWN;
 		this.makeCurrRoom();
+		
+		/*Update the engine with the current room and environment*/
+		this.engine.setEnvironment(this.currEnvironment);
+		this.engine.setRoom(this.currRoom);
+		
 		this.engine.respawn(this.player);
 	}
 	
@@ -176,9 +185,15 @@ public class Game1 implements Game, Serializable {
 	}
 	
 	public void changeRoom() {
+		/*Make the current room*/
 		this.currRoomID = this.destinationRoomID;
 		this.makeCurrRoom();
 		
+		/*Update the engine with the current room and environment*/
+		this.engine.setEnvironment(this.currEnvironment);
+		this.engine.setRoom(this.currRoom);
+		
+		/*Offset the player from the doorway*/
 		this.player.setXLoc(this.player.getXLoc() + this.changeRoomOffsetX);
 		this.player.setYLoc(this.player.getYLoc() + this.changeRoomOffsetY);
 	}
@@ -245,56 +260,49 @@ public class Game1 implements Game, Serializable {
 	
 	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
 		/*Assert gravity*/
-		this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-		this.engine.assertGravity(this.currRoom, this.currEnvironment, this.player);
+		this.engine.checkBottomEdgeCollisions(this.player);
+		this.engine.assertGravity(this.player);
 		
 		/*Check moving surfaces*/
-		this.engine.checkMovingSurfaces(this.currRoom, this.currEnvironment, false, player);
+		this.engine.checkMovingSurfaces(false, player);
 		
 		/*Move all non-player entities*/
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof game1Models.Enemy) {
 				((game1Models.Enemy) m).move();
-			} else if (m instanceof game1Models.Interactable) {
-				this.engine.moveInteractable(this.currRoom, this.currEnvironment, (game1Models.Interactable) m, this.player);
+			} else if (m instanceof game1Models.Autonomous) {
+				this.engine.moveAutonomous((game1Models.Autonomous) m, this.player);
 			}
 		}
 		
-		/*Check player, an interactable may have moved them*/
-		this.engine.checkRightEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-		this.engine.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-		this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-		this.engine.checkTopEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-		this.engine.checkLeavingSurface(this.currEnvironment, this.player); //check if interactable pushed player off surface
-		
 		/*Check and evaluate area collisions*/
-		this.engine.checkAreaCollisions(this.currEnvironment, this.player);
-		this.engine.evaluateAreaCollisions(this.currRoom, this.currEnvironment, player);
+		this.engine.checkAreaCollisions(this.player);
+		this.engine.evaluateAreaCollisions(this.player);
 		
 		/*Evaluate user input*/
 		if (rightPressed) {
-			this.engine.checkRightEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-			this.engine.moveRight(this.currRoom, this.currEnvironment, this.player);
-			this.engine.checkLeavingSurface(this.currEnvironment, this.player);
+			this.engine.checkRightEdgeCollisions(this.player);
+			this.engine.moveRight(this.player);
 		}
 		if (leftPressed) {
-			this.engine.checkLeftEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-			this.engine.moveLeft(this.currRoom, this.currEnvironment, this.player);
-			this.engine.checkLeavingSurface(this.currEnvironment, this.player);
+			this.engine.checkLeftEdgeCollisions(this.player);
+			this.engine.moveLeft(this.player);
 		}
+		this.engine.checkLeavingSurface(this.player);
+		
 		if (spacePressed) {
 			this.engine.setJumping(true);
 		}
 		if (downPressed) {
-			this.engine.phaseThroughPlatformOrExit(this.currRoom, this.currEnvironment, this.player);
-			this.engine.checkMovingSurfaces(this.currRoom, this.currEnvironment, false, player);
-			this.engine.checkBottomEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
+			this.engine.phaseThroughPlatformOrExit(this.player);
+			this.engine.checkMovingSurfaces(false, player);
+			this.engine.checkBottomEdgeCollisions(this.player);
 		}
 		
 		/*Evaluate jumping*/
 		if (this.engine.getJumping()) {
-			this.engine.checkTopEdgeCollisions(this.currRoom, this.currEnvironment, this.player);
-			if (!this.engine.initiateJumpArc(this.currRoom, this.currEnvironment, this.player)) {
+			this.engine.checkTopEdgeCollisions(this.player);
+			if (!this.engine.initiateJumpArc(this.player)) {
 				this.engine.setJumping(false);
 			}
 		}
@@ -304,7 +312,7 @@ public class Game1 implements Game, Serializable {
 		
 		/*Change room if room changed*/
 		if (this.roomChangeEvent) {
-			this.changeRoom(); // main sets roomChangeEvent back to false
+			this.changeRoom(); // Main sets roomChangeEvent back to false
 		}
 		
 		/*Check if player died*/

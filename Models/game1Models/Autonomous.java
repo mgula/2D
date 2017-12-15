@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import enums.Direction;
 
-public class Interactable extends SolidObject {
+public class Autonomous extends SolidObject {
 	private int incr;
 	private int currSegment;
 	private int waitCounter = 0;
@@ -15,7 +15,7 @@ public class Interactable extends SolidObject {
 	private Direction currDir;
 	private Direction lastDir;
 	
-	public Interactable(int x, int y, int h, int w, Direction d, int moveVariance, int incr) {
+	public Autonomous(int x, int y, int h, int w, Direction d, int moveVariance, int incr) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);
