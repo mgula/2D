@@ -1,7 +1,5 @@
 package game1Models;
 
-import java.util.ArrayList;
-
 import enums.Direction;
 
 public class Autonomous extends SolidObject {

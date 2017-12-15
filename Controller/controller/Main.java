@@ -22,7 +22,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,7 +33,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -BIG REFACTOR (tidy up import statements)
+ * -BIG REFACTOR
  * -magic numbers in views --> ratios of screen size
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves

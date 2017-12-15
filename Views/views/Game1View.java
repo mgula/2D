@@ -21,8 +21,6 @@ public class Game1View extends GameView {
 	
 	private int mainSleepTime;
 	
-	private boolean roomChangeEvent = false;
-	
 	private final int healthXloc = 5;
 	private final int healthtYloc = 5;
 	private final int pixelsPerHealth = 2;
@@ -99,10 +97,6 @@ public class Game1View extends GameView {
 	
 	public void setSpaceBar(boolean b) {
 		this.spaceBar = b;
-	}
-	
-	public void setRoomChangeEvent(boolean b) {
-		this.roomChangeEvent = b;
 	}
 	
 	public void paint(Graphics g) {

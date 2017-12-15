@@ -1,11 +1,6 @@
 package game1Models;
 
-import java.util.ArrayList;
-
-import enums.Direction;
-
 public class Controllable extends Game1Model {
-	
 	private int xIncr;
 	private int yIncr;
 	
@@ -147,8 +142,8 @@ public class Controllable extends Game1Model {
 		this.currHealth = h;
 	}
 	
-	public void setInContactWith(Autonomous i) {
-		this.inContactWith = i;
+	public void setInContactWith(Autonomous a) {
+		this.inContactWith = a;
 	}
 	
 	public void setOnSurfaceBottom(boolean b) {

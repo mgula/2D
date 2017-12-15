@@ -286,7 +286,7 @@ public class GameEngine implements Serializable {
 		this.checkRightEdgeCollisions(c);
 		this.checkBottomEdgeCollisions(c);
 		this.checkTopEdgeCollisions(c);
-		/*Respond to these collisions. These collisions only increment/decrement because Interactable uses 
+		/*Respond to these collisions. These collisions only increment/decrement because Autonomous uses 
 		 *the same while loop scheme to move (move a pixel and then check for collisions).*/
 		if (c.isAgainstMovingSurfaceLeft() && c.getInContactWith().getDirection() == Direction.EAST) {
 			c.setXLoc(c.getXLoc() + 1);
@@ -301,8 +301,8 @@ public class GameEngine implements Serializable {
 			c.setYLoc(c.getYLoc() - 1);
 			c.setAgainstMovingSurfaceBottom(false);
 		}
-		/*If resting on a moving surface, the crab will move in the same direction as the 
-		 *moving surface. This code should never be executed by Interactable.*/
+		/*If resting on a moving surface, the player will move in the same direction as the 
+		 *moving surface. This code should never be executed by Autonomous.*/
 		if (c.isOnMovingSurfaceBottom()) {
 			if (!calledWithinEngine) {
 				switch (c.getInContactWith().getDirection()) {
