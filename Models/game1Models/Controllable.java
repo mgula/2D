@@ -24,7 +24,7 @@ public class Controllable extends Game1Model {
 	
 	private boolean onPlatform = false;
 	
-	private boolean signalDamage = false;
+	private boolean enemyCollision = false; // true if player is occupying same area as an enemy
 	
 	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health) {
 		this.setXLoc(x);
@@ -102,8 +102,8 @@ public class Controllable extends Game1Model {
 		return this.onPlatform;
 	}
 	
-	public boolean getDamageSignal() {
-		return this.signalDamage;
+	public boolean getEnemyCollision() {
+		return this.enemyCollision;
 	}
 	
 	/*Setters*/
@@ -171,7 +171,7 @@ public class Controllable extends Game1Model {
 		this.onPlatform = b;
 	}
 	
-	public void setDamageSignal(boolean b) {
-		this.signalDamage = b;
+	public void setEnemyCollision(boolean b) {
+		this.enemyCollision = b;
 	}
 }

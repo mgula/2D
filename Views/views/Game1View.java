@@ -195,7 +195,7 @@ public class Game1View extends GameView {
 	}
 	
 	public void drawPlayer(Graphics g) {
-		if (this.player.getDamageSignal()) {
+		if (this.player.getEnemyCollision()) {
 			if (this.getGame1State() != GameState.PAUSE) {
 				this.flash = this.engine.getDamageCoolDown();
 			}
@@ -205,6 +205,7 @@ public class Game1View extends GameView {
 		} else {
 			this.flash = 0;
 		}
+		
 		if (this.playerDrawable) {
 			g.drawRect(this.player.getXLoc() - this.playerOffsetX, this.player.getYLoc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight());
 		}
@@ -220,7 +221,7 @@ public class Game1View extends GameView {
 		g.drawRect(this.player.getXLoc() - this.playerOffsetX, this.player.getYLoc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight()); //hitbox
 		String message = "X: " + this.player.getXLoc() + ", Y: " + this.player.getYLoc();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
-		message = "damaged: " + this.player.getDamageSignal();
+		message = "damaged: " + this.player.getEnemyCollision();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
 		String[] debugMessages = {"Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
 				"Screen moving right bool: " + this.viewMovingRight, "Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, 

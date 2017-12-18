@@ -48,9 +48,6 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
 	
-	//private Direction dirOfCurrent;
-	//private int incrFromCurrent;
-	
 	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
 	
 	private final int interactableWaitTime = 50;
@@ -131,6 +128,10 @@ public class GameEngine implements Serializable {
 	
 	public int getFloatingThreshold() {
 		return this.floatingThreshold;
+	}
+	
+	public boolean getDamaged() {
+		return this.damageCooldown != this.damageCooldownThresh;
 	}
 	
 	/*Setters*/
@@ -538,7 +539,6 @@ public class GameEngine implements Serializable {
 	
 	/*Methods for checking collisions with event areas*/
 	public void checkAreaCollisions(Controllable c) {
-		boolean enemyCollision = false;
 		boolean damageCollision = false;
 		boolean regenCollision = false;
 		boolean forceCollision = false;
@@ -561,8 +561,7 @@ public class GameEngine implements Serializable {
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
 									if (m instanceof game1Models.Enemy) {
-										enemyCollision = true;
-										c.setDamageSignal(true);
+										c.setEnemyCollision(true);
 										this.healthDecreaseEnemy = ((game1Models.Enemy)m).getDamage();
 										break;
 									} else if (m instanceof game1Models.DamageArea) {
@@ -587,7 +586,7 @@ public class GameEngine implements Serializable {
 		}
 		
 		/*Evaluate area collisions*/
-		if (enemyCollision) {
+		if (c.getEnemyCollision()) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
 				c.setHealth(c.getHealth() - this.healthDecreaseEnemy);
@@ -600,7 +599,7 @@ public class GameEngine implements Serializable {
 				/*Update the appropriate booleans after the cooldown.*/
 				this.damageCooldown = this.damageCooldownThresh;
 				this.damageDealt = false;
-				c.setDamageSignal(false);
+				c.setEnemyCollision(false);
 			}
 		}
 		if (damageCollision) {
