@@ -31,6 +31,8 @@ public class GameEngine implements Serializable {
 	
 	private AreaMap currMap;
 	
+	private boolean enemyCollision = false;
+	
 	private Room currRoom;
 	private RoomID currRoomID = RoomID.SPAWN;
 	private RoomID destinationRoomID;
@@ -130,8 +132,8 @@ public class GameEngine implements Serializable {
 		return this.floatingThreshold;
 	}
 	
-	public boolean getDamaged() {
-		return this.damageCooldown != this.damageCooldownThresh;
+	public boolean getEnemyCollision() {
+		return this.enemyCollision;
 	}
 	
 	/*Setters*/
@@ -553,6 +555,7 @@ public class GameEngine implements Serializable {
 				int w = m.getWidth();
 				int h = m.getHeight();
 				/*Check every point of the hitbox against every point of the model.*/
+				loop:
 				for (int i = x; i < x + w; i++) {
 					for (int j = y; j < y + h; j++) {
 						for (int k = c.getXLoc(); k < c.getXLoc() + c.getWidth(); k++) {
@@ -561,21 +564,21 @@ public class GameEngine implements Serializable {
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
 									if (m instanceof game1Models.Enemy) {
-										c.setEnemyCollision(true);
+										this.enemyCollision = true;
 										this.healthDecreaseEnemy = ((game1Models.Enemy)m).getDamage();
-										break;
+										break loop;
 									} else if (m instanceof game1Models.DamageArea) {
 										damageCollision = true;
 										this.healthDecreaseDamArea = ((game1Models.DamageArea)m).getHealthDecr();
-										break;
+										break loop;
 									} else if (m instanceof game1Models.RegenArea) {
 										regenCollision = true;
 										this.healthIncrease = ((game1Models.RegenArea)m).getHealthIncr();
-										break;
+										break loop;
 									} else if (m instanceof game1Models.Force) {
 										forceCollision = true;
 										f = (game1Models.Force) m;
-										break;
+										break loop;
 									}
 								}
 							}
@@ -586,7 +589,7 @@ public class GameEngine implements Serializable {
 		}
 		
 		/*Evaluate area collisions*/
-		if (c.getEnemyCollision()) {
+		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
 				c.setHealth(c.getHealth() - this.healthDecreaseEnemy);
@@ -599,7 +602,7 @@ public class GameEngine implements Serializable {
 				/*Update the appropriate booleans after the cooldown.*/
 				this.damageCooldown = this.damageCooldownThresh;
 				this.damageDealt = false;
-				c.setEnemyCollision(false);
+				this.enemyCollision = false;
 			}
 		}
 		if (damageCollision) {
