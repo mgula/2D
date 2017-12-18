@@ -24,10 +24,7 @@ public class Controllable extends Game1Model {
 	
 	private boolean onPlatform = false;
 	
-	private boolean enemyCollision = false; // true if player is occupying same area as an enemy
-	private boolean damageCollision = false;
-	private boolean regenCollision = false; // true if player is occupying same area as a regen area
-	private boolean currentCollision = false; // true if player is occupying same area as a current (Current.java)
+	private boolean signalDamage = false;
 	
 	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health) {
 		this.setXLoc(x);
@@ -105,20 +102,8 @@ public class Controllable extends Game1Model {
 		return this.onPlatform;
 	}
 	
-	public boolean getEnemyCollision() {
-		return this.enemyCollision;
-	}
-	
-	public boolean getDamageCollision() {
-		return this.damageCollision;
-	}
-	
-	public boolean getRegenCollision() {
-		return this.regenCollision;
-	}
-	
-	public boolean getCurrentCollision() {
-		return this.currentCollision;
+	public boolean getDamageSignal() {
+		return this.signalDamage;
 	}
 	
 	/*Setters*/
@@ -186,19 +171,7 @@ public class Controllable extends Game1Model {
 		this.onPlatform = b;
 	}
 	
-	public void setEnemyCollision(boolean b) {
-		this.enemyCollision = b;
-	}
-	
-	public void setDamageCollision(boolean b) {
-		this.damageCollision = b;
-	}
-	
-	public void setRegenCollision(boolean b) {
-		this.regenCollision = b;
-	}
-	
-	public void setCurrentCollision(boolean b) {
-		this.currentCollision = b;
+	public void setDamageSignal(boolean b) {
+		this.signalDamage = b;
 	}
 }

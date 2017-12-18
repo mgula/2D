@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import enums.Direction;
+import enums.RoomID;
 import game1Models.*;
 
 public class GameEngine implements Serializable {
@@ -24,11 +25,17 @@ public class GameEngine implements Serializable {
 	private int maxHealth = 100;
 	
 	private int floatingCounter = 0;
-	
 	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
 	
 	private ArrayList<Game1Model> currEnvironment;
+	
+	private AreaMap currMap;
+	
 	private Room currRoom;
+	private RoomID currRoomID = RoomID.SPAWN;
+	private RoomID destinationRoomID;
+	private int changeRoomOffsetX;
+	private int changeRoomOffsetY;
 	
 	private int jumpingCounter = 0;
 	private int jumpDuration = 30;
@@ -41,14 +48,14 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
 	
-	private Direction dirOfCurrent; // direction of current (Current.java)
-	private int incrFromCurrent; // magnitude of push from currents (Current.java)
+	//private Direction dirOfCurrent;
+	//private int incrFromCurrent;
 	
 	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
 	
 	private final int interactableWaitTime = 50;
 	
-	public Controllable getPlayer() {
+	public Controllable makePlayer() {
 		return new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.maxHealth);
 	}
 	
@@ -68,6 +75,9 @@ public class GameEngine implements Serializable {
 		this.jumpCount = 0;
 		this.jumpingCounter = 0;
 		this.floatingCounter = 0;
+		
+		this.currRoomID = RoomID.SPAWN;
+		this.makeCurrRoom();
 	}
 	
 	/*Getters*/
@@ -93,6 +103,14 @@ public class GameEngine implements Serializable {
 	
 	public int getJumpNumber() {
 		return this.jumpCount;
+	}
+	
+	public Room getCurrRoom() {
+		return this.currRoom;
+	}
+	
+	public ArrayList<Game1Model> getEnvironment() {
+		return this.currEnvironment;
 	}
 	
 	public int getMaxHealth() {
@@ -132,11 +150,15 @@ public class GameEngine implements Serializable {
 		this.currEnvironment = e;
 	}
 	
+	public void setMap(AreaMap m) {
+		this.currMap = m;
+	}
+	
 	public void setRoom(Room r) {
 		this.currRoom = r;
 	}
 	
-	/*Movement/collision detection*/
+	/*Methods that move a controllable object*/
 	public void incrX(Controllable c) {
 		if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
 			c.setXLoc(c.getXLoc() + 1);
@@ -166,7 +188,6 @@ public class GameEngine implements Serializable {
 	}
 	
 	public void moveRight(Controllable c) {
-		/*Implement the concept mentioned above: check for collisions after every pixel.*/
 		while (c.getCurrXSegment() < c.getXIncr()) {
 			this.checkRightEdgeCollisions(c);
 			this.incrX(c);
@@ -250,6 +271,7 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
+	/*Methods for checking collisions with other models*/
 	public void checkLeavingSurface(Controllable c) {
 		if (c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) {
 			boolean contact = false;
@@ -500,8 +522,30 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
+	public boolean checkBottomSurface(Game1Model m, Controllable c) {
+		int x = m.getXLoc();
+		int y = m.getYLoc();
+		int w = m.getWidth();
+		if (c.getYLoc() + c.getHeight() == y) {
+			for (int i = x - c.getWidth() + 1; i < x + w; i++) {
+				if (c.getXLoc() == i) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/*Methods for checking collisions with event areas*/
 	public void checkAreaCollisions(Controllable c) {
-		c.setCurrentCollision(false); // innocent until proven guilty policy
+		boolean enemyCollision = false;
+		boolean damageCollision = false;
+		boolean regenCollision = false;
+		boolean forceCollision = false;
+		
+		Force f = null;
+		
+		/*Check for event area collisions*/
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof EventArea) {
 				int x = m.getXLoc();
@@ -517,22 +561,22 @@ public class GameEngine implements Serializable {
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
 									if (m instanceof game1Models.Enemy) {
-										c.setEnemyCollision(true);
+										enemyCollision = true;
+										c.setDamageSignal(true);
 										this.healthDecreaseEnemy = ((game1Models.Enemy)m).getDamage();
-										return;
+										break;
 									} else if (m instanceof game1Models.DamageArea) {
-										c.setDamageCollision(true);
+										damageCollision = true;
 										this.healthDecreaseDamArea = ((game1Models.DamageArea)m).getHealthDecr();
-										return;
+										break;
 									} else if (m instanceof game1Models.RegenArea) {
-										c.setRegenCollision(true);
+										regenCollision = true;
 										this.healthIncrease = ((game1Models.RegenArea)m).getHealthIncr();
-										return;
-									} else if (m instanceof game1Models.Current) {
-										c.setCurrentCollision(true);
-										this.dirOfCurrent = ((game1Models.Current)m).getFlowDirection();
-										this.incrFromCurrent = ((game1Models.Current)m).getIncr();
-										return;
+										break;
+									} else if (m instanceof game1Models.Force) {
+										forceCollision = true;
+										f = (game1Models.Force) m;
+										break;
 									}
 								}
 							}
@@ -541,24 +585,9 @@ public class GameEngine implements Serializable {
 				}
 			}
 		}
-	}
-	
-	public boolean checkBottomSurface(Game1Model m, Controllable c) {
-		int x = m.getXLoc();
-		int y = m.getYLoc();
-		int w = m.getWidth();
-		if (c.getYLoc() + c.getHeight() == y) {
-			for (int i = x - c.getWidth() + 1; i < x + w; i++) {
-				if (c.getXLoc() == i) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	public void evaluateAreaCollisions(Controllable c) {
-		if (c.getEnemyCollision()) {
+		
+		/*Evaluate area collisions*/
+		if (enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
 				c.setHealth(c.getHealth() - this.healthDecreaseEnemy);
@@ -571,20 +600,15 @@ public class GameEngine implements Serializable {
 				/*Update the appropriate booleans after the cooldown.*/
 				this.damageCooldown = this.damageCooldownThresh;
 				this.damageDealt = false;
-				c.setEnemyCollision(false);
+				c.setDamageSignal(false);
 			}
 		}
-		
-		if (c.getDamageCollision()) {
+		if (damageCollision) {
 			if (c.getHealth() >= 0) {
 				c.setHealth(c.getHealth() - this.healthDecreaseDamArea);
-				c.setDamageCollision(false);
-			} else {
-				c.setDamageCollision(false);
 			}
 		}
-		
-		if (c.getRegenCollision()) {
+		if (regenCollision) {
 			/*Don't give the player more than the maximum health.*/
 			if (c.getHealth() < this.maxHealth) {
 				if (c.getHealth() + this.healthIncrease > this.maxHealth) {
@@ -592,45 +616,52 @@ public class GameEngine implements Serializable {
 				} else {
 					c.setHealth(c.getHealth() + this.healthIncrease);
 				}
-				c.setRegenCollision(false);
-			} else {
-				c.setRegenCollision(false);
 			}
 		}
-		
-		/*If a current collision has been detected, move the player in the corresponding direction.*/
-		if (c.getCurrentCollision()) {
-			switch (this.dirOfCurrent) {
+		if (forceCollision) {
+			int incr = f.getIncr();
+			switch (f.getFlowDirection()) {
 				case EAST:
 					this.checkRightEdgeCollisions(c);
 					if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
-						c.setXLoc(c.getXLoc() + this.incrFromCurrent);
+						c.setXLoc(c.getXLoc() + incr);
 					}
 					break;
 					
 				case WEST:
 					this.checkLeftEdgeCollisions(c);
 					if (!c.isAgainstSurfaceLeft() && !c.isAgainstMovingSurfaceLeft()) {
-						c.setXLoc(c.getXLoc() - this.incrFromCurrent);
+						c.setXLoc(c.getXLoc() - incr);
 					}
 					break;
 					
 				case NORTH:
 					this.checkTopEdgeCollisions(c);
 					if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
-						c.setYLoc(c.getYLoc() - this.incrFromCurrent);
+						c.setYLoc(c.getYLoc() - incr);
 					}
 					break;
 					
 				case SOUTH:
 					this.checkBottomEdgeCollisions(c);
 					if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
-						c.setYLoc(c.getYLoc() + this.incrFromCurrent);
+						c.setYLoc(c.getYLoc() + incr);
 					}
 					break;
 				
 				default:
 					break;
+			}
+		}
+	}
+	
+	/*Move things that move (enemies, autonomous)*/
+	public void moveAll(Controllable c) {
+		for (Game1Model m : this.currEnvironment) {
+			if (m instanceof game1Models.Enemy) {
+				((game1Models.Enemy) m).move();
+			} else if (m instanceof game1Models.Autonomous) {
+				this.moveAutonomous((game1Models.Autonomous) m, c);
 			}
 		}
 	}
@@ -721,4 +752,82 @@ public class GameEngine implements Serializable {
 				break;
 		}
 	}
+	
+	/*Methods for rooms*/
+	public void makeCurrRoom() {
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
+		this.currEnvironment = this.currRoom.getEnvironment();
+	}
+	
+	public void changeRoom(Controllable c) {
+		/*Make the current room*/
+		this.currRoomID = this.destinationRoomID;
+		this.makeCurrRoom();
+		
+		/*Offset the player from the doorway*/
+		c.setXLoc(c.getXLoc() + this.changeRoomOffsetX);
+		c.setYLoc(c.getYLoc() + this.changeRoomOffsetY);
+	}
+	
+	public boolean checkRoomBoundaries(Controllable c) {
+		int px = c.getXLoc();
+		int py = c.getYLoc();
+		
+		for (Exit e : this.currMap.accessRoomLinks(this.currRoomID)) {
+			int x = e.getXLoc();
+			int y = e.getYLoc();
+			int h = e.getHeight();
+			int w = e.getWidth();
+			switch (e.getDirection()) {
+				case NORTH:
+					if (px >= x && px + c.getWidth() <= x + w) {
+						if (py < y) {
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = 0;
+							this.changeRoomOffsetY = -1 * (c.getHeight() + 1); //push rest of player through door (to avoid erroneously triggering more room change events)
+							return true;
+						}
+					}
+					break;
+					
+				case SOUTH:
+					if (px >= x && px + c.getWidth() <= x + w) {
+						if (py + c.getHeight() > y) {
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = 0;
+							this.changeRoomOffsetY = c.getHeight() + 1;
+							return true;
+						}
+					}
+					break;
+					
+				case EAST:
+					if (py <= y && py > y - h) {
+						if (px + c.getWidth() >= x) {
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = c.getWidth() + 1;
+							this.changeRoomOffsetY = 0;
+							return true;
+						}
+					}
+					break;
+					
+				case WEST:
+					if (py <= y && py > y - h) {
+						if (px <= x) {
+							this.destinationRoomID = e.getNextRoom();
+							this.changeRoomOffsetX = -1 * (c.getWidth() + 1);
+							this.changeRoomOffsetY = 0;
+							return true;
+						}
+					}
+					break;
+				
+				default:
+					break;
+			}
+		}
+		return false;
+	}
+	
 }

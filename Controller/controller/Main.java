@@ -67,7 +67,7 @@ public class Main implements KeyListener, MouseListener {
 	private boolean loadingFromFile = false;
 	
 	private boolean play = true;
-	private Game1 currentGame = new Game1(); //avoid null pointer in updateViewStates()
+	private GameWrapper currentGame = new GameWrapper(); //avoid null pointer in updateViewStates()
 	private MainView mainView;
 	private SettingsView settingsView;
 	private Game1View game1View;
@@ -428,7 +428,7 @@ public class Main implements KeyListener, MouseListener {
 			this.loadGame();
 			this.loadingFromFile = false;
 		} else {
-			this.currentGame = new Game1();
+			this.currentGame = new GameWrapper();
 		}
 		
 		this.currentGame.setGameState(GameState.PLAY);
@@ -503,7 +503,7 @@ public class Main implements KeyListener, MouseListener {
 				break;
 				
 			case DEATH:
-				this.currentGame.respawn();
+				this.currentGame.getEngine().respawn(this.currentGame.getPlayer());
 				
 				this.game1View.setStartingOffsets();
 				
@@ -584,7 +584,7 @@ public class Main implements KeyListener, MouseListener {
 		try {
 			this.fileIn = new FileInputStream(save);
 			this.objectIn = new ObjectInputStream(this.fileIn);
-			this.currentGame = (Game1)this.objectIn.readObject();
+			this.currentGame = (GameWrapper)this.objectIn.readObject();
 			this.objectIn.close();
 			this.fileIn.close();
 		} catch (FileNotFoundException e) {

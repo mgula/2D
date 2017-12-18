@@ -9,7 +9,10 @@ import enums.MapID;
 import enums.RoomID;
 import game1Models.*;
 
-public class Game1 implements Game, Serializable {
+/*This class serves as a "wrapper" that uses an engine object on a controllable object. This class
+ *is responsible for making maps (essentially just collections of rooms), calling the necessary engine
+ *methods every tick, and signaling Main when a room change event occurs.*/
+public class GameWrapper implements Game, Serializable {
 	private static final long serialVersionUID = 1L;
 	private GameState gameState;
 	private GameState lastState;
@@ -18,44 +21,34 @@ public class Game1 implements Game, Serializable {
 	
 	private GameEngine engine = new GameEngine();
 	
-	private Controllable player;
-	
 	private boolean roomChangeEvent = false;
 	
-	private final int RoomDataArrayLength = 4;
+	private Controllable player;
 	
-	private RoomID destinationRoomID;
-	private int changeRoomOffsetX;
-	private int changeRoomOffsetY;
+	public static final int RoomDataArrayLength = 4;
 	
 	private AreaMap map1;
 	private RoomID[] map1Rooms = {RoomID.SPAWN, RoomID.EAST1, RoomID.WEST1, RoomID.EAST2, RoomID.WEST2, RoomID.NORTHEAST1};
 	
 	private AreaMap currMap;
 	private MapID currMapID = MapID.MAP1;
-	private Room currRoom;
-	private RoomID currRoomID = RoomID.SPAWN;
-	private RoomID lastRoomID = RoomID.SPAWN;
-	private ArrayList<Game1Model> currEnvironment;
 	
-	public Game1() {
+	public GameWrapper() {
 		this.initCurrMap();
 		
-		this.player = this.engine.getPlayer();
+		this.player = this.engine.makePlayer();
 		
 		this.initCurrentMapRooms();
 		
-		this.makeCurrRoom();
+		this.engine.setMap(this.currMap);
 		
-		/*Update the engine with the current room and environment*/
-		this.engine.setEnvironment(this.currEnvironment);
-		this.engine.setRoom(this.currRoom);
+		this.engine.makeCurrRoom();
 	}
 	
 	public void initCurrentMapRooms() {
 		for (RoomID r : this.currMap.getRoomIDs()) {
 			
-			int[] roomDims = new int[this.RoomDataArrayLength];
+			int[] roomDims = new int[RoomDataArrayLength];
 			ArrayList<Game1Model> env = new ArrayList<Game1Model>();
 			ArrayList<Exit> roomLinks = new ArrayList<Exit>();
 			
@@ -91,6 +84,7 @@ public class Game1 implements Game, Serializable {
 					roomDims[3] = 1000;
 					
 					env.add(new Rock(3500, -125, 70, 70));
+					env.add(new Force(3300, -175, 70, 70, Direction.EAST, 1));
 					env.add(new Rock(3250, -250, 50, 50));
 					
 					
@@ -157,17 +151,6 @@ public class Game1 implements Game, Serializable {
 		}
 	}
 	
-	public void respawn() {
-		this.currRoomID = RoomID.SPAWN;
-		this.makeCurrRoom();
-		
-		/*Update the engine with the current room and environment*/
-		this.engine.setEnvironment(this.currEnvironment);
-		this.engine.setRoom(this.currRoom);
-		
-		this.engine.respawn(this.player);
-	}
-	
 	public void initCurrMap() {
 		switch (this.currMapID) {
 			case MAP1:
@@ -176,85 +159,6 @@ public class Game1 implements Game, Serializable {
 				break;
 			default:
 				break;
-		}
-	}
-	
-	public void makeCurrRoom() {
-		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
-		this.currEnvironment = this.currRoom.getEnvironment();
-	}
-	
-	public void changeRoom() {
-		/*Make the current room*/
-		this.currRoomID = this.destinationRoomID;
-		this.makeCurrRoom();
-		
-		/*Update the engine with the current room and environment*/
-		this.engine.setEnvironment(this.currEnvironment);
-		this.engine.setRoom(this.currRoom);
-		
-		/*Offset the player from the doorway*/
-		this.player.setXLoc(this.player.getXLoc() + this.changeRoomOffsetX);
-		this.player.setYLoc(this.player.getYLoc() + this.changeRoomOffsetY);
-	}
-	
-	public void checkRoomBoundaries() {
-		int px = this.player.getXLoc();
-		int py = this.player.getYLoc();
-		
-		for (Exit e : this.currMap.accessRoomLinks(this.currRoomID)) {
-			int x = e.getXLoc();
-			int y = e.getYLoc();
-			int h = e.getHeight();
-			int w = e.getWidth();
-			switch (e.getDirection()) {
-				case NORTH:
-					if (px >= x && px + this.player.getWidth() <= x + w) {
-						if (py < y) {
-							this.roomChangeEvent = true;
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = 0;
-							this.changeRoomOffsetY = -1 * (this.player.getHeight() + 1); //push rest of player through door (to avoid erroneously triggering more room change events)
-						}
-					}
-					break;
-					
-				case SOUTH:
-					if (px >= x && px + this.player.getWidth() <= x + w) {
-						if (py + this.player.getHeight() > y) {
-							this.roomChangeEvent = true;
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = 0;
-							this.changeRoomOffsetY = this.player.getHeight() + 1;
-						}
-					}
-					break;
-					
-				case EAST:
-					if (py <= y && py > y - h) {
-						if (px + this.player.getWidth() >= x) {
-							this.roomChangeEvent = true;
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = this.player.getWidth() + 1;
-							this.changeRoomOffsetY = 0;
-						}
-					}
-					break;
-					
-				case WEST:
-					if (py <= y && py > y - h) {
-						if (px <= x) {
-							this.roomChangeEvent = true;
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = -1 * (this.player.getWidth() + 1);
-							this.changeRoomOffsetY = 0;
-						}
-					}
-					break;
-				
-				default:
-					break;
-			}
 		}
 	}
 	
@@ -267,17 +171,10 @@ public class Game1 implements Game, Serializable {
 		this.engine.checkMovingSurfaces(false, player);
 		
 		/*Move all non-player entities*/
-		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof game1Models.Enemy) {
-				((game1Models.Enemy) m).move();
-			} else if (m instanceof game1Models.Autonomous) {
-				this.engine.moveAutonomous((game1Models.Autonomous) m, this.player);
-			}
-		}
+		this.engine.moveAll(this.player);
 		
 		/*Check and evaluate area collisions*/
 		this.engine.checkAreaCollisions(this.player);
-		this.engine.evaluateAreaCollisions(this.player);
 		
 		/*Evaluate user input*/
 		if (rightPressed) {
@@ -289,7 +186,6 @@ public class Game1 implements Game, Serializable {
 			this.engine.moveLeft(this.player);
 		}
 		this.engine.checkLeavingSurface(this.player);
-		
 		if (spacePressed) {
 			this.engine.setJumping(true);
 		}
@@ -308,18 +204,13 @@ public class Game1 implements Game, Serializable {
 		}
 		
 		/*Check for room changes*/
-		this.checkRoomBoundaries();
+		this.roomChangeEvent = this.engine.checkRoomBoundaries(this.player);
 		
-		/*Change room if room changed*/
 		if (this.roomChangeEvent) {
-			this.changeRoom(); // Main sets roomChangeEvent back to false
+			this.engine.changeRoom(this.player);
 		}
 		
 		/*Check if player died*/
-		this.gameStateCheck();
-	}
-	
-	public void gameStateCheck() {
 		if (this.player.getHealth() <= 0) {
 			this.lastState = this.gameState;
 			this.gameState = GameState.DEATH;
@@ -351,24 +242,8 @@ public class Game1 implements Game, Serializable {
 		return this.player;
 	}
 	
-	public Room getCurrRoom() {
-		return this.currRoom;
-	}
-	
 	public AreaMap getCurrMap() {
 		return this.map1;
-	}
-	
-	public RoomID getCurrRoomID() {
-		return this.currRoomID;
-	}
-	
-	public RoomID getLastRoomID() {
-		return this.lastRoomID;
-	}
-	
-	public ArrayList<Game1Model> getEnvironment() {
-		return this.currEnvironment;
 	}
 	
 	public GameState getGameState() {

@@ -2,11 +2,11 @@ package game1Models;
 
 import enums.Direction;
 
-public class Current extends EventArea {
+public class Force extends EventArea {
 	private Direction flowDir;
 	private int incr;
 	
-	public Current(int x, int y, int h, int w, Direction d, int incr) {
+	public Force(int x, int y, int h, int w, Direction d, int incr) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);

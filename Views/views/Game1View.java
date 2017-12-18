@@ -4,7 +4,7 @@ import enums.AppState;
 import enums.GameState;
 import game1Models.*;
 import games.GameEngine;
-import games.Game1;
+import games.GameWrapper;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -195,7 +195,7 @@ public class Game1View extends GameView {
 	}
 	
 	public void drawPlayer(Graphics g) {
-		if (this.player.getEnemyCollision()) {
+		if (this.player.getDamageSignal()) {
 			if (this.getGame1State() != GameState.PAUSE) {
 				this.flash = this.engine.getDamageCoolDown();
 			}
@@ -220,7 +220,7 @@ public class Game1View extends GameView {
 		g.drawRect(this.player.getXLoc() - this.playerOffsetX, this.player.getYLoc() - this.playerOffsetY, this.player.getWidth(), this.player.getHeight()); //hitbox
 		String message = "X: " + this.player.getXLoc() + ", Y: " + this.player.getYLoc();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
-		message = "damaged: " + this.player.getEnemyCollision();
+		message = "damaged: " + this.player.getDamageSignal();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
 		String[] debugMessages = {"Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
 				"Screen moving right bool: " + this.viewMovingRight, "Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, 
@@ -242,22 +242,22 @@ public class Game1View extends GameView {
 		}
 	}
 	
-	public void load(Game1 game) {
+	public void load(GameWrapper game) {
 		this.playerDrawable = true;
 		this.flash = 0;
 		this.engine = game.getEngine();
 		this.player = game.getPlayer();
 		this.currMap = game.getCurrMap();
-		this.currRoom = game.getCurrRoom();
+		this.currRoom = game.getEngine().getCurrRoom();
 		this.lastYloc = this.player.getYLoc();
-		this.environment = game.getEnvironment();
+		this.environment = game.getEngine().getEnvironment();
 		
 		this.updateOffsets();
 	}
 	
-	public void updateView(Game1 game) {
-		this.currRoom = game.getCurrRoom();
-		this.environment = game.getEnvironment();
+	public void updateView(GameWrapper game) {
+		this.currRoom = game.getEngine().getCurrRoom();
+		this.environment = game.getEngine().getEnvironment();
 		this.lastYloc = this.player.getYLoc();
 	}
 	
