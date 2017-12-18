@@ -13,8 +13,8 @@ Models/game1Models/EventArea.java
 Models/game1Models/Enemy.java
 Models/game1Models/Exit.java
 Models/game1Models/AreaMap.java
-Models/game1Models/Current.java
-Models/game1Models/CurrentDrawable.java
+Models/game1Models/Force.java
+Models/game1Models/ForceDrawable.java
 Models/game1Models/DamageArea.java
 Models/game1Models/EnemyA.java
 Models/game1Models/EnemyB.java

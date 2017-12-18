@@ -1,10 +1,10 @@
 package game1Models;
 
-public class CurrentDrawable extends Game1Model {
+public class ForceDrawable extends Game1Model {
 	private final int drawHeight = 50;
 	private final int drawWidth = 185;
 	
-	public CurrentDrawable(int x, int y) {
+	public ForceDrawable(int x, int y) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(this.drawHeight);

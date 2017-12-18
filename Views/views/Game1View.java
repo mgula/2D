@@ -180,7 +180,7 @@ public class Game1View extends GameView {
 			} else if (m instanceof game1Models.DamageArea) {
 				g.setColor(Color.MAGENTA);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.CurrentDrawable) {
+			} else if (m instanceof game1Models.ForceDrawable) {
 				g.setColor(Color.CYAN);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof game1Models.Autonomous) {
