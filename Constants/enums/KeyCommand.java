@@ -9,8 +9,8 @@ public enum KeyCommand {
 	RIGHT_RELEASED,
 	SPACE_RELEASED,
 	DOWN_RELEASED,
-	C_PRESSED,
-	M_PRESSED;
+	M_PRESSED,
+	C_PRESSED;
 	
 	private KeyCommand(){};
 }

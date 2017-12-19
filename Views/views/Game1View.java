@@ -117,7 +117,7 @@ public class Game1View extends GameView {
 		
 		switch (this.getPauseState()) {
 		case PLAYER_INFO:
-			g.drawString("Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), 500, 200);
+			g.drawString("Health: " + this.player.getCurrHealth() + "/" + this.player.getMaxHealth(), 500, 200);
 			break;
 		case SYSTEM:
 			
@@ -149,9 +149,9 @@ public class Game1View extends GameView {
 		
 		/*Draw HUD components: start with life*/
 		g.setColor(Color.RED);
-		g.fillRect(this.healthXloc, this.healthtYloc, this.pixelsPerHealth * this.player.getHealth(), this.healthBarHeight);
+		g.fillRect(this.healthXloc, this.healthtYloc, this.pixelsPerHealth * this.player.getCurrHealth(), this.healthBarHeight);
 		g.setColor(Color.BLACK);
-		g.fillRect(this.healthXloc + (this.pixelsPerHealth * this.player.getHealth()), this.healthtYloc, this.pixelsPerHealth * (this.engine.getMaxHealth() - this.player.getHealth()), this.healthBarHeight);
+		g.fillRect(this.healthXloc + (this.pixelsPerHealth * this.player.getCurrHealth()), this.healthtYloc, this.pixelsPerHealth * (this.player.getMaxHealth() - this.player.getCurrHealth()), this.healthBarHeight);
 		
 		/*Update last y location, in order to know when to use falling animation*/
 		this.lastYloc = this.player.getYLoc();
@@ -189,6 +189,11 @@ public class Game1View extends GameView {
 			} else if (m instanceof game1Models.Platform) {
 				g.setColor(Color.BLACK);
 				g.drawLine(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getXLoc() + m.getWidth() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY);
+			} else if (m instanceof game1Models.Controllable) {
+				if (m != this.player) {
+					g.setColor(Color.CYAN);
+					g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
+				}
 			}
 		}
 		g.setColor(Color.BLACK);
@@ -223,7 +228,7 @@ public class Game1View extends GameView {
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset1X, this.player.getYLoc() - this.debugMsgOffset1Y - this.playerOffsetY); //location
 		message = "damaged: " + this.engine.getEnemyCollision();
 		g.drawString(message, this.player.getXLoc() - this.playerOffsetX - this.debugMsgOffset2, this.player.getYLoc() - this.debugMsgOffset2 - this.playerOffsetY); //damage boolean
-		String[] debugMessages = {"Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
+		String[] debugMessages = {"Health: " + this.player.getCurrHealth() + "/" + this.player.getMaxHealth(), "Static screen bool (X): " + this.viewStationaryX, "Screen moving left bool: " + this.viewMovingLeft, 
 				"Screen moving right bool: " + this.viewMovingRight, "Static screen bool (Y): " + this.viewStationaryY, "Screen moving up bool: " + this.viewMovingUp, "screen moving down bool: " + this.viewMovingDown, 
 				"Y screen thresh (U): " + this.thresholdYU, "Y screen thresh (D): " + this.thresholdYD, "X screen thresh (R): " + this.thresholdXR, "X screen thresh (L): " + this.thresholdXL, 
 				"Player offset X: " + this.playerOffsetX, "Player offset Y: " + this.playerOffsetY, "Current room: " + this.currRoom.getID(), "Initial X Threshold (R): " + this.initialThresholdXR,
@@ -251,6 +256,13 @@ public class Game1View extends GameView {
 		this.currMap = game.getCurrMap();
 		this.currRoom = game.getEngine().getCurrRoom();
 		this.lastYloc = this.player.getYLoc();
+		this.environment = game.getEngine().getEnvironment();
+		
+		this.updateOffsets();
+	}
+	
+	public void loadPlayer(GameWrapper game) {
+		this.player = game.getPlayer();
 		this.environment = game.getEngine().getEnvironment();
 		
 		this.updateOffsets();

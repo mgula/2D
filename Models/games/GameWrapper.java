@@ -70,6 +70,9 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 5, 25));
 					
+					env.add(new Controllable(1200, -125, 20, 20, 10, 10, 150, 150));
+					env.add(new Controllable(1300, -125, 30, 30, 10, 10, 100, 200));
+					
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.WEST1, Direction.WEST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.EAST1, Direction.EAST, 1000 + 2000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.NORTHEAST1, Direction.EAST, 1000 + 2000, -500, 50));
@@ -163,7 +166,7 @@ public class GameWrapper implements Game, Serializable {
 	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
 		/*Assert gravity*/
 		this.engine.checkBottomEdgeCollisions(this.player);
-		this.engine.assertGravity(this.player);
+		this.engine.assertGravity(this.player, true);
 		
 		/*Check moving surfaces*/
 		this.engine.checkMovingSurfaces(player);
@@ -207,9 +210,16 @@ public class GameWrapper implements Game, Serializable {
 		}
 		
 		/*Check if player died*/
-		if (this.player.getHealth() <= 0) {
+		if (this.player.getCurrHealth() <= 0) {
 			this.lastState = this.gameState;
 			this.gameState = GameState.DEATH;
+		}
+	}
+	
+	public void changeBodies() {
+		Controllable newBody = this.engine.newBody(this.player);
+		if (newBody != null) {
+			this.player = newBody;
 		}
 	}
 	

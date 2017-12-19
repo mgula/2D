@@ -8,6 +8,7 @@ public class Controllable extends Game1Model {
 	private int currYSegment = 0;
 	
 	private int currHealth;
+	private int maxHealth;
 	
 	private Autonomous inContactWith;
 	
@@ -24,7 +25,7 @@ public class Controllable extends Game1Model {
 	
 	private boolean onPlatform = false;
 	
-	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health) {
+	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health, int maxHealth) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);
@@ -33,6 +34,7 @@ public class Controllable extends Game1Model {
 		this.xIncr = xIncr;
 		this.yIncr = yIncr;
 		this.currHealth = health;
+		this.maxHealth = maxHealth;
 	}
 	
 	/*Getters*/
@@ -52,8 +54,12 @@ public class Controllable extends Game1Model {
 		return this.currYSegment;
 	}
 	
-	public int getHealth() {
+	public int getCurrHealth() {
 		return this.currHealth;
+	}
+	
+	public int getMaxHealth() {
+		return this.maxHealth;
 	}
 	
 	public Autonomous getInContactWith() {
@@ -117,8 +123,12 @@ public class Controllable extends Game1Model {
 		this.currYSegment = y;
 	}
 	
-	public void setHealth(int h) {
+	public void setCurrHealth(int h) {
 		this.currHealth = h;
+	}
+	
+	public void setMaxHealth(int h) {
+		this.maxHealth = h;
 	}
 	
 	public void setInContactWith(Autonomous a) {

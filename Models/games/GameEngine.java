@@ -7,6 +7,9 @@ import enums.Direction;
 import enums.RoomID;
 import game1Models.*;
 
+//TODO:
+//fix change body issues
+//move collision checks from check moving surfaces to gamewrapper for clarity
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -22,7 +25,7 @@ public class GameEngine implements Serializable {
 	
 	private boolean jumping = false;
 	
-	private int maxHealth = 100;
+	private int defaultHealth = 100;
 	
 	private int floatingCounter = 0;
 	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
@@ -52,12 +55,14 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
 	
+	private Controllable newBody = null;
+	
 	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
 	
 	private final int interactableWaitTime = 50;
 	
 	public Controllable makePlayer() {
-		return new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.maxHealth);
+		return new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
 	}
 	
 	public void restoreDefaultAttributes(Controllable c) {
@@ -70,7 +75,7 @@ public class GameEngine implements Serializable {
 	public void respawn(Controllable c) {
 		c.setXLoc(this.playerStartingXloc);
 		c.setYLoc(this.playerStartingYloc);
-		c.setHealth(this.maxHealth);
+		c.setCurrHealth(c.getMaxHealth());
 		
 		this.jumping = false;
 		this.jumpCount = 0;
@@ -112,10 +117,6 @@ public class GameEngine implements Serializable {
 	
 	public ArrayList<Game1Model> getEnvironment() {
 		return this.currEnvironment;
-	}
-	
-	public int getMaxHealth() {
-		return this.maxHealth;
 	}
 	
 	public int getFloatingCounter() {
@@ -249,9 +250,9 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void assertGravity(Controllable c) {
+	public void assertGravity(Controllable c, boolean player) {
 		if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
-			if (this.floatingCounter < this.floatingThreshold) {
+			if (this.floatingCounter < this.floatingThreshold && player) {
 				this.floatingCounter++;
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
@@ -326,7 +327,7 @@ public class GameEngine implements Serializable {
 					if (this.checkBottomSurface(m, c)) {
 						movingContact = true;
 					}
-				} else if (m instanceof SolidObject || m instanceof Platform) {
+				} else if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
 					if (this.checkBottomSurface(m, c)) {
 						contact = true;
 					}
@@ -376,7 +377,7 @@ public class GameEngine implements Serializable {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof SolidObject || m instanceof Platform) {
+			if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
 				if (this.checkBottomSurface(m, c)) {
 					/*If there was an environmental bottom edge collision, reset jump count and 
 					 *jump counter, and and update the appropriate boolean.*/
@@ -393,12 +394,17 @@ public class GameEngine implements Serializable {
 								c.setAgainstMovingSurfaceBottom(false);
 								break;
 						}
+					} else if (m instanceof Controllable) {
+						c.setOnSurfaceBottom(true);
+						this.newBody = (game1Models.Controllable) m;
 					} else {
 						c.setOnSurfaceBottom(true);
 						if (m instanceof Platform) {
 							c.setOnPlatform(true);
 						}
 					}
+				} else {
+					this.newBody = null;
 				}
 			}
 		}
@@ -453,7 +459,7 @@ public class GameEngine implements Serializable {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof SolidObject) {
+			if (m instanceof SolidObject || m instanceof Controllable) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -524,7 +530,7 @@ public class GameEngine implements Serializable {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof SolidObject) {
+			if (m instanceof SolidObject || m instanceof Controllable) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int h = m.getHeight();
@@ -592,7 +598,7 @@ public class GameEngine implements Serializable {
 		}
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
-			if (m instanceof SolidObject) {
+			if (m instanceof SolidObject || m instanceof Controllable) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -686,7 +692,7 @@ public class GameEngine implements Serializable {
 		if (this.enemyCollision) {
 			if (!this.damageDealt) {
 				/*Deal the appropriate amount of damage, and only once.*/
-				c.setHealth(c.getHealth() - this.healthDecreaseEnemy);
+				c.setCurrHealth(c.getCurrHealth() - this.healthDecreaseEnemy);
 				this.damageDealt = true;
 			}
 			/*Give the player some time before being open to taking damage again.*/
@@ -700,17 +706,17 @@ public class GameEngine implements Serializable {
 			}
 		}
 		if (damageCollision) {
-			if (c.getHealth() >= 0) {
-				c.setHealth(c.getHealth() - this.healthDecreaseDamArea);
+			if (c.getCurrHealth() >= 0) {
+				c.setCurrHealth(c.getCurrHealth() - this.healthDecreaseDamArea);
 			}
 		}
 		if (regenCollision) {
 			/*Don't give the player more than the maximum health.*/
-			if (c.getHealth() < this.maxHealth) {
-				if (c.getHealth() + this.healthIncrease > this.maxHealth) {
-					c.setHealth(this.maxHealth);
+			if (c.getCurrHealth() < c.getMaxHealth()) {
+				if (c.getCurrHealth() + this.healthIncrease > c.getMaxHealth()) {
+					c.setCurrHealth(c.getMaxHealth());
 				} else {
-					c.setHealth(c.getHealth() + this.healthIncrease);
+					c.setCurrHealth(c.getCurrHealth() + this.healthIncrease);
 				}
 			}
 		}
@@ -758,6 +764,8 @@ public class GameEngine implements Serializable {
 				((game1Models.Enemy) m).move();
 			} else if (m instanceof game1Models.Autonomous) {
 				this.moveAutonomous((game1Models.Autonomous) m, c);
+			} else if (m instanceof game1Models.Controllable) {
+				this.assertGravity((game1Models.Controllable) m, false);
 			}
 		}
 	}
@@ -869,4 +877,14 @@ public class GameEngine implements Serializable {
 		c.setYLoc(c.getYLoc() + this.changeRoomOffsetY);
 	}
 	
+	/*Change bodies*/
+	public Controllable newBody(Controllable c) {
+		if (this.newBody != null) {
+			this.currEnvironment.add(c);
+			this.currEnvironment.remove(newBody);
+			return this.newBody;
+		} else {
+			return null;
+		}
+	}
 }
