@@ -62,7 +62,7 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new Rock(2500, -125, 70, 70));
 					env.add(new Rock(1500, -550, 70, 70));
 					env.add(new Rock(2500, -550, 70, 70));
-					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 1000, 10));
+					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 900, 10));
 					env.add(new Platform(1700, -125, 50));
 					env.add(new Platform(1400, -400, 1000));
 					env.add(new Platform(2925, -500, 75));
@@ -166,7 +166,7 @@ public class GameWrapper implements Game, Serializable {
 		this.engine.assertGravity(this.player);
 		
 		/*Check moving surfaces*/
-		this.engine.checkMovingSurfaces(false, player);
+		this.engine.checkMovingSurfaces(player);
 		
 		/*Move all non-player entities*/
 		this.engine.moveAll(this.player);
@@ -189,7 +189,7 @@ public class GameWrapper implements Game, Serializable {
 		}
 		if (downPressed) {
 			this.engine.phaseThroughPlatformOrExit(this.player);
-			this.engine.checkMovingSurfaces(false, player);
+			this.engine.checkMovingSurfaces(player);
 			this.engine.checkBottomEdgeCollisions(this.player);
 		}
 		

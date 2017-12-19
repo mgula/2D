@@ -255,7 +255,7 @@ public class GameEngine implements Serializable {
 				this.floatingCounter++;
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
-					this.checkMovingSurfaces(true, c);
+					this.checkMovingSurfaces(c);
 					this.decrY(c);
 				}
 				c.setCurrYSegment(0);
@@ -284,6 +284,33 @@ public class GameEngine implements Serializable {
 						}
 					}
 				}
+			}
+		}
+	}
+	
+	public void movePlayerWithAutonomous(Controllable c) {
+		/*If resting on a moving surface, the player will move in the same direction as the 
+		 *moving surface.*/
+		if (c.isOnMovingSurfaceBottom()) {
+			switch (c.getInContactWith().getDirection()) {
+				case EAST:
+					c.setXLoc(c.getXLoc() + c.getInContactWith().getIncr());
+					break;
+						
+				case WEST:
+					c.setXLoc(c.getXLoc() - c.getInContactWith().getIncr());
+					break;
+						
+				case NORTH:
+					c.setYLoc(c.getYLoc() - c.getInContactWith().getIncr());
+					break;
+						
+				case SOUTH:
+					c.setYLoc(c.getYLoc() + c.getInContactWith().getIncr());
+					break;
+						
+				default:
+					break;
 			}
 		}
 	}
@@ -319,7 +346,7 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void checkMovingSurfaces(boolean calledWithinEngine, Controllable c) {
+	public void checkMovingSurfaces(Controllable c) {
 		/*Check all edges for collisions (particularly of the moving variety).*/
 		this.checkLeftEdgeCollisions(c);
 		this.checkRightEdgeCollisions(c);
@@ -339,32 +366,6 @@ public class GameEngine implements Serializable {
 		if (c.isAgainstMovingSurfaceBottom() && c.getInContactWith().getDirection() == Direction.NORTH) {
 			c.setYLoc(c.getYLoc() - 1);
 			c.setAgainstMovingSurfaceBottom(false);
-		}
-		/*If resting on a moving surface, the player will move in the same direction as the 
-		 *moving surface. This code should never be executed by Autonomous.*/
-		if (c.isOnMovingSurfaceBottom()) {
-			if (!calledWithinEngine) {
-				switch (c.getInContactWith().getDirection()) {
-					case EAST:
-						c.setXLoc(c.getXLoc() + c.getInContactWith().getIncr());
-						break;
-						
-					case WEST:
-						c.setXLoc(c.getXLoc() - c.getInContactWith().getIncr());
-						break;
-						
-					case NORTH:
-						c.setYLoc(c.getYLoc() - c.getInContactWith().getIncr());
-						break;
-						
-					case SOUTH:
-						c.setYLoc(c.getYLoc() + c.getInContactWith().getIncr());
-						break;
-						
-					default:
-						break;
-				}
-			}
 		}
 	}
 	
@@ -767,9 +768,10 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setXLoc(a.getXLoc() + 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(true, c);
+					this.checkMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
+				this.movePlayerWithAutonomous(c);
 				if (a.getXLoc() >= a.getMoveThreshR()) {
 					a.setLastDirection(a.getDirection());
 					a.setDirection(Direction.IDLE);
@@ -780,9 +782,10 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setXLoc(a.getXLoc() - 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(true, c);
+					this.checkMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
+				this.movePlayerWithAutonomous(c);
 				if (a.getXLoc() <= a.getMoveThreshL()) {
 					a.setLastDirection(a.getDirection());
 					a.setDirection(Direction.IDLE);
@@ -793,9 +796,10 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setYLoc(a.getYLoc() - 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(true, c);
+					this.checkMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
+				this.movePlayerWithAutonomous(c);
 				if (a.getYLoc() <= a.getMoveThreshU()) {
 					a.setLastDirection(a.getDirection());
 					a.setDirection(Direction.IDLE);
@@ -806,9 +810,10 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setYLoc(a.getYLoc() + 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(true, c);
+					this.checkMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
+				this.movePlayerWithAutonomous(c);
 				if (a.getYLoc() >= a.getMoveThreshD()) {
 					a.setLastDirection(a.getDirection());
 					a.setDirection(Direction.IDLE);
