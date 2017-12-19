@@ -16,7 +16,7 @@ public abstract class GameView extends View {
 	
 	private final int numTangles = 2;
 	
-	private PauseState pauseState = PauseState.PLAYERINFO;
+	private PauseState pauseState = PauseState.PLAYER_INFO;
 	
 	/*"Tabs"*/
 	private JButton playerInfoButton;

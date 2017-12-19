@@ -116,7 +116,7 @@ public class Game1View extends GameView {
 		super.drawPauseMenu(g, appState);
 		
 		switch (this.getPauseState()) {
-		case PLAYERINFO:
+		case PLAYER_INFO:
 			g.drawString("Health: " + this.player.getHealth() + "/" + this.engine.getMaxHealth(), 500, 200);
 			break;
 		case SYSTEM:

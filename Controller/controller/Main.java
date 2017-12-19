@@ -33,7 +33,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*TODO:
- * -BIG REFACTOR
  * -magic numbers in views --> ratios of screen size
  * -do all buttons need listeners all the time?
  * -develop system for keeping track of view offsets across saves
@@ -142,7 +141,6 @@ public class Main implements KeyListener, MouseListener {
 			}
 		}
 		this.setButtonListeners();
-		this.bindKeysToViews();
 		this.frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // full screen
 		this.frame.setUndecorated(true);
 		this.addViewToFrame(this.mainView);
@@ -280,7 +278,7 @@ public class Main implements KeyListener, MouseListener {
 		this.game1View.getPlayerInfoButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game1View.setPauseState(PauseState.PLAYERINFO);
+				game1View.setPauseState(PauseState.PLAYER_INFO);
 				screenHandled = false;
 			}
     		});
@@ -305,7 +303,7 @@ public class Main implements KeyListener, MouseListener {
 				nextState = AppState.SELECT;
 				currentGame.setGameState(GameState.QUIT);
 				currentGame.setLastState(GameState.PAUSE);
-				game1View.setPauseState(PauseState.PLAYERINFO);
+				game1View.setPauseState(PauseState.PLAYER_INFO);
 				screenHandled = false;
 			}
     		});
@@ -472,8 +470,7 @@ public class Main implements KeyListener, MouseListener {
 					}
 					
 					switch (this.game1View.getPauseState()) {
-						case PLAYERINFO:
-							
+						case PLAYER_INFO:
 							break;
 						
 						case SYSTEM:
@@ -628,6 +625,9 @@ public class Main implements KeyListener, MouseListener {
 	public void addViewToFrame(View view) {
 		this.frame.setBackground(Color.GRAY);
 		this.frame.getContentPane().add(view);
+		if (view instanceof views.Game1View) {
+			this.bindKeysToView(view);
+		}
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.setVisible(true);
 	}
@@ -637,7 +637,7 @@ public class Main implements KeyListener, MouseListener {
 		game.setLastState(GameState.PAUSE);
 		this.frame.getContentPane().removeAll();
 		this.screenHandled = false;
-		this.game1View.setPauseState(PauseState.PLAYERINFO);
+		this.game1View.setPauseState(PauseState.PLAYER_INFO);
 		addViewToFrame(view);
 	}
 	
@@ -709,47 +709,47 @@ public class Main implements KeyListener, MouseListener {
 		public void actionPerformed(ActionEvent e) {
 			switch (this.command) {
 				/*Key presses set their respective booleans to true*/
-				case LEFTPRESSED:
+				case LEFT_PRESSED:
 					leftPressed = true;
 					game1View.setLeftArrow(true);
 					break;
 					
-				case RIGHTPRESSED:
+				case RIGHT_PRESSED:
 					rightPressed = true;
 					game1View.setRightArrow(true);
 					break;
 					
-				case SPACEPRESSED:
+				case SPACE_PRESSED:
 					spacePressed = true;
 					game1View.setSpaceBar(true);
 					break;
 					
-				case DOWNPRESSED:
+				case DOWN_PRESSED:
 					downPressed = true;
 					break;
 					
 				/*Key releases set their respective booleans to false*/
-				case LEFTRELEASED:
+				case LEFT_RELEASED:
 					leftPressed = false;
 					game1View.setLeftArrow(false);
 					break;
 					
-				case RIGHTRELEASED:
+				case RIGHT_RELEASED:
 					rightPressed = false;
 					game1View.setRightArrow(false);
 					break;
 					
-				case SPACERELEASED:
+				case SPACE_RELEASED:
 					spacePressed = false;
 					game1View.setSpaceBar(false);
 					break;
 					
-				case DOWNRELEASED:
+				case DOWN_RELEASED:
 					downPressed = false;
 					break;
 					
-				/*P key activates pause menu*/	
-				case PAUSE:
+				/*M key activates pause menu*/	
+				case M_PRESSED:
 					switch (currentState) {
 						case GAME1:
 							if (currentGame.getGameState() != GameState.PAUSE) {
@@ -771,31 +771,27 @@ public class Main implements KeyListener, MouseListener {
 		}
 	}
 	
-	public void bindKeysToViews() {
-		for (View v : this.allViews) {
-			if (v instanceof views.Game1View) {
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RightPressed");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SpacePressed");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "DownPressed");
-				v.getActionMap().put("RightPressed", new ArrowKeyEvent(KeyCommand.RIGHTPRESSED));
-				v.getActionMap().put("LeftPressed", new ArrowKeyEvent(KeyCommand.LEFTPRESSED));
-				v.getActionMap().put("SpacePressed", new ArrowKeyEvent(KeyCommand.SPACEPRESSED));
-				v.getActionMap().put("DownPressed", new ArrowKeyEvent(KeyCommand.DOWNPRESSED));
-				
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "RightReleased");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "LeftReleased");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "SpaceReleased");
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "DownReleased");
-				v.getActionMap().put("RightReleased", new ArrowKeyEvent(KeyCommand.RIGHTRELEASED));
-				v.getActionMap().put("LeftReleased", new ArrowKeyEvent(KeyCommand.LEFTRELEASED));
-				v.getActionMap().put("SpaceReleased", new ArrowKeyEvent(KeyCommand.SPACERELEASED));
-				v.getActionMap().put("DownReleased", new ArrowKeyEvent(KeyCommand.DOWNRELEASED));
-				
-				v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "Pause");
-				v.getActionMap().put("Pause", new ArrowKeyEvent(KeyCommand.PAUSE));
-			}
-		}
+	public void bindKeysToView(View v) {
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "RightPressed");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "LeftPressed");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "SpacePressed");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "DownPressed");
+		v.getActionMap().put("RightPressed", new ArrowKeyEvent(KeyCommand.RIGHT_PRESSED));
+		v.getActionMap().put("LeftPressed", new ArrowKeyEvent(KeyCommand.LEFT_PRESSED));
+		v.getActionMap().put("SpacePressed", new ArrowKeyEvent(KeyCommand.SPACE_PRESSED));
+		v.getActionMap().put("DownPressed", new ArrowKeyEvent(KeyCommand.DOWN_PRESSED));
+		
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "RightReleased");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "LeftReleased");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "SpaceReleased");
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "DownReleased");
+		v.getActionMap().put("RightReleased", new ArrowKeyEvent(KeyCommand.RIGHT_RELEASED));
+		v.getActionMap().put("LeftReleased", new ArrowKeyEvent(KeyCommand.LEFT_RELEASED));
+		v.getActionMap().put("SpaceReleased", new ArrowKeyEvent(KeyCommand.SPACE_RELEASED));
+		v.getActionMap().put("DownReleased", new ArrowKeyEvent(KeyCommand.DOWN_RELEASED));
+		
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0), "Pause");
+		v.getActionMap().put("Pause", new ArrowKeyEvent(KeyCommand.M_PRESSED));
 	}
 
 	@Override

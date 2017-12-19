@@ -1,7 +1,7 @@
 package enums;
 
 public enum PauseState {
-	PLAYERINFO,
+	PLAYER_INFO,
 	SYSTEM,
 	DEBUG;
 	
