@@ -517,9 +517,9 @@ public class Main implements KeyListener, MouseListener {
 			case PLAY:
 				this.currentGame.tick(this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
 				
-				if (this.currentGame.getRoomChangeEvent()) {
+				if (this.currentGame.getEngine().getRoomChangeEvent()) {
 					this.game1View.updateView(this.currentGame);
-					this.currentGame.setRoomChangeEvent(false);
+					this.currentGame.getEngine().setRoomChangeEvent(false);
 				}
 				break;
 				

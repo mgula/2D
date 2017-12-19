@@ -21,8 +21,6 @@ public class GameWrapper implements Game, Serializable {
 	
 	private GameEngine engine = new GameEngine();
 	
-	private boolean roomChangeEvent = false;
-	
 	private Controllable player;
 	
 	public static final int RoomDataArrayLength = 4;
@@ -204,9 +202,7 @@ public class GameWrapper implements Game, Serializable {
 		}
 		
 		/*Check for room changes*/
-		this.roomChangeEvent = this.engine.checkRoomBoundaries(this.player);
-		
-		if (this.roomChangeEvent) {
+		if (this.engine.getRoomChangeEvent()) {
 			this.engine.changeRoom(this.player);
 		}
 		
@@ -225,15 +221,7 @@ public class GameWrapper implements Game, Serializable {
 		this.lastState = state;
 	}
 	
-	public void setRoomChangeEvent(boolean b) {
-		this.roomChangeEvent = b;
-	}
-	
 	/*Getters*/
-	public boolean getRoomChangeEvent() {
-		return this.roomChangeEvent;
-	}
-	
 	public GameEngine getEngine() {
 		return this.engine;
 	}
