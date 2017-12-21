@@ -10,7 +10,8 @@ public class Controllable extends Game1Model {
 	private int currHealth;
 	private int maxHealth;
 	
-	private Autonomous inContactWith;
+	private Autonomous inContactWith = null;
+	private Controllable newBody = null;
 	
 	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
 	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
@@ -35,6 +36,10 @@ public class Controllable extends Game1Model {
 		this.yIncr = yIncr;
 		this.currHealth = health;
 		this.maxHealth = maxHealth;
+	}
+	
+	public static Controllable makeCopy(Controllable c) {
+		return new Controllable(c.getXLoc(), c.getYLoc(), c.getHeight(), c.getWidth(), c.getXIncr(), c.getYIncr(), c.getCurrHealth(), c.getMaxHealth());
 	}
 	
 	/*Getters*/
@@ -64,6 +69,10 @@ public class Controllable extends Game1Model {
 	
 	public Autonomous getInContactWith() {
 		return this.inContactWith;
+	}
+	
+	public Controllable getNewBody() {
+		return this.newBody;
 	}
 	
 	public boolean isOnSurfaceBottom() {
@@ -133,6 +142,10 @@ public class Controllable extends Game1Model {
 	
 	public void setInContactWith(Autonomous a) {
 		this.inContactWith = a;
+	}
+	
+	public void setNewBody(Controllable c) {
+		this.newBody = c;
 	}
 	
 	public void setOnSurfaceBottom(boolean b) {

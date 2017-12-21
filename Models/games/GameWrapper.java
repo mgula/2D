@@ -34,7 +34,7 @@ public class GameWrapper implements Game, Serializable {
 	public GameWrapper() {
 		this.initCurrMap();
 		
-		this.player = this.engine.makePlayer();
+		this.player = this.engine.initPlayer();
 		
 		this.initCurrentMapRooms();
 		
@@ -70,8 +70,8 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 5, 25));
 					
-					env.add(new Controllable(1200, -125, 20, 20, 10, 10, 150, 150));
-					env.add(new Controllable(1300, -125, 30, 30, 10, 10, 100, 200));
+					env.add(new Controllable(1200, -125, 20, 20, 10, 5, 150, 150));
+					env.add(new Controllable(1300, -125, 30, 30, 10, 5, 100, 200));
 					
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.WEST1, Direction.WEST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.EAST1, Direction.EAST, 1000 + 2000, this.groundLevel, 50));
@@ -164,12 +164,14 @@ public class GameWrapper implements Game, Serializable {
 	}
 	
 	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
-		/*Assert gravity*/
-		this.engine.checkBottomEdgeCollisions(this.player);
-		this.engine.assertGravity(this.player, true);
+		/*Check all edges for collisions*/
+		this.engine.checkAllEdges(this.player);
+		
+		/*Assert gravity on player*/
+		this.engine.assertGravity(this.player);
 		
 		/*Check moving surfaces*/
-		this.engine.checkMovingSurfaces(player);
+		this.engine.respondToMovingSurfaces(player);
 		
 		/*Move all non-player entities*/
 		this.engine.moveAll(this.player);
@@ -192,14 +194,13 @@ public class GameWrapper implements Game, Serializable {
 		}
 		if (downPressed) {
 			this.engine.phaseThroughPlatformOrExit(this.player);
-			this.engine.checkMovingSurfaces(player);
 			this.engine.checkBottomEdgeCollisions(this.player);
 		}
 		
 		/*Evaluate jumping*/
 		if (this.engine.getJumping()) {
 			this.engine.checkTopEdgeCollisions(this.player);
-			if (!this.engine.initiateJumpArc(this.player)) {
+			if (!this.engine.executeJump(this.player)) {
 				this.engine.setJumping(false);
 			}
 		}
@@ -219,7 +220,10 @@ public class GameWrapper implements Game, Serializable {
 	public void changeBodies() {
 		Controllable newBody = this.engine.newBody(this.player);
 		if (newBody != null) {
-			this.player = newBody;
+			Controllable copy = Controllable.makeCopy(newBody);
+			this.player = copy;
+			this.engine.setPlayer(copy);
+			this.engine.getEnvironment().add(copy);
 		}
 	}
 	

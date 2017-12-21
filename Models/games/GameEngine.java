@@ -7,9 +7,7 @@ import enums.Direction;
 import enums.RoomID;
 import game1Models.*;
 
-//TODO:
-//fix change body issues
-//move collision checks from check moving surfaces to gamewrapper for clarity
+//rethink moveLeft, moveRight, etc (I think using a while and a break may be more effective)
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -29,6 +27,8 @@ public class GameEngine implements Serializable {
 	
 	private int floatingCounter = 0;
 	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
+	
+	private Controllable player; //we'll use this reference to the player in various methods to see if the controllable in question is the player
 	
 	private ArrayList<Game1Model> currEnvironment;
 	
@@ -55,14 +55,13 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseDamArea;
 	private boolean damageDealt = false;
 	
-	private Controllable newBody = null;
-	
 	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
 	
 	private final int interactableWaitTime = 50;
 	
-	public Controllable makePlayer() {
-		return new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
+	public Controllable initPlayer() {
+		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
+		return this.player;
 	}
 	
 	public void restoreDefaultAttributes(Controllable c) {
@@ -87,6 +86,10 @@ public class GameEngine implements Serializable {
 	}
 	
 	/*Getters*/
+	public Controllable getPlayer() {
+		return this.player;
+	}
+	
 	public int getPlayerStartingXloc() {
 		return this.playerStartingXloc;
 	}
@@ -144,6 +147,10 @@ public class GameEngine implements Serializable {
 	}
 	
 	/*Setters*/
+	public void setPlayer(Controllable c) {
+		this.player = c;
+	}
+	
 	public void setJumping(boolean b) {
 		this.jumping = b;
 	}
@@ -170,6 +177,10 @@ public class GameEngine implements Serializable {
 	
 	public void setRoomChangeEvent(boolean b) {
 		this.roomChangeEvent = b;
+	}
+	
+	private boolean isPlayer(Controllable c) {
+		return c == this.player;
 	}
 	
 	/*Methods that move a controllable object*/
@@ -221,6 +232,7 @@ public class GameEngine implements Serializable {
 		if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
 			c.setOnSurfaceBottom(false);
 			c.setOnMovingSurfaceBottom(false);
+			c.setNewBody(null);
 			c.setOnPlatform(false);
 			c.setAgainstMovingSurfaceBottom(false);
 			this.floatingCounter = 0;
@@ -234,7 +246,7 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public boolean initiateJumpArc(Controllable c) {
+	public boolean executeJump(Controllable c) {
 		if (this.jumpCount < this.maxJumps) {
 			if (this.jumpingCounter < this.jumpDuration) {
 				this.jumpingCounter++;
@@ -250,13 +262,17 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	public void assertGravity(Controllable c, boolean player) {
+	public void assertGravity(Controllable c) {
+		boolean player = this.isPlayer(c);
 		if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
 			if (this.floatingCounter < this.floatingThreshold && player) {
 				this.floatingCounter++;
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
-					this.checkMovingSurfaces(c);
+					this.respondToMovingSurfaces(c);
+					if (!player) {
+						this.checkBottomEdgeCollisions(c);
+					}
 					this.decrY(c);
 				}
 				c.setCurrYSegment(0);
@@ -316,45 +332,7 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
-	/*Methods for checking collisions with other models*/
-	public void checkLeavingSurface(Controllable c) {
-		if (c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) {
-			boolean contact = false;
-			boolean movingContact = false;
-			/*Check against every model that acts as a surface.*/
-			for (Game1Model m : this.currEnvironment) {
-				if (m instanceof game1Models.Autonomous) {
-					if (this.checkBottomSurface(m, c)) {
-						movingContact = true;
-					}
-				} else if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
-					if (this.checkBottomSurface(m, c)) {
-						contact = true;
-					}
-				} 
-			}
-			/*If there were no environmental collisions, reset floating counter and update the appropriate boolean.*/
-			if (!contact) {
-				c.setOnPlatform(false);
-				this.floatingCounter = 0;
-				c.setOnSurfaceBottom(false);
-			}
-			if (!movingContact) {
-				this.floatingCounter = 0;
-				c.setOnMovingSurfaceBottom(false);
-				c.setAgainstMovingSurfaceBottom(false);
-			}
-		}
-	}
-	
-	public void checkMovingSurfaces(Controllable c) {
-		/*Check all edges for collisions (particularly of the moving variety).*/
-		this.checkLeftEdgeCollisions(c);
-		this.checkRightEdgeCollisions(c);
-		this.checkBottomEdgeCollisions(c);
-		this.checkTopEdgeCollisions(c);
-		/*Respond to these collisions. These collisions only increment/decrement because Autonomous uses 
-		 *the same while loop scheme to move (move a pixel and then check for collisions).*/
+	public void respondToMovingSurfaces(Controllable c) {
 		if (c.isAgainstMovingSurfaceLeft() && c.getInContactWith().getDirection() == Direction.EAST) {
 			c.setXLoc(c.getXLoc() + 1);
 		}
@@ -370,7 +348,51 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
+	/*Methods for checking collisions with other models*/
+	public void checkLeavingSurface(Controllable c) {
+		boolean player = this.isPlayer(c);
+		
+		if (c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) {
+			boolean contact = false;
+			boolean movingContact = false;
+			/*Check against every model that acts as a surface.*/
+			for (Game1Model m : this.currEnvironment) {
+				if (m instanceof game1Models.Autonomous) {
+					if (this.checkBottomSurface(m, c)) {
+						movingContact = true;
+					}
+				} else if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
+					if (m instanceof Controllable) {
+						if (this.isPlayer((game1Models.Controllable) m) && this.isPlayer(c)) {
+							continue; //skip the case where c is the player and m is the player
+						}
+					}
+					if (this.checkBottomSurface(m, c)) {
+						contact = true;
+					}
+				} 
+			}
+			/*If there were no environmental collisions, reset floating counter and update the appropriate boolean.*/
+			if (!contact) {
+				c.setOnPlatform(false);
+				if (player) {
+					this.floatingCounter = 0;
+				}
+				c.setOnSurfaceBottom(false);
+			}
+			if (!movingContact) {
+				if (player) {
+					this.floatingCounter = 0;
+				}
+				c.setOnMovingSurfaceBottom(false);
+				c.setAgainstMovingSurfaceBottom(false);
+			}
+		}
+	}
+	
 	public void checkBottomEdgeCollisions(Controllable c) {
+		boolean player = this.isPlayer(c);
+		
 		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
 		if (c.getYLoc() + c.getHeight() >= this.currRoom.getYLoc()) {
 			c.setOnSurfaceBottom(true);
@@ -379,9 +401,9 @@ public class GameEngine implements Serializable {
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
 				if (this.checkBottomSurface(m, c)) {
-					/*If there was an environmental bottom edge collision, reset jump count and 
-					 *jump counter, and and update the appropriate boolean.*/
-					this.floatingCounter = 0;
+					if (player) {
+						this.floatingCounter = 0;
+					}
 					if (m instanceof game1Models.Autonomous) {
 						c.setInContactWith((Autonomous) m);
 						switch (((game1Models.Autonomous) m).getDirection()) {
@@ -395,21 +417,22 @@ public class GameEngine implements Serializable {
 								break;
 						}
 					} else if (m instanceof Controllable) {
+						if (this.isPlayer((game1Models.Controllable) m) && this.isPlayer(c)) {
+							continue;
+						}
 						c.setOnSurfaceBottom(true);
-						this.newBody = (game1Models.Controllable) m;
+						c.setNewBody((game1Models.Controllable) m);
 					} else {
 						c.setOnSurfaceBottom(true);
 						if (m instanceof Platform) {
 							c.setOnPlatform(true);
 						}
 					}
-				} else {
-					this.newBody = null;
 				}
 			}
 		}
 		
-		if ((c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) && this.jumpingCounter == 0) {
+		if ((c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) && this.jumpingCounter == 0 && player) {
 			this.jumpCount = 0;
 		}
 	}
@@ -460,6 +483,11 @@ public class GameEngine implements Serializable {
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
+				if (m instanceof Controllable) {
+					if (this.isPlayer((game1Models.Controllable) m) && this.isPlayer(c)) {
+						continue;
+					}
+				}
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -531,6 +559,11 @@ public class GameEngine implements Serializable {
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
+				if (m instanceof Controllable) {
+					if (this.isPlayer((game1Models.Controllable) m) && this.isPlayer(c)) {
+						continue;
+					}
+				}
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int h = m.getHeight();
@@ -599,6 +632,11 @@ public class GameEngine implements Serializable {
 		/*Check against every model that acts as a surface.*/
 		for (Game1Model m : this.currEnvironment) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
+				if (m instanceof Controllable) {
+					if (this.isPlayer((game1Models.Controllable) m) && this.isPlayer(c)) {
+						continue;
+					}
+				}
 				int x = m.getXLoc();
 				int y = m.getYLoc();
 				int w = m.getWidth();
@@ -623,6 +661,13 @@ public class GameEngine implements Serializable {
 			c.setAgainstSurfaceLeft(false);
 			c.setAgainstMovingSurfaceLeft(false);
 		}
+	}
+	
+	public void checkAllEdges(Controllable c) {
+		this.checkBottomEdgeCollisions(c);
+		this.checkTopEdgeCollisions(c);
+		this.checkRightEdgeCollisions(c);
+		this.checkLeftEdgeCollisions(c);
 	}
 	
 	public boolean checkBottomSurface(Game1Model m, Controllable c) {
@@ -765,7 +810,13 @@ public class GameEngine implements Serializable {
 			} else if (m instanceof game1Models.Autonomous) {
 				this.moveAutonomous((game1Models.Autonomous) m, c);
 			} else if (m instanceof game1Models.Controllable) {
-				this.assertGravity((game1Models.Controllable) m, false);
+				Controllable ce = (game1Models.Controllable) m;
+				if (this.isPlayer(ce) && this.isPlayer(c)) {
+					continue;
+				}
+				this.checkBottomEdgeCollisions(ce);
+				this.assertGravity(ce);
+				this.checkLeavingSurface(ce);
 			}
 		}
 	}
@@ -776,7 +827,8 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setXLoc(a.getXLoc() + 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(c);
+					this.checkAllEdges(c);
+					this.respondToMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
 				this.movePlayerWithAutonomous(c);
@@ -790,7 +842,8 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setXLoc(a.getXLoc() - 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(c);
+					this.checkAllEdges(c);
+					this.respondToMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
 				this.movePlayerWithAutonomous(c);
@@ -804,7 +857,8 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setYLoc(a.getYLoc() - 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(c);
+					this.checkAllEdges(c);
+					this.respondToMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
 				this.movePlayerWithAutonomous(c);
@@ -818,7 +872,8 @@ public class GameEngine implements Serializable {
 				while (a.getCurrSegment() < a.getIncr()) {
 					a.setYLoc(a.getYLoc() + 1);
 					a.setCurrSegment(a.getCurrSegment() + 1);
-					this.checkMovingSurfaces(c);
+					this.checkAllEdges(c);
+					this.respondToMovingSurfaces(c);
 				}
 				a.setCurrSegment(0);
 				this.movePlayerWithAutonomous(c);
@@ -865,6 +920,9 @@ public class GameEngine implements Serializable {
 	public void makeCurrRoom() {
 		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
 		this.currEnvironment = this.currRoom.getEnvironment();
+		
+		/*Add the player to the environment*/
+		this.currEnvironment.add(this.player);
 	}
 	
 	public void changeRoom(Controllable c) {
@@ -879,10 +937,14 @@ public class GameEngine implements Serializable {
 	
 	/*Change bodies*/
 	public Controllable newBody(Controllable c) {
-		if (this.newBody != null) {
-			this.currEnvironment.add(c);
+		Controllable newBody = c.getNewBody();
+		if (newBody != null) {
 			this.currEnvironment.remove(newBody);
-			return this.newBody;
+			Controllable copy = Controllable.makeCopy(c); //make a copy in order to set all variables back to starting state
+			copy.setYLoc(copy.getYLoc() - 1);
+			this.currEnvironment.remove(c);
+			this.currEnvironment.add(copy);
+			return newBody;
 		} else {
 			return null;
 		}

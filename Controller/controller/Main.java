@@ -40,7 +40,6 @@ import java.util.ArrayList;
  * -squishing
  * -sound
  * -slopes/stairs
- * -change body
  * -pushable objects
  * -JUnit ... ? :/
  */
