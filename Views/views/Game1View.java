@@ -14,7 +14,6 @@ import javax.swing.JLabel;
 
 public class Game1View extends GameView {
 	private GameEngine engine;
-	private AreaMap currMap;
 	private Room currRoom;
 	private ArrayList<Game1Model> environment;
 	private Controllable player;
@@ -248,29 +247,28 @@ public class Game1View extends GameView {
 		}
 	}
 	
-	public void load(GameWrapper game) {
+	public void load(GameEngine engine) {
 		this.playerDrawable = true;
 		this.flash = 0;
-		this.engine = game.getEngine();
-		this.player = game.getPlayer();
-		this.currMap = game.getCurrMap();
-		this.currRoom = game.getEngine().getCurrRoom();
+		this.engine = engine;
+		this.player = engine.getPlayer();
+		this.currRoom = engine.getCurrRoom();
 		this.lastYloc = this.player.getYLoc();
-		this.environment = game.getEngine().getEnvironment();
+		this.environment = engine.getEnvironment();
 		
 		this.updateOffsets();
 	}
 	
-	public void loadPlayer(GameWrapper game) {
-		this.player = game.getPlayer();
-		this.environment = game.getEngine().getEnvironment();
+	public void loadPlayer(GameEngine engine) {
+		this.player = engine.getPlayer();
+		this.environment = engine.getEnvironment();
 		
 		this.updateOffsets();
 	}
 	
-	public void updateView(GameWrapper game) {
-		this.currRoom = game.getEngine().getCurrRoom();
-		this.environment = game.getEngine().getEnvironment();
+	public void updateView(GameEngine engine) {
+		this.currRoom = engine.getCurrRoom();
+		this.environment = engine.getEnvironment();
 		this.lastYloc = this.player.getYLoc();
 	}
 	

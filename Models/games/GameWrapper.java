@@ -19,10 +19,6 @@ public class GameWrapper implements Game, Serializable {
 	
 	private int groundLevel = 0;
 	
-	private GameEngine engine = new GameEngine();
-	
-	private Controllable player;
-	
 	public static final int RoomDataArrayLength = 4;
 	
 	private AreaMap map1;
@@ -31,16 +27,14 @@ public class GameWrapper implements Game, Serializable {
 	private AreaMap currMap;
 	private MapID currMapID = MapID.MAP1;
 	
-	public GameWrapper() {
+	public GameWrapper(GameEngine e) {
 		this.initCurrMap();
-		
-		this.player = this.engine.initPlayer();
 		
 		this.initCurrentMapRooms();
 		
-		this.engine.setMap(this.currMap);
+		e.setMap(this.currMap);
 		
-		this.engine.makeCurrRoom();
+		e.makeCurrRoom();
 	}
 	
 	public void initCurrentMapRooms() {
@@ -163,67 +157,57 @@ public class GameWrapper implements Game, Serializable {
 		}
 	}
 	
-	public void tick(boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
+	public void tick(GameEngine e, boolean rightPressed, boolean leftPressed, boolean spacePressed, boolean downPressed) {
 		/*Check all edges for collisions*/
-		this.engine.checkAllEdges(this.player);
+		e.checkAllEdges(e.getPlayer());
 		
 		/*Assert gravity on player*/
-		this.engine.assertGravity(this.player);
+		e.assertGravity(e.getPlayer());
 		
 		/*Check moving surfaces*/
-		this.engine.respondToMovingSurfaces(player);
+		e.respondToMovingSurfaces(e.getPlayer());
 		
 		/*Move all non-player entities*/
-		this.engine.moveAll(this.player);
+		e.moveAll(e.getPlayer());
 		
 		/*Check and evaluate area collisions*/
-		this.engine.checkAreaCollisions(this.player);
+		e.checkAreaCollisions(e.getPlayer());
 		
 		/*Evaluate user input*/
 		if (rightPressed) {
-			this.engine.checkRightEdgeCollisions(this.player);
-			this.engine.moveRight(this.player);
+			e.checkRightEdgeCollisions(e.getPlayer());
+			e.moveRight(e.getPlayer());
 		}
 		if (leftPressed) {
-			this.engine.checkLeftEdgeCollisions(this.player);
-			this.engine.moveLeft(this.player);
+			e.checkLeftEdgeCollisions(e.getPlayer());
+			e.moveLeft(e.getPlayer());
 		}
-		this.engine.checkLeavingSurface(this.player);
+		e.checkLeavingSurface(e.getPlayer());
 		if (spacePressed) {
-			this.engine.setJumping(true);
+			e.setJumping(true);
 		}
 		if (downPressed) {
-			this.engine.phaseThroughPlatformOrExit(this.player);
-			this.engine.checkBottomEdgeCollisions(this.player);
+			e.phaseThroughPlatformOrExit(e.getPlayer());
+			e.checkBottomEdgeCollisions(e.getPlayer());
 		}
 		
 		/*Evaluate jumping*/
-		if (this.engine.getJumping()) {
-			this.engine.checkTopEdgeCollisions(this.player);
-			if (!this.engine.executeJump(this.player)) {
-				this.engine.setJumping(false);
+		if (e.getJumping()) {
+			e.checkTopEdgeCollisions(e.getPlayer());
+			if (!e.executeJump(e.getPlayer())) {
+				e.setJumping(false);
 			}
 		}
 		
 		/*Check for room changes*/
-		if (this.engine.getRoomChangeEvent()) {
-			this.engine.changeRoom(this.player);
+		if (e.getRoomChangeEvent()) {
+			e.changeRoom(e.getPlayer());
 		}
 		
 		/*Check if player died*/
-		if (this.player.getCurrHealth() <= 0) {
+		if (e.getPlayer().getCurrHealth() <= 0) {
 			this.lastState = this.gameState;
 			this.gameState = GameState.DEATH;
-		}
-	}
-	
-	public void changeBodies() {
-		Controllable newBody = this.engine.newBody(this.player);
-		if (newBody != null) {
-			Controllable copy = Controllable.makeCopy(newBody);
-			this.player = copy;
-			this.engine.setPlayer(copy);
-			this.engine.getEnvironment().add(copy);
 		}
 	}
 	
@@ -236,14 +220,6 @@ public class GameWrapper implements Game, Serializable {
 	}
 	
 	/*Getters*/
-	public GameEngine getEngine() {
-		return this.engine;
-	}
-	
-	public Controllable getPlayer() {
-		return this.player;
-	}
-	
 	public AreaMap getCurrMap() {
 		return this.map1;
 	}

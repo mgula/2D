@@ -8,6 +8,7 @@ import enums.RoomID;
 import game1Models.*;
 
 //rethink moveLeft, moveRight, etc (I think using a while and a break may be more effective)
+//phase through platform issue (no idea when I broke this)
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -59,9 +60,9 @@ public class GameEngine implements Serializable {
 	
 	private final int interactableWaitTime = 50;
 	
-	public Controllable initPlayer() {
+	public GameEngine() {
 		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
-		return this.player;
+		this.currEnvironment = new ArrayList<Game1Model>();
 	}
 	
 	public void restoreDefaultAttributes(Controllable c) {
@@ -919,7 +920,11 @@ public class GameEngine implements Serializable {
 	/*Methods for rooms*/
 	public void makeCurrRoom() {
 		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
-		this.currEnvironment = this.currRoom.getEnvironment();
+		
+		while (!this.currEnvironment.isEmpty()) {
+			this.currEnvironment.remove(0);
+		}
+		this.currEnvironment.addAll(this.currRoom.getEnvironment());
 		
 		/*Add the player to the environment*/
 		this.currEnvironment.add(this.player);
@@ -936,17 +941,29 @@ public class GameEngine implements Serializable {
 	}
 	
 	/*Change bodies*/
-	public Controllable newBody(Controllable c) {
-		Controllable newBody = c.getNewBody();
+	public void changeBody() {
+		Controllable newBody = this.player.getNewBody();
 		if (newBody != null) {
+			/*Remove old model from current environment and room environment*/
 			this.currEnvironment.remove(newBody);
-			Controllable copy = Controllable.makeCopy(c); //make a copy in order to set all variables back to starting state
-			copy.setYLoc(copy.getYLoc() - 1);
-			this.currEnvironment.remove(c);
-			this.currEnvironment.add(copy);
-			return newBody;
-		} else {
-			return null;
+			this.currMap.accessRoomEnvs(this.currRoomID).remove(newBody);
+			
+			/*Make a copy of the player controllable in order to set all variables back to starting state*/
+			Controllable oldCopy = Controllable.makeCopy(this.player); 
+			
+			/*Remove the player from the environment*/
+			this.currEnvironment.remove(this.player);
+			
+			/*Add copy to the current environment and room environment*/
+			this.currEnvironment.add(oldCopy);
+			this.currMap.accessRoomEnvs(this.currRoomID).add(oldCopy);
+			
+			/*Make a copy of the body we are switching to*/
+			Controllable newCopy = Controllable.makeCopy(newBody);
+			
+			/*Set player to new body and add to current environment*/
+			this.player = newCopy;
+			this.currEnvironment.add(newCopy);
 		}
 	}
 }

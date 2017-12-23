@@ -62,7 +62,10 @@ public class Main implements KeyListener, MouseListener {
 	private boolean loadingFromFile = false;
 	
 	private boolean play = true;
-	private GameWrapper currentGame = new GameWrapper(); //avoid null pointer in updateViewStates()
+	
+	private GameEngine currentEngine = new GameEngine();
+	private GameWrapper currentGame = new GameWrapper(this.currentEngine); //avoid null pointer in updateViewStates()
+	
 	private MainView mainView;
 	private SettingsView settingsView;
 	private Game1View game1View;
@@ -314,7 +317,7 @@ public class Main implements KeyListener, MouseListener {
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentGame.getEngine().restoreDefaultAttributes(currentGame.getPlayer());
+				currentEngine.restoreDefaultAttributes(currentEngine.getPlayer());
 				sleepTime = defaultSleepTime;
 			}
     		});
@@ -416,7 +419,6 @@ public class Main implements KeyListener, MouseListener {
 	}
 	
 	public void loadGame1() {
-		//this.currentGame.setJumping(false);
 		this.rightPressed = false;
 		this.spacePressed = false;
 		
@@ -424,12 +426,13 @@ public class Main implements KeyListener, MouseListener {
 			this.loadGame();
 			this.loadingFromFile = false;
 		} else {
-			this.currentGame = new GameWrapper();
+			this.currentEngine = new GameEngine();
+			this.currentGame = new GameWrapper(this.currentEngine);
 		}
 		
 		this.currentGame.setGameState(GameState.PLAY);
 		this.currentGame.setLastState(GameState.LOAD);
-		this.game1View.load(this.currentGame);
+		this.game1View.load(this.currentEngine);
 	}
 	
 	public void tick() {
@@ -498,7 +501,7 @@ public class Main implements KeyListener, MouseListener {
 				break;
 				
 			case DEATH:
-				this.currentGame.getEngine().respawn(this.currentGame.getPlayer());
+				this.currentEngine.respawn(this.currentEngine.getPlayer());
 				
 				this.game1View.setStartingOffsets();
 				
@@ -510,11 +513,11 @@ public class Main implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
-				this.currentGame.tick(this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+				this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
 				
-				if (this.currentGame.getEngine().getRoomChangeEvent()) {
-					this.game1View.updateView(this.currentGame);
-					this.currentGame.getEngine().setRoomChangeEvent(false);
+				if (this.currentEngine.getRoomChangeEvent()) {
+					this.game1View.updateView(this.currentEngine);
+					this.currentEngine.setRoomChangeEvent(false);
 				}
 				break;
 				
@@ -548,7 +551,7 @@ public class Main implements KeyListener, MouseListener {
 		try {
 			this.fileOut = new FileOutputStream(save);
 			this.objectOut = new ObjectOutputStream(this.fileOut);
-			this.objectOut.writeObject(this.currentGame);
+			this.objectOut.writeObject(this.currentEngine);
 			this.objectOut.close();
 			this.fileOut.close();
 		} catch (FileNotFoundException e) {
@@ -579,7 +582,7 @@ public class Main implements KeyListener, MouseListener {
 		try {
 			this.fileIn = new FileInputStream(save);
 			this.objectIn = new ObjectInputStream(this.fileIn);
-			this.currentGame = (GameWrapper)this.objectIn.readObject();
+			this.currentEngine = (GameEngine) this.objectIn.readObject();
 			this.objectIn.close();
 			this.fileIn.close();
 		} catch (FileNotFoundException e) {
@@ -675,22 +678,22 @@ public class Main implements KeyListener, MouseListener {
 	
 	public void changeMaxJumps(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getEngine().setMaxJumps(num);
+		this.currentEngine.setMaxJumps(num);
 	}
 	
 	public void changeFloatingThreshold(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getEngine().setFloatingThreshold(num);
+		this.currentEngine.setFloatingThreshold(num);
 	}
 	
 	public void changeXIncr(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getPlayer().setXIncr(num);
+		this.currentEngine.getPlayer().setXIncr(num);
 	}
 	
 	public void changeYIncr(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.getPlayer().setYIncr(num);
+		this.currentEngine.getPlayer().setYIncr(num);
 	}
 	
 	public static void changeSleepTime(String input) {
@@ -765,8 +768,8 @@ public class Main implements KeyListener, MouseListener {
 					
 				/*C changes body*/
 				case C_PRESSED:
-					currentGame.changeBodies();
-					game1View.loadPlayer(currentGame);
+					currentEngine.changeBody();
+					game1View.loadPlayer(currentEngine);
 					break;
 					
 				default:
