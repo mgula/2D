@@ -7,7 +7,6 @@ import enums.Direction;
 import enums.RoomID;
 import game1Models.*;
 
-//rethink moveLeft, moveRight, etc (I think using a while and a break may be more effective)
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -184,38 +183,15 @@ public class GameEngine implements Serializable {
 	
 	
 	/*Methods that move a controllable object*/
-	public void incrX(Controllable c) {
-		if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
-			c.setXLoc(c.getXLoc() + 1);
-		}
-		c.setCurrXSegment(c.getCurrXSegment() + 1);
-	}
-	
-	public void decrX(Controllable c) {
-		if (!c.isAgainstSurfaceLeft() && !c.isAgainstMovingSurfaceLeft()) {
-			c.setXLoc(c.getXLoc() - 1);
-		}
-		c.setCurrXSegment(c.getCurrXSegment() + 1);
-	}
-	
-	public void incrY(Controllable c) {
-		if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
-			c.setYLoc(c.getYLoc() - 1);
-		}
-		c.setCurrYSegment(c.getCurrYSegment() + 1);
-	}
-	
-	public void decrY(Controllable c) {
-		if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
-			c.setYLoc(c.getYLoc() + 1);
-		}
-		c.setCurrYSegment(c.getCurrYSegment() + 1);
-	}
-	
 	public void moveRight(Controllable c) {
 		while (c.getCurrXSegment() < c.getXIncr()) {
 			this.checkRightEdgeCollisions(c);
-			this.incrX(c);
+			if (!c.isAgainstSurfaceRight() && !c.isAgainstMovingSurfaceRight()) {
+				c.setXLoc(c.getXLoc() + 1);
+			} else {
+				break;
+			}
+			c.setCurrXSegment(c.getCurrXSegment() + 1);
 		}
 		c.setCurrXSegment(0);
 	}
@@ -223,7 +199,12 @@ public class GameEngine implements Serializable {
 	public void moveLeft(Controllable c) {
 		while (c.getCurrXSegment() < c.getXIncr()) {
 			this.checkLeftEdgeCollisions(c);
-			this.decrX(c);
+			if (!c.isAgainstSurfaceLeft() && !c.isAgainstMovingSurfaceLeft()) {
+				c.setXLoc(c.getXLoc() - 1);
+			} else {
+				break;
+			}
+			c.setCurrXSegment(c.getCurrXSegment() + 1);
 		}
 		c.setCurrXSegment(0);
 	}
@@ -238,7 +219,12 @@ public class GameEngine implements Serializable {
 			this.floatingCounter = 0;
 			while (c.getCurrYSegment() < c.getYIncr()) {
 				this.checkTopEdgeCollisions(c);
-				this.incrY(c);
+				if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
+					c.setYLoc(c.getYLoc() - 1);
+				} else {
+					break;
+				}
+				c.setCurrYSegment(c.getCurrYSegment() + 1);
 			}
 			c.setCurrYSegment(0);
 		} else {
@@ -270,10 +256,13 @@ public class GameEngine implements Serializable {
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
 					this.respondToMovingSurfaces(c);
-					if (!player) {
-						this.checkBottomEdgeCollisions(c);
+					this.checkBottomEdgeCollisions(c);
+					if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
+						c.setYLoc(c.getYLoc() + 1);
+					} else {
+						break;
 					}
-					this.decrY(c);
+					c.setCurrYSegment(c.getCurrYSegment() + 1);
 				}
 				c.setCurrYSegment(0);
 			}
@@ -285,9 +274,11 @@ public class GameEngine implements Serializable {
 			c.setOnPlatform(false);
 			c.setOnSurfaceBottom(false);
 			this.floatingCounter = this.floatingThreshold;
-			this.decrY(c);
+			if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
+				c.setYLoc(c.getYLoc() + 1);
+			}
+			c.setCurrYSegment(0);
 		} else {
-			loop:
 			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (ex.getDirection() == Direction.SOUTH) {
 					if (c.getYLoc() <= ex.getYLoc()) {
@@ -298,7 +289,7 @@ public class GameEngine implements Serializable {
 							this.destinationRoomID = ex.getNextRoom();
 							this.roomChangeEvent = true;
 							this.directionOfRoomChangeEvent = Direction.SOUTH;
-							break loop;
+							break;
 						}
 					}
 				}

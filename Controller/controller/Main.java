@@ -42,6 +42,9 @@ import java.util.ArrayList;
  * -slopes/stairs
  * -pushable objects
  * -JUnit ... ? :/
+ * 
+ * Things to remove if there's ever a final version:
+ * -frame by frame debugging (q and w keys)
  */
 
 public class Main implements KeyListener, MouseListener {
