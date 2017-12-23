@@ -97,6 +97,8 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new Rock(500, -125, 70, 70));
 					env.add(new Rock(750, -250, 50, 50));
 					
+					env.add(new Controllable(650, -125, 20, 20, 10, 5, 150, 150));
+					
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.SPAWN, Direction.EAST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.WEST2, Direction.WEST, 0, this.groundLevel, 50));
 					break;
@@ -175,12 +177,14 @@ public class GameWrapper implements Game, Serializable {
 		
 		/*Evaluate user input*/
 		if (rightPressed) {
-			e.checkRightEdgeCollisions(e.getPlayer());
 			e.moveRight(e.getPlayer());
+			e.checkRightEdgeCollisions(e.getPlayer());
+			e.checkLeavingRoom(e.getPlayer(), Direction.EAST);
 		}
 		if (leftPressed) {
-			e.checkLeftEdgeCollisions(e.getPlayer());
 			e.moveLeft(e.getPlayer());
+			e.checkLeftEdgeCollisions(e.getPlayer());
+			e.checkLeavingRoom(e.getPlayer(), Direction.WEST);
 		}
 		e.checkLeavingSurface(e.getPlayer());
 		if (spacePressed) {
@@ -194,6 +198,7 @@ public class GameWrapper implements Game, Serializable {
 		/*Evaluate jumping*/
 		if (e.getJumping()) {
 			e.checkTopEdgeCollisions(e.getPlayer());
+			e.checkLeavingRoom(e.getPlayer(), Direction.NORTH);
 			if (!e.executeJump(e.getPlayer())) {
 				e.setJumping(false);
 			}

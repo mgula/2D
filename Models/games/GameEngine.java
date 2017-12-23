@@ -39,10 +39,9 @@ public class GameEngine implements Serializable {
 	private Room currRoom;
 	private RoomID currRoomID = RoomID.SPAWN;
 	private RoomID destinationRoomID;
-	private int changeRoomOffsetX;
-	private int changeRoomOffsetY;
 	
 	private boolean roomChangeEvent;
+	private Direction directionOfRoomChangeEvent;
 	
 	private int jumpingCounter = 0;
 	private int jumpDuration = 30;
@@ -288,17 +287,18 @@ public class GameEngine implements Serializable {
 			this.floatingCounter = this.floatingThreshold;
 			this.decrY(c);
 		} else {
+			loop:
 			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (ex.getDirection() == Direction.SOUTH) {
 					if (c.getYLoc() <= ex.getYLoc()) {
 						if (c.getXLoc() >= ex.getXLoc() && c.getXLoc() + c.getWidth() <= ex.getXLoc() + ex.getWidth()) {
-							c.setYLoc(c.getYLoc() + 1);
 							c.setOnSurfaceBottom(false);
 							this.floatingCounter = this.floatingThreshold;
+							
 							this.destinationRoomID = ex.getNextRoom();
-							this.changeRoomOffsetX = 0;
-							this.changeRoomOffsetY = c.getHeight() + 1;
 							this.roomChangeEvent = true;
+							this.directionOfRoomChangeEvent = Direction.SOUTH;
+							break loop;
 						}
 					}
 				}
@@ -310,21 +310,21 @@ public class GameEngine implements Serializable {
 		/*If resting on a moving surface, the player will move in the same direction as the 
 		 *moving surface.*/
 		if (c.isOnMovingSurfaceBottom()) {
-			switch (c.getInContactWith().getDirection()) {
+			switch (c.getAdjacentAutonomous().getDirection()) {
 				case EAST:
-					c.setXLoc(c.getXLoc() + c.getInContactWith().getIncr());
+					c.setXLoc(c.getXLoc() + c.getAdjacentAutonomous().getIncr());
 					break;
 						
 				case WEST:
-					c.setXLoc(c.getXLoc() - c.getInContactWith().getIncr());
+					c.setXLoc(c.getXLoc() - c.getAdjacentAutonomous().getIncr());
 					break;
 						
 				case NORTH:
-					c.setYLoc(c.getYLoc() - c.getInContactWith().getIncr());
+					c.setYLoc(c.getYLoc() - c.getAdjacentAutonomous().getIncr());
 					break;
 						
 				case SOUTH:
-					c.setYLoc(c.getYLoc() + c.getInContactWith().getIncr());
+					c.setYLoc(c.getYLoc() + c.getAdjacentAutonomous().getIncr());
 					break;
 						
 				default:
@@ -334,16 +334,16 @@ public class GameEngine implements Serializable {
 	}
 	
 	public void respondToMovingSurfaces(Controllable c) {
-		if (c.isAgainstMovingSurfaceLeft() && c.getInContactWith().getDirection() == Direction.EAST) {
+		if (c.isAgainstMovingSurfaceLeft() && c.getAdjacentAutonomous().getDirection() == Direction.EAST) {
 			c.setXLoc(c.getXLoc() + 1);
 		}
-		if (c.isAgainstMovingSurfaceRight() && c.getInContactWith().getDirection() == Direction.WEST) {
+		if (c.isAgainstMovingSurfaceRight() && c.getAdjacentAutonomous().getDirection() == Direction.WEST) {
 			c.setXLoc(c.getXLoc() - 1);
 		}	
-		if (c.isAgainstMovingSurfaceTop() && c.getInContactWith().getDirection() == Direction.SOUTH) {
+		if (c.isAgainstMovingSurfaceTop() && c.getAdjacentAutonomous().getDirection() == Direction.SOUTH) {
 			c.setYLoc(c.getYLoc() + 1);
 		}
-		if (c.isAgainstMovingSurfaceBottom() && c.getInContactWith().getDirection() == Direction.NORTH) {
+		if (c.isAgainstMovingSurfaceBottom() && c.getAdjacentAutonomous().getDirection() == Direction.NORTH) {
 			c.setYLoc(c.getYLoc() - 1);
 			c.setAgainstMovingSurfaceBottom(false);
 		}
@@ -394,8 +394,8 @@ public class GameEngine implements Serializable {
 	public void checkBottomEdgeCollisions(Controllable c) {
 		boolean player = this.isPlayer(c);
 		
-		/*If yloc is at ground level, reset jump count and jump counter, and and update the appropriate boolean.*/
-		if (c.getYLoc() + c.getHeight() >= this.currRoom.getYLoc()) {
+		/*Check to see if we're on the bottom of the map.*/
+		if (c.getYLoc() + c.getHeight() + 1 > this.currRoom.getYLoc()) {
 			c.setOnSurfaceBottom(true);
 		}
 		/*Check against every model that acts as a surface.*/
@@ -406,7 +406,7 @@ public class GameEngine implements Serializable {
 						this.floatingCounter = 0;
 					}
 					if (m instanceof game1Models.Autonomous) {
-						c.setInContactWith((Autonomous) m);
+						c.setAdjacentAutonomous((Autonomous) m);
 						switch (((game1Models.Autonomous) m).getDirection()) {
 							case NORTH:
 								c.setAgainstMovingSurfaceBottom(true);
@@ -447,33 +447,23 @@ public class GameEngine implements Serializable {
 		
 		/*Check yloc to see if we've hit the ceiling (valid y locations will range from map.getGroundLevel() 
 		 *to map.getGroundLevel() - map.getHeight(), since y = 0 is the top of the screen.*/
-		if (py <= this.currRoom.getYLoc() - this.currRoom.getHeight()) {
+		if (py - 1 < this.currRoom.getYLoc() - this.currRoom.getHeight()) {
 			c.setAgainstSurfaceTop(true);
 			newCollision = true;
-			for (Exit ex : this.currRoom.getRoomLinks()) {
-				int x = ex.getXLoc();
-				if (py <= ex.getYLoc()) {
-					if (px >= x && px + pw <= x + ex.getWidth()) {
-						c.setAgainstSurfaceTop(false);
-						newCollision = false;
-					}
-				}
-			}
 		}
 		/*Check exits to see if we're leaving the room.*/
+		loop:
 		for (Exit e : this.currRoom.getRoomLinks()) {
 			int x = e.getXLoc();
 			int y = e.getYLoc();
 			int w = e.getWidth();
 			switch (e.getDirection()) {
 				case NORTH:
-					if (px >= x && px + pw <= x + w) {
-						if (py < y) {
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = 0;
-							this.changeRoomOffsetY = -1 * (c.getHeight() + 1); //push rest of player through door (to avoid erroneously triggering more room change events)
-							this.roomChangeEvent = true;
-						}
+					if (px >= x && px + pw <= x + w && py == y) {
+						c.setAdjacentExit(e);
+						break loop;
+					} else {
+						c.setAdjacentExit(null);
 					}
 					break;
 					
@@ -498,7 +488,7 @@ public class GameEngine implements Serializable {
 						if (c.getXLoc() == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Autonomous) {
-								c.setInContactWith((Autonomous) m);
+								c.setAdjacentAutonomous((Autonomous) m);
 								c.setAgainstMovingSurfaceTop(true);
 							} else {
 								c.setAgainstSurfaceTop(true);
@@ -523,33 +513,23 @@ public class GameEngine implements Serializable {
 		boolean newCollision = false;
 		
 		/*Check xloc to see if we're at the right edge of the map.*/
-		if (px + pw >= this.currRoom.getXLoc() + this.currRoom.getWidth()) {
+		if (px + pw + 1 > this.currRoom.getXLoc() + this.currRoom.getWidth()) {
 			c.setAgainstSurfaceRight(true);
 			newCollision = true;
-			for (Exit ex : this.currRoom.getRoomLinks()) {
-				int y = ex.getYLoc();
-				if (px + pw >= ex.getXLoc()) {
-					if (py >= y && py <= y + ex.getHeight()) {
-						c.setAgainstSurfaceRight(false);
-						newCollision = false;
-					}
-				}
-			}
 		}
 		/*Check exits to see if we're leaving the room.*/
+		loop:
 		for (Exit e : this.currRoom.getRoomLinks()) {
 			int x = e.getXLoc();
 			int y = e.getYLoc();
 			int h = e.getHeight();
 			switch (e.getDirection()) {
 				case EAST:
-					if (py <= y && py > y - h) {
-						if (px + pw >= x) {
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = pw + 1;
-							this.changeRoomOffsetY = 0;
-							this.roomChangeEvent = true;
-						}
+					if (py <= y && py > y - h && px + pw == x) {
+						c.setAdjacentExit(e);
+						break loop;
+					} else {
+						c.setAdjacentExit(null);
 					}
 					break;
 					
@@ -573,7 +553,7 @@ public class GameEngine implements Serializable {
 						if (py == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Autonomous) {
-								c.setInContactWith((Autonomous) m);
+								c.setAdjacentAutonomous((Autonomous) m);
 								c.setAgainstMovingSurfaceRight(true);
 							} else {
 								c.setAgainstSurfaceRight(true);
@@ -597,32 +577,23 @@ public class GameEngine implements Serializable {
 		boolean newCollision = false;
 		
 		/*Check xloc to see if we're at the left edge of the map.*/
-		if (px <= this.currRoom.getXLoc()) {
+		if (px - 1 < this.currRoom.getXLoc()) {
 			c.setAgainstSurfaceLeft(true);
 			newCollision = true;
-			for (Exit ex : this.currRoom.getRoomLinks()) {
-				if (px <= ex.getXLoc()) {
-					if (py >= ex.getYLoc() && py <= ex.getYLoc() + ex.getHeight()) {
-						c.setAgainstSurfaceLeft(false);
-						newCollision = false;
-					}
-				}
-			}
 		}
 		/*Check exits to see if we're leaving the room.*/
+		loop:
 		for (Exit e : this.currRoom.getRoomLinks()) {
 			int x = e.getXLoc();
 			int y = e.getYLoc();
 			int h = e.getHeight();
 			switch (e.getDirection()) {
 				case WEST:
-					if (py <= y && py > y - h) {
-						if (px <= x) {
-							this.destinationRoomID = e.getNextRoom();
-							this.changeRoomOffsetX = -1 * (c.getWidth() + 1);
-							this.changeRoomOffsetY = 0;
-							this.roomChangeEvent = true;
-						}
+					if (py <= y && py > y - h && px == x) {
+						c.setAdjacentExit(e);
+						break loop;
+					} else {
+						c.setAdjacentExit(null);
 					}
 					break;
 				
@@ -647,7 +618,7 @@ public class GameEngine implements Serializable {
 						if (py == i) {
 							newCollision = true;
 							if (m instanceof game1Models.Autonomous) {
-								c.setInContactWith((Autonomous) m);
+								c.setAdjacentAutonomous((Autonomous) m);
 								c.setAgainstMovingSurfaceLeft(true);
 							} else {
 								c.setAgainstSurfaceLeft(true);
@@ -661,6 +632,17 @@ public class GameEngine implements Serializable {
 		if (!newCollision) {
 			c.setAgainstSurfaceLeft(false);
 			c.setAgainstMovingSurfaceLeft(false);
+		}
+	}
+	
+	public void checkLeavingRoom(Controllable c, Direction d) {
+		Exit e = c.getAdjacentExit();
+		if (e != null) {
+			if (e.getDirection() == d) {
+				this.roomChangeEvent = true;
+				this.destinationRoomID = e.getNextRoom();
+				this.directionOfRoomChangeEvent = e.getDirection();
+			}
 		}
 	}
 	
@@ -884,7 +866,7 @@ public class GameEngine implements Serializable {
 				}
 				break;
 				
-			/*Interactables wait for a moment before switching directions.*/
+			/*Autonomous objects wait for a moment before switching directions.*/
 			case IDLE:
 				if (a.getWaitCounter() < this.interactableWaitTime) {
 					a.setWaitCounter(a.getWaitCounter() + 1);
@@ -936,13 +918,43 @@ public class GameEngine implements Serializable {
 		this.makeCurrRoom();
 		
 		/*Offset the player from the doorway*/
-		c.setXLoc(c.getXLoc() + this.changeRoomOffsetX);
-		c.setYLoc(c.getYLoc() + this.changeRoomOffsetY);
+		switch (this.directionOfRoomChangeEvent) {
+			case NORTH:
+				c.setYLoc(this.currRoom.getYLoc() - c.getHeight());
+				c.setCurrYSegment(0);
+				
+				c.setOnSurfaceBottom(true);
+				
+				this.floatingCounter = 0;
+				
+				this.jumpCount = 0;
+				this.jumpingCounter = 0;
+				this.jumping = false;
+				break;
+				
+			case SOUTH:
+				c.setYLoc(c.getYLoc() + c.getHeight());
+				c.setCurrYSegment(0);
+				break;
+				
+			case EAST:
+				c.setXLoc(c.getXLoc() + c.getWidth());
+				c.setCurrXSegment(0);
+				break;
+				
+			case WEST:
+				c.setXLoc(c.getXLoc() - c.getWidth());
+				c.setCurrXSegment(0);
+				break;
+				
+			default:
+				break;
+		}
 	}
 	
 	/*Change bodies*/
 	public void changeBody() {
-		Controllable newBody = this.player.getNewBody();
+		Controllable newBody = this.player.getAdjacentControllable();
 		if (newBody != null) {
 			/*Remove old model from current environment and room environment*/
 			this.currEnvironment.remove(newBody);

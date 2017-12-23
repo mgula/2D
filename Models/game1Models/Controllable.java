@@ -10,8 +10,9 @@ public class Controllable extends Game1Model {
 	private int currHealth;
 	private int maxHealth;
 	
-	private Autonomous inContactWith = null;
-	private Controllable newBody = null;
+	private Autonomous adjacentAutonmous = null;
+	private Controllable adjacentControllable = null;
+	private Exit adjacentExit = null;
 	
 	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
 	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
@@ -67,12 +68,16 @@ public class Controllable extends Game1Model {
 		return this.maxHealth;
 	}
 	
-	public Autonomous getInContactWith() {
-		return this.inContactWith;
+	public Autonomous getAdjacentAutonomous() {
+		return this.adjacentAutonmous;
 	}
 	
-	public Controllable getNewBody() {
-		return this.newBody;
+	public Controllable getAdjacentControllable() {
+		return this.adjacentControllable;
+	}
+	
+	public Exit getAdjacentExit() {
+		return this.adjacentExit;
 	}
 	
 	public boolean isOnSurfaceBottom() {
@@ -140,12 +145,16 @@ public class Controllable extends Game1Model {
 		this.maxHealth = h;
 	}
 	
-	public void setInContactWith(Autonomous a) {
-		this.inContactWith = a;
+	public void setAdjacentAutonomous(Autonomous a) {
+		this.adjacentAutonmous = a;
 	}
 	
 	public void setNewBody(Controllable c) {
-		this.newBody = c;
+		this.adjacentControllable = c;
+	}
+	
+	public void setAdjacentExit(Exit e) {
+		this.adjacentExit = e;
 	}
 	
 	public void setOnSurfaceBottom(boolean b) {

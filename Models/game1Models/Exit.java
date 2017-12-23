@@ -17,25 +17,26 @@ public class Exit extends Game1Model {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		
-		this.setHeight(0);
-		this.setWidth(0);
-		
 		this.setDimensions(dimension);
 	}
 	
 	public void setDimensions(int dimension) {
 		switch (this.dir) {
 			case NORTH:
+				this.setHeight(0);
 				this.setWidth(dimension);
 				break;
 			case SOUTH:
+				this.setHeight(0);
 				this.setWidth(dimension);
 				break;
 			case EAST:
 				this.setHeight(dimension);
+				this.setWidth(0);
 				break;
 			case WEST:
 				this.setHeight(dimension);
+				this.setWidth(0);
 				break;
 				
 			default:
