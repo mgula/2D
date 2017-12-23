@@ -8,7 +8,6 @@ import enums.RoomID;
 import game1Models.*;
 
 //rethink moveLeft, moveRight, etc (I think using a while and a break may be more effective)
-//phase through platform issue (no idea when I broke this)
 public class GameEngine implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -63,6 +62,10 @@ public class GameEngine implements Serializable {
 	public GameEngine() {
 		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
 		this.currEnvironment = new ArrayList<Game1Model>();
+	}
+
+	private boolean isPlayer(Controllable c) {
+		return c == this.player;
 	}
 	
 	public void restoreDefaultAttributes(Controllable c) {
@@ -180,9 +183,6 @@ public class GameEngine implements Serializable {
 		this.roomChangeEvent = b;
 	}
 	
-	private boolean isPlayer(Controllable c) {
-		return c == this.player;
-	}
 	
 	/*Methods that move a controllable object*/
 	public void incrX(Controllable c) {
@@ -283,10 +283,10 @@ public class GameEngine implements Serializable {
 	
 	public void phaseThroughPlatformOrExit(Controllable c) {
 		if (c.isOnPlatform()) {
-			c.setYLoc(c.getYLoc() + 1);
 			c.setOnPlatform(false);
 			c.setOnSurfaceBottom(false);
 			this.floatingCounter = this.floatingThreshold;
+			this.decrY(c);
 		} else {
 			for (Exit ex : this.currRoom.getRoomLinks()) {
 				if (ex.getDirection() == Direction.SOUTH) {
