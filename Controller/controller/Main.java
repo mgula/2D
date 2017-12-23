@@ -86,6 +86,9 @@ public class Main implements KeyListener, MouseListener {
 	private static final int defaultSleepTime = 30;
 	private static int sleepTime = defaultSleepTime; //Time in milliseconds to wait each cycle of the main loop
 	
+	private boolean byTick = false; //for debugging one tick at a time
+	private boolean advanceTick = false;
+	
 	public static void main(String[] args) {
 		Main main = new Main();
     	while (main.play) {
@@ -513,8 +516,14 @@ public class Main implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
-				this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
-				
+				if (this.byTick) {
+					if (this.advanceTick) {
+						this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+						this.advanceTick = false;
+					}
+				} else {
+					this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+				}
 				if (this.currentEngine.getRoomChangeEvent()) {
 					this.game1View.updateView(this.currentEngine);
 					this.currentEngine.setRoomChangeEvent(false);
@@ -772,6 +781,16 @@ public class Main implements KeyListener, MouseListener {
 					game1View.loadPlayer(currentEngine);
 					break;
 					
+					
+				/*Debug keys*/
+				case Q_PRESSED:
+					byTick = !byTick;
+					break;
+					
+				case W_PRESSED:
+					advanceTick = true;
+					break;
+					
 				default:
 					break;
 			}
@@ -803,6 +822,12 @@ public class Main implements KeyListener, MouseListener {
 		
 		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false), "C Pressed");
 		v.getActionMap().put("C Pressed", new ArrowKeyEvent(KeyCommand.C_PRESSED));
+		
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false), "Q Pressed");
+		v.getActionMap().put("Q Pressed", new ArrowKeyEvent(KeyCommand.Q_PRESSED));
+		
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "W Pressed");
+		v.getActionMap().put("W Pressed", new ArrowKeyEvent(KeyCommand.W_PRESSED));
 	}
 
 	@Override

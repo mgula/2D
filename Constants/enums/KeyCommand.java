@@ -1,6 +1,10 @@
 package enums;
 
 public enum KeyCommand {
+	/*Debug keys*/
+	Q_PRESSED,
+	W_PRESSED,
+	/*Regular keys*/
 	LEFT_PRESSED,
 	RIGHT_PRESSED,
 	SPACE_PRESSED,
