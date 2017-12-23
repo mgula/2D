@@ -1,18 +1,18 @@
-package games;
+package engine;
 
 import java.util.ArrayList;
 import java.io.Serializable;
 
+import models.*;
 import enums.Direction;
 import enums.GameState;
 import enums.MapID;
 import enums.RoomID;
-import game1Models.*;
 
 /*This class serves as a "wrapper" that uses an engine object on a controllable object. This class
  *is responsible for making maps (essentially just collections of rooms), calling the necessary engine
  *methods every tick, and signaling Main when a room change event occurs.*/
-public class GameWrapper implements Game, Serializable {
+public class GameWrapper implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private GameState gameState;
 	private GameState lastState;
@@ -56,16 +56,16 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new Rock(2500, -125, 70, 70));
 					env.add(new Rock(1500, -550, 70, 70));
 					env.add(new Rock(2500, -550, 70, 70));
-					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 900, 10));
+					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 900, 4));
 					env.add(new Platform(1700, -125, 50));
 					env.add(new Platform(1400, -400, 1000));
 					env.add(new Platform(2925, -500, 75));
 					env.add(new RegenArea(2250, -50, 50, 50, 1));
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
-					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 5, 25));
+					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 4, 25));
 					
-					env.add(new Controllable(1200, -125, 20, 20, 10, 5, 150, 150));
-					env.add(new Controllable(1300, -125, 30, 30, 10, 5, 100, 200));
+					env.add(new Controllable(1200, -125, 20, 20, 5, 4, 150, 150));
+					env.add(new Controllable(1300, -125, 30, 30, 5, 4, 100, 200));
 					
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.WEST1, Direction.WEST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.EAST1, Direction.EAST, 1000 + 2000, this.groundLevel, 50));
@@ -97,7 +97,7 @@ public class GameWrapper implements Game, Serializable {
 					env.add(new Rock(500, -125, 70, 70));
 					env.add(new Rock(750, -250, 50, 50));
 					
-					env.add(new Controllable(650, -125, 20, 20, 10, 5, 150, 150));
+					env.add(new Controllable(650, -125, 20, 20, 5, 4, 150, 150));
 					
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.SPAWN, Direction.EAST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.WEST2, Direction.WEST, 0, this.groundLevel, 50));

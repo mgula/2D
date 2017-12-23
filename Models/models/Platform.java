@@ -1,20 +1,12 @@
-package game1Models;
+package models;
 
-public class Marker extends Game1Model {
+public class Platform extends Game1Model {
 
-	public Marker(int x, int y) {
+	public Platform(int x, int y, int w) {
 		this.setXLoc(x);
 		this.setYLoc(y);
-	}
-
-	@Override
-	public int getHeight() {
-		return 0;
-	}
-
-	@Override
-	public int getWidth() {
-		return 0;
+		this.setHeight(0);
+		this.setWidth(w);
 	}
 	
 	@Override

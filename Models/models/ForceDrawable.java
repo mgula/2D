@@ -1,4 +1,4 @@
-package game1Models;
+package models;
 
 public class ForceDrawable extends Game1Model {
 	private final int drawHeight = 50;

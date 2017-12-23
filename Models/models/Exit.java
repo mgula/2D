@@ -1,4 +1,4 @@
-package game1Models;
+package models;
 
 import enums.Direction;
 import enums.RoomID;

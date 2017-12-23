@@ -1,4 +1,4 @@
-package game1Models;
+package models;
 
 public class Controllable extends Game1Model {
 	private int xIncr;

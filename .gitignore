@@ -1,7 +1,7 @@
 # local files
-/bin/
-/data/
-/exec/
+bin
+data
+exec
 
 # garbage
 .DS_Store

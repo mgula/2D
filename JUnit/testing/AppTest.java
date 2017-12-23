@@ -12,14 +12,14 @@ import java.awt.event.KeyEvent;
 import org.junit.Test;
 
 import views.MainView;
-import controller.Main;
+import controller.Game;
 import enums.AppState;
 
 /*This test will start up a new Main object and automatically click various buttons in the application.
  *Author note: my computer is old and slow, so I typically have to run this test about 3-4
  *times before it will pass. This may or may not be the case for other users.*/
 public class AppTest {
-	Main main;
+	Game main;
 	MainView view;
 	
 	Robot robot;
@@ -59,7 +59,7 @@ public class AppTest {
 		this.buttonY6 = view.getButtonSlot6Y() + this.extraMousePixels;
 		
 		/*Create a new main*/
-		this.main = new Main();
+		this.main = new Game();
 		//this.main.init();
 		this.simulate(this.initialCycles);  // duration = 150 here because there's a bit of loading to do
 		try {

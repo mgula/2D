@@ -1,16 +1,17 @@
 package views;
 
+import engine.GameEngine;
+import engine.GameWrapper;
 import enums.AppState;
 import enums.GameState;
-import game1Models.*;
-import games.GameEngine;
-import games.GameWrapper;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
+
+import models.*;
 
 public class Game1View extends GameView {
 	private GameEngine engine;
@@ -166,29 +167,29 @@ public class Game1View extends GameView {
 	
 	public void drawEnvironment(Graphics g) {
 		for (Game1Model m : this.environment) {
-			if (m instanceof game1Models.Rock) {
+			if (m instanceof models.Rock) {
 				g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Enemy) {
+			} else if (m instanceof models.Enemy) {
 				g.setColor(Color.RED);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Marker) {
+			} else if (m instanceof models.Marker) {
 				
-			} else if (m instanceof game1Models.RegenArea) {
+			} else if (m instanceof models.RegenArea) {
 				g.setColor(Color.GREEN);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.DamageArea) {
+			} else if (m instanceof models.DamageArea) {
 				g.setColor(Color.MAGENTA);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.ForceDrawable) {
+			} else if (m instanceof models.ForceDrawable) {
 				g.setColor(Color.CYAN);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Autonomous) {
+			} else if (m instanceof models.Autonomous) {
 				g.setColor(Color.YELLOW);
 				g.fillRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
-			} else if (m instanceof game1Models.Platform) {
+			} else if (m instanceof models.Platform) {
 				g.setColor(Color.BLACK);
 				g.drawLine(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getXLoc() + m.getWidth() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY);
-			} else if (m instanceof game1Models.Controllable) {
+			} else if (m instanceof models.Controllable) {
 				if (m != this.player) {
 					g.setColor(Color.CYAN);
 					g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
