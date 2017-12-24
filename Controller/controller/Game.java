@@ -153,26 +153,26 @@ public class Game implements KeyListener, MouseListener {
 			public void actionPerformed(ActionEvent e) {
 				nextState = AppState.INBETWEEN1;
 			}
-    		});
+		});
 		this.mainView.getControlsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				nextState = AppState.SETTINGS;
 			}
-    		});
+		});
 		this.mainView.getExitButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				nextState = AppState.END;
 			}
-    		});
+		});
 		/*In between view 1*/
 		this.betweenView.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				nextState = AppState.SELECT;
 			}
-    		});
+		});
 		this.betweenView.getNewGameButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -180,7 +180,7 @@ public class Game implements KeyListener, MouseListener {
 				currentGame.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		this.betweenView.getLoadGameButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -188,7 +188,7 @@ public class Game implements KeyListener, MouseListener {
 				loadingFromFile = true;
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		this.betweenView.getNewGameButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -196,7 +196,7 @@ public class Game implements KeyListener, MouseListener {
 				currentGame.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		this.betweenView.getLoadGameButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -204,7 +204,7 @@ public class Game implements KeyListener, MouseListener {
 				loadingFromFile = true;
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		this.betweenView.getNewGameButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -212,7 +212,7 @@ public class Game implements KeyListener, MouseListener {
 				currentGame.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		this.betweenView.getLoadGameButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -220,14 +220,14 @@ public class Game implements KeyListener, MouseListener {
 				loadingFromFile = true;
 				nextState = AppState.GAME1;
 			}
-    		});
+		});
 		/*Settings view*/
 		this.settingsView.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				nextState = AppState.SELECT;
 			}
-    		});
+		});
 		this.settingsView.getDebugToggleOn().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -235,7 +235,7 @@ public class Game implements KeyListener, MouseListener {
 					v.setDebugMode(true);
 				}
 			}
-    		});
+		});
 		this.settingsView.getDebugToggleOff().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -243,37 +243,37 @@ public class Game implements KeyListener, MouseListener {
 					v.setDebugMode(false);
 				}
 			}
-    		});
+		});
 		this.settingsView.getWindowedOn().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				toggleWindowedMode(true);
 			}
-    		});
+		});
 		this.settingsView.getWindowedOff().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				toggleWindowedMode(false);
 			}
-    		});
+		});
 		this.settingsView.getClearDataButton1().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save1);
 			}
-    		});
+		});
 		this.settingsView.getClearDataButton2().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save2);
 			}
-    		});
+		});
 		this.settingsView.getClearDataButton3().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				clearSaveData(save3);
 			}
-    		});
+		});
 		/*Game 1*/
 		this.game1View.getPlayerInfoButton().addActionListener(new ActionListener() {
 			@Override
@@ -281,21 +281,21 @@ public class Game implements KeyListener, MouseListener {
 				game1View.setPauseState(PauseState.PLAYER_INFO);
 				screenHandled = false;
 			}
-    		});
+		});
 		this.game1View.getSystemButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game1View.setPauseState(PauseState.SYSTEM);
 				screenHandled = false;
 			}
-    		});
+		});
 		this.game1View.getDebugButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game1View.setPauseState(PauseState.DEBUG);
 				screenHandled = false;
 			}
-    		});
+		});
 		this.game1View.getBackButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -306,55 +306,55 @@ public class Game implements KeyListener, MouseListener {
 				game1View.setPauseState(PauseState.PLAYER_INFO);
 				screenHandled = false;
 			}
-    		});
+		});
 		this.game1View.getResumeButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				unpauseGame(currentGame, game1View);
 			}
-    		});
+		});
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentEngine.restoreDefaultAttributes(currentEngine.getPlayer());
 				sleepTime = defaultSleepTime;
 			}
-    		});
+		});
 		this.game1View.getEditJumpsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeMaxJumps(game1View.getEditJumpsField().getText());
 				game1View.getEditJumpsField().setText("");
 			}
-    		});
+		});
 		this.game1View.getEditFloatButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeFloatingThreshold(game1View.getEditFloatField().getText());
 				game1View.getEditFloatField().setText("");
 			}
-    		});
+		});
 		this.game1View.getEditXIncrButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeXIncr(game1View.getEditXIncrField().getText());
 				game1View.getEditXIncrField().setText("");
 			}
-    		});
+		});
 		this.game1View.getEditYIncrButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeYIncr(game1View.getEditYIncrField().getText());
 				game1View.getEditYIncrField().setText("");
 			}
-    		});
+		});
 		this.game1View.getEditSleepTimeButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				changeSleepTime(game1View.getEditSleepTimeField().getText());
 				game1View.getEditSleepTimeField().setText("");
 			}
-    		});
+		});
 	}
 	
 	public void updateCurrentState() {
