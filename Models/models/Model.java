@@ -2,7 +2,7 @@ package models;
 
 import java.io.Serializable;
 
-public abstract class Game1Model implements Serializable {
+public abstract class Model implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private int xloc;
 	private int yloc;

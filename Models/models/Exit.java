@@ -3,7 +3,7 @@ package models;
 import enums.Direction;
 import enums.RoomID;
 
-public class Exit extends Game1Model {
+public class Exit extends Model {
 
 	private RoomID thisRoom;
 	private RoomID nextRoom;

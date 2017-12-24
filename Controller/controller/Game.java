@@ -45,6 +45,7 @@ import java.util.ArrayList;
  * 
  * Things to remove if there's ever a final version:
  * -frame by frame debugging (q and w keys)
+ * -junit test suite and debug enums
  */
 
 public class Game implements KeyListener, MouseListener {
@@ -67,7 +68,7 @@ public class Game implements KeyListener, MouseListener {
 	private boolean play = true;
 	
 	private GameEngine currentEngine = new GameEngine();
-	private GameWrapper currentGame = new GameWrapper(this.currentEngine); //avoid null pointer in updateViewStates()
+	private GameWrapper currentGame = new GameWrapper(); //avoid null pointer in updateViewStates()
 	
 	private MainView mainView;
 	private SettingsView settingsView;
@@ -426,7 +427,9 @@ public class Game implements KeyListener, MouseListener {
 			this.loadingFromFile = false;
 		} else {
 			this.currentEngine = new GameEngine();
-			this.currentGame = new GameWrapper(this.currentEngine);
+			this.currentEngine.init();
+			this.currentGame = new GameWrapper();
+			this.currentGame.startEngine(this.currentEngine);
 		}
 		
 		this.currentGame.setGameState(GameState.PLAY);

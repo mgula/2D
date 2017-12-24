@@ -1,6 +1,6 @@
 package models;
 
-public class Marker extends Game1Model {
+public class Marker extends Model {
 
 	public Marker(int x, int y) {
 		this.setXLoc(x);

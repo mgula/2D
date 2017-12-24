@@ -27,7 +27,7 @@ public class GameWrapper implements Serializable {
 	private AreaMap currMap;
 	private MapID currMapID = MapID.MAP1;
 	
-	public GameWrapper(GameEngine e) {
+	public void startEngine(GameEngine e) {
 		this.initCurrMap();
 		
 		this.initCurrentMapRooms();
@@ -41,7 +41,7 @@ public class GameWrapper implements Serializable {
 		for (RoomID r : this.currMap.getRoomIDs()) {
 			
 			int[] roomDims = new int[RoomDataArrayLength];
-			ArrayList<Game1Model> env = new ArrayList<Game1Model>();
+			ArrayList<Model> env = new ArrayList<Model>();
 			ArrayList<Exit> roomLinks = new ArrayList<Exit>();
 			
 			switch (r) {

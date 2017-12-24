@@ -1,3 +1,3 @@
 package models;
 
-public abstract class SolidObject extends Game1Model {}
+public abstract class SolidObject extends Model {}

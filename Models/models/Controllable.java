@@ -1,6 +1,6 @@
 package models;
 
-public class Controllable extends Game1Model {
+public class Controllable extends Model {
 	private int xIncr;
 	private int yIncr;
 	

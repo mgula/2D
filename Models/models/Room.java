@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import enums.RoomID;
 
-public class Room extends Game1Model {
+public class Room extends Model {
 	private RoomID ID;
-	private ArrayList<Game1Model> environment;
+	private ArrayList<Model> environment;
 	private ArrayList<Exit> roomLinks;
 	
-	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Game1Model> e) {
+	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Model> e) {
 		this.ID = n;
 		this.setXLoc(x);
 		this.setYLoc(y);
@@ -18,7 +18,7 @@ public class Room extends Game1Model {
 		this.environment = e;
 	}
 	
-	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Game1Model> e, ArrayList<Exit> rl) {
+	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Model> e, ArrayList<Exit> rl) {
 		this.ID = n;
 		this.setXLoc(x);
 		this.setYLoc(y);
@@ -32,7 +32,7 @@ public class Room extends Game1Model {
 		return this.ID;
 	}
 	
-	public ArrayList<Game1Model> getEnvironment() {
+	public ArrayList<Model> getEnvironment() {
 		return this.environment;
 	}
 	
@@ -47,7 +47,7 @@ public class Room extends Game1Model {
 		
 		info += "\nEnvironment Info: \n";
 		
-		for (Game1Model m : this.environment) {
+		for (Model m : this.environment) {
 			info += m.toString() + "\n";
 		}
 		

@@ -1,6 +1,6 @@
 package models;
 
-public class Platform extends Game1Model {
+public class Platform extends Model {
 
 	public Platform(int x, int y, int w) {
 		this.setXLoc(x);

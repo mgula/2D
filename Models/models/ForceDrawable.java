@@ -1,6 +1,6 @@
 package models;
 
-public class ForceDrawable extends Game1Model {
+public class ForceDrawable extends Model {
 	private final int drawHeight = 50;
 	private final int drawWidth = 185;
 	

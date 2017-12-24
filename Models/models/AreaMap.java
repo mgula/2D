@@ -14,7 +14,7 @@ public class AreaMap implements Serializable {
 	
 	/*Better way then 3 maps?*/
 	private HashMap<RoomID, int[]> roomData;
-	private HashMap<RoomID, ArrayList<Game1Model>> roomEnvs;
+	private HashMap<RoomID, ArrayList<Model>> roomEnvs;
 	private HashMap<RoomID, ArrayList<Exit>> roomLinks;
 	
 	private int numRooms;
@@ -25,7 +25,7 @@ public class AreaMap implements Serializable {
 		this.numRooms = rooms.length;
 		
 		this.roomData = new HashMap<RoomID, int[]>();
-		this.roomEnvs = new HashMap<RoomID, ArrayList<Game1Model>>();
+		this.roomEnvs = new HashMap<RoomID, ArrayList<Model>>();
 		this.roomLinks = new HashMap<RoomID, ArrayList<Exit>>();
 	}
 	
@@ -33,7 +33,7 @@ public class AreaMap implements Serializable {
 		return this.roomData.get(key);
 	}
 	
-	public ArrayList<Game1Model> accessRoomEnvs(RoomID key) {
+	public ArrayList<Model> accessRoomEnvs(RoomID key) {
 		return this.roomEnvs.get(key);
 	}
 	
@@ -48,7 +48,7 @@ public class AreaMap implements Serializable {
 		this.roomData.put(roomID, roomDims);
 	}
 	
-	public void addRoomEnv(RoomID roomID, ArrayList<Game1Model> env) {
+	public void addRoomEnv(RoomID roomID, ArrayList<Model> env) {
 		this.roomEnvs.put(roomID, env);
 	}
 	
@@ -84,7 +84,7 @@ public class AreaMap implements Serializable {
 			
 			info += "\n\tEnvironment Info: ";
 			
-			for (Game1Model m : this.accessRoomEnvs(r)) {
+			for (Model m : this.accessRoomEnvs(r)) {
 				info += m.toStringForAreaMap() + "\n";
 			}
 			

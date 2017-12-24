@@ -16,7 +16,7 @@ import models.*;
 public class Game1View extends GameView {
 	private GameEngine engine;
 	private Room currRoom;
-	private ArrayList<Game1Model> environment;
+	private ArrayList<Model> environment;
 	private Controllable player;
 	
 	private int mainSleepTime;
@@ -83,7 +83,7 @@ public class Game1View extends GameView {
 		this.staticScreenAreaY = this.initialThresholdYD - this.initialThresholdYU;
 	}
 	
-	public ArrayList<Game1Model> getDraw() {
+	public ArrayList<Model> getDraw() {
 		return this.environment;
 	}
 	
@@ -166,7 +166,7 @@ public class Game1View extends GameView {
 	}
 	
 	public void drawEnvironment(Graphics g) {
-		for (Game1Model m : this.environment) {
+		for (Model m : this.environment) {
 			if (m instanceof models.Rock) {
 				g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof models.Enemy) {
@@ -242,7 +242,7 @@ public class Game1View extends GameView {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
 		/*Environment and Enemy info*/ 
-		for (Game1Model m : this.environment) {
+		for (Model m : this.environment) {
 			message = "X: " + m.getXLoc() + ", Y: " + m.getYLoc();
 			g.drawString(message, m.getXLoc() - this.playerOffsetX - 20, m.getYLoc() - 5 - this.playerOffsetY);
 		}
