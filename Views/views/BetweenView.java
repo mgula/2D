@@ -1,10 +1,7 @@
 package views;
 
 import java.awt.Graphics;
-
 import javax.swing.JButton;
-
-import enums.AppState;
 
 public class BetweenView extends MainView {
 	private JButton backButton;

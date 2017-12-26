@@ -39,6 +39,19 @@ public class Controllable extends Model {
 		this.maxHealth = maxHealth;
 	}
 	
+	/*Make a square controllable*/
+	public Controllable(int x, int y, int d, int xIncr, int yIncr, int health, int maxHealth) {
+		this.setXLoc(x);
+		this.setYLoc(y);
+		this.setHeight(d);
+		this.setWidth(d);
+		
+		this.xIncr = xIncr;
+		this.yIncr = yIncr;
+		this.currHealth = health;
+		this.maxHealth = maxHealth;
+	}
+	
 	public static Controllable makeCopy(Controllable c) {
 		return new Controllable(c.getXLoc(), c.getYLoc(), c.getHeight(), c.getWidth(), c.getXIncr(), c.getYIncr(), c.getCurrHealth(), c.getMaxHealth());
 	}
