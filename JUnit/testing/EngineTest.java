@@ -26,10 +26,10 @@ public class EngineTest {
 	int maxMoveSpeed = 30;
 	
 	/*This might not be necessary but I was getting some cases where System.out.print wasn't showing
-	 *anything (maybe it has something to do with the large number of asserts? No idea really).
-	 *This is a workaround - printing isn't used by the tests, but printing information is useful
-	 *when making the tests. These before and after methods simply set System.out to some temporary output
-	 *stream, which seems to print correctly.*/
+	*anything (maybe it has something to do with the large number of asserts? No idea really).
+	*This is a workaround - printing isn't used by the tests, but printing information is useful
+	*when making the tests. These before and after methods simply set System.out to some temporary output
+	*stream, which seems to print correctly.*/
 	private final PrintStream stdout = System.out;
 	private final ByteArrayOutputStream output = new ByteArrayOutputStream();
 	
@@ -54,26 +54,26 @@ public class EngineTest {
 	/***************************************** Movement testing *****************************************/
 	/****************************************************************************************************/
 	
-    public void testPlayerMovement() {
-    	int numRuns = 0;
+	public void testPlayerMovement() {
+		int numRuns = 0;
     	
-    	/*Test on a few combinations of movement speeds*/
-    	for (int i = this.minMoveSpeed; i < this.maxMoveSpeed; i++) {
-    		this.basicPlayerMovementTest1(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
-    		this.basicPlayerMovementTest1(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
-    		this.basicPlayerMovementTest1(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
-    		
-    		this.basicPlayerMovementTest2(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
-    		this.basicPlayerMovementTest2(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
-    		this.basicPlayerMovementTest2(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
+		/*Test on a few combinations of movement speeds*/
+		for (int i = this.minMoveSpeed; i < this.maxMoveSpeed; i++) {
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
+			
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
         	
-        	numRuns += 6;
-    	}
+			numRuns += 6;
+		}
     	
-    	System.out.println("Movements tests passed (" + numRuns + " runs).");
-    }
+		System.out.println("Movements tests passed (" + numRuns + " runs).");
+	}
     
-    /*Test player moving right, player moving left, and player jumping (no combined input)*/
+	/*Test player moving right, player moving left, and player jumping (no combined input)*/
 	public void basicPlayerMovementTest1(Controllable c) {
 		/*Initialize the engine and wrapper*/
 		this.init();
@@ -222,7 +222,7 @@ public class EngineTest {
 	/****************************************************************************************************/
 	
 	/*Test basic collisions (one on one collisions - only the player and one other non-moving object). The
-	 *sizes of the non-moving objects are static.*/
+	*sizes of the non-moving objects are static.*/
 	public void testBasicCollisions() {
 		int numRuns = 0;
 		
@@ -559,7 +559,7 @@ public class EngineTest {
 	}
 	
 	/*Assert each of a controllable objects variable are in a given state. It's up to
-	 *you to provide the expected state*/
+	*you to provide the expected state*/
 	public void assertAllCollisionVariables(Controllable c, boolean bottom, boolean left, boolean right, boolean top, boolean oMBottom, boolean aMBottom, boolean aMLeft, boolean aMRight, boolean aMTop, boolean plat) {
 		assertEquals(bottom, c.isOnSurfaceBottom());
 		assertEquals(left, c.isAgainstSurfaceLeft());
@@ -592,8 +592,8 @@ public class EngineTest {
 	}
 	
 	/*Given that a controllable object is in the air with nothing below it, calculate 
-	 *the amount of frames needed to put the controllable on the ground, and execute 
-	 *that many ticks*/
+	*the amount of frames needed to put the controllable on the ground, and execute 
+	*that many ticks*/
 	public void fallToGround(Controllable c, Room r) {
 		int playerBottomEdgeY = c.getYLoc() + c.getHeight();
 		int groundY = r.getYLoc();
