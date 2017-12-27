@@ -346,6 +346,10 @@ public class GameEngine implements Serializable {
 		if (c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) {
 			boolean contact = false;
 			boolean movingContact = false;
+			/*Check if sitting on the bottom of the room*/
+			if (c.getYLoc() + c.getHeight() + 1 > this.currRoom.getYLoc()) {
+				contact = true;
+			}
 			/*Check against every model that acts as a surface.*/
 			for (Model m : this.currEnvironment) {
 				if (m instanceof models.Autonomous) {
@@ -358,7 +362,7 @@ public class GameEngine implements Serializable {
 							continue; //skip the case where c is the player and m is the player
 						}
 					}
-					if (this.checkBottomSurface(m, c) || c.getYLoc() + c.getHeight() + 1 > this.currRoom.getYLoc()) {
+					if (this.checkBottomSurface(m, c)) {
 						contact = true;
 					}
 				} 
