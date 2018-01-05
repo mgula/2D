@@ -16,14 +16,14 @@ import org.junit.Test;
 
 /*Tests include ample comments to narrate exactly what should be happening on any given frame.*/
 public class EngineTest {
-	GameEngine engine;
-	GameWrapper game;
+	private GameEngine engine;
+	private GameWrapper game;
 	
 	/*Attributes of the player that will vary among tests*/
-	int minPlayerDimensions = 1;
-	int maxPlayerDimensions = 300;
-	int minMoveSpeed = 1;
-	int maxMoveSpeed = 30;
+	private int minPlayerDimensions = 1;
+	private int maxPlayerDimensions = 300;
+	private int minMoveSpeed = 1;
+	private int maxMoveSpeed = 30;
 	
 	/*This might not be necessary but I was getting some cases where System.out.print wasn't showing
 	*anything (maybe it has something to do with the large number of asserts? No idea really).
@@ -38,7 +38,7 @@ public class EngineTest {
 		System.setOut(new PrintStream(this.output, true, "UTF-8"));
 	}
     
-	@Test
+	//@Test
 	public void allTests() {
 		this.testPlayerMovement();
 		this.testBasicCollisions();
@@ -53,7 +53,7 @@ public class EngineTest {
 	/****************************************************************************************************/
 	/***************************************** Movement testing *****************************************/
 	/****************************************************************************************************/
-	
+	@Test
 	public void testPlayerMovement() {
 		int numRuns = 0;
     	
@@ -221,6 +221,7 @@ public class EngineTest {
 	/**************************************Basic Collision Testing **************************************/
 	/****************************************************************************************************/
 	
+	@Test
 	/*Test basic collisions (one on one collisions - only the player and one other non-moving object). The
 	*sizes of the non-moving objects are static.*/
 	public void testBasicCollisions() {

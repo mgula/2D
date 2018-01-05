@@ -57,6 +57,10 @@ public class Game1View extends GameView {
 	private final int[] debugMsgXlocs = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 350, 350, 550, 10, 10, 10, 10, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000};
 	private final int[] debugMsgYlocs = {50, 70, 85, 100, 125, 140, 155, 660, 675, 690, 705, 690, 705, 705, 185, 200, 215, 230, 70, 85, 100, 115, 130, 145, 160, 175, 190, 220, 250, 265, 280, 295, 320, 335};
 	
+	private String currentText;
+	private int textCounter = 0;
+	private int sizeToPrint = 0;
+	
 	public Game1View(int w, int h) {
 		super(w, h);
 		this.initialThresholdXR = (int)((double)w * this.upperRatio);
@@ -138,6 +142,7 @@ public class Game1View extends GameView {
 	
 	public void drawScreen(Graphics g) {
 		this.updateOffsets();
+		this.drawAndUpdateText(g);
 		
 		/*Draw the current room*/
 		g.drawRect(this.currRoom.getXLoc() - this.playerOffsetX, this.currRoom.getYLoc() - this.playerOffsetY - this.currRoom.getHeight(), this.currRoom.getWidth(), this.currRoom.getHeight());
@@ -376,6 +381,39 @@ public class Game1View extends GameView {
 			this.viewMovingDown = true;
 			this.viewMovingUp = false;
 			this.viewStationaryY = false;
+		}
+	}
+	
+	public void drawAndUpdateText(Graphics g) {
+		TextArea t = this.player.getActivatedTextArea();
+		
+		if (t != null) {
+			/*Save old color and set to new color*/
+			Color old = g.getColor();
+			g.setColor(t.getTextColor());
+			
+			if (t.getActivated()) {
+				this.textCounter++;
+				
+				if (this.textCounter % t.getTextSpeed() == 0) {
+					this.sizeToPrint++;
+				}
+			
+				if (this.sizeToPrint >= t.getText().length()) {
+					this.sizeToPrint = t.getText().length();
+				}
+			
+				this.currentText = t.getText().substring(0, this.sizeToPrint);
+			
+				g.drawString(this.currentText, t.getTextXLoc() - this.playerOffsetX, t.getTextYLoc() - this.playerOffsetY);
+			}
+			
+			/*Revert to old color*/
+			g.setColor(old);
+		} else {
+			this.currentText = "";
+			this.textCounter = 0;
+			this.sizeToPrint = 0;
 		}
 	}
 }

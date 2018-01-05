@@ -1,6 +1,8 @@
 package engine;
 
 import java.util.ArrayList;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.Serializable;
 
 import models.*;
@@ -10,8 +12,8 @@ import enums.MapID;
 import enums.RoomID;
 
 /*This class serves as a "wrapper" that uses an engine object on a controllable object. This class
- *is responsible for making maps (essentially just collections of rooms), calling the necessary engine
- *methods every tick, and signaling Main when a room change event occurs.*/
+ *is responsible for making maps (essentially just collections of rooms) and calling the necessary engine
+ *methods every tick.*/
 public class GameWrapper implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private GameState gameState;
@@ -82,7 +84,6 @@ public class GameWrapper implements Serializable {
 					env.add(new Force(3300, -175, 70, 70, Direction.EAST, 1));
 					env.add(new Rock(3250, -250, 50, 50));
 					
-					
 					roomLinks.add(new Exit(RoomID.EAST1, RoomID.SPAWN, Direction.WEST, 3000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.EAST1, RoomID.EAST2, Direction.EAST, 3000 + 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.EAST1, RoomID.NORTHEAST1, Direction.NORTH, 3250, -500, 50));
@@ -98,6 +99,9 @@ public class GameWrapper implements Serializable {
 					env.add(new Rock(750, -250, 50, 50));
 					
 					env.add(new Controllable(650, -125, 20, 20, 5, 4, 150, 150));
+					
+					env.add(new TextArea(100, -50, 100, 100, "here is some sample dialogue bub", false, 4, Color.CYAN, 100, -300));
+					env.add(new TextArea(250, -50, 100, 100, "this here is test dialogue bub", true, 7, Color.GREEN, 250, -300));
 					
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.SPAWN, Direction.EAST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.WEST1, RoomID.WEST2, Direction.WEST, 0, this.groundLevel, 50));

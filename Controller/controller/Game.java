@@ -94,6 +94,9 @@ public class Game implements KeyListener, MouseListener {
 	private boolean byTick = false; //for debugging one tick at a time
 	private boolean advanceTick = false;
 	
+	private boolean CEvent = false;
+	private boolean LEvent = false;
+	
 	public boolean isRunning() {
 		return this.play;
 	}
@@ -515,6 +518,7 @@ public class Game implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
+				/*Use wrapper to handle arrow keys*/
 				if (this.byTick) {
 					if (this.advanceTick) {
 						this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
@@ -523,9 +527,24 @@ public class Game implements KeyListener, MouseListener {
 				} else {
 					this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
 				}
+				
+				/*Handle room change event - view needs to be updated as well*/
 				if (this.currentEngine.getRoomChangeEvent()) {
 					this.game1View.updateView(this.currentEngine);
 					this.currentEngine.setRoomChangeEvent(false);
+				}
+				
+				/*Change bodies - view needs to be updated as well*/
+				if (this.CEvent) {
+					this.currentEngine.changeBody();
+					this.game1View.loadPlayer(currentEngine);
+					this.CEvent = false;
+				}
+				
+				/*Activate a text area*/
+				if (this.LEvent) {
+					this.currentEngine.activateTextArea();
+					this.LEvent = false;
 				}
 				break;
 				
@@ -776,10 +795,13 @@ public class Game implements KeyListener, MouseListener {
 					
 				/*C changes body*/
 				case C_PRESSED:
-					currentEngine.changeBody();
-					game1View.loadPlayer(currentEngine);
+					CEvent = true;
 					break;
-					
+				
+				/*L activates text*/
+				case L_PRESSED:
+					LEvent = true;
+					break;
 					
 				/*Debug keys*/
 				case Q_PRESSED:
@@ -827,6 +849,9 @@ public class Game implements KeyListener, MouseListener {
 		
 		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "W Pressed");
 		v.getActionMap().put("W Pressed", new ArrowKeyEvent(KeyCommand.W_PRESSED));
+		
+		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false), "L Pressed");
+		v.getActionMap().put("L Pressed", new ArrowKeyEvent(KeyCommand.L_PRESSED));
 	}
 
 	@Override

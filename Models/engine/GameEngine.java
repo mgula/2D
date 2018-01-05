@@ -666,6 +666,7 @@ public class GameEngine implements Serializable {
 		boolean damageCollision = false;
 		boolean regenCollision = false;
 		boolean forceCollision = false;
+		boolean textCollision = false;
 		
 		Force f = null;
 		
@@ -683,6 +684,10 @@ public class GameEngine implements Serializable {
 						for (int k = c.getXLoc(); k < c.getXLoc() + c.getWidth(); k++) {
 							for (int l = c.getYLoc(); l < c.getYLoc() + c.getHeight(); l++) {
 								if (i == k && j == l) {
+									if (m instanceof models.TextArea) {
+										textCollision = true;
+										c.setActivatedTextArea((models.TextArea) m);
+									}
 									/*Currently, if an enemy and regen area/current occupy the same area, the
 									 *enemy takes precedence.*/
 									if (m instanceof models.Enemy) {
@@ -775,6 +780,18 @@ public class GameEngine implements Serializable {
 				
 				default:
 					break;
+			}
+		}
+		if (textCollision) {
+			if (!c.getActivatedTextArea().needsAction()) {
+				c.getActivatedTextArea().setActivated(true);
+			}
+		} else {
+			c.setActivatedTextArea(null);
+			for (Model m : this.currEnvironment) {
+				if (m instanceof models.TextArea) {
+					((models.TextArea) m).setActivated(false);
+				}
 			}
 		}
 	}
@@ -970,6 +987,13 @@ public class GameEngine implements Serializable {
 			/*Set player to new body and add to current environment*/
 			this.player = newCopy;
 			this.currEnvironment.add(newCopy);
+		}
+	}
+	
+	/*Activate a text area*/
+	public void activateTextArea() {
+		if (this.player.getActivatedTextArea() != null) {
+			this.player.getActivatedTextArea().setActivated(true);
 		}
 	}
 }

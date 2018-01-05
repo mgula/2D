@@ -13,6 +13,7 @@ public class Controllable extends Model {
 	private Autonomous adjacentAutonmous = null;
 	private Controllable adjacentControllable = null;
 	private Exit adjacentExit = null;
+	private TextArea activatedTextArea = null;
 	
 	private boolean onSurfaceBottom = false; // boolean used for checking if the player's bottom edge is in contact with an object
 	private boolean againstSurfaceTop = false; // boolean used for checking if the player's top edge is in contact with another object
@@ -93,6 +94,10 @@ public class Controllable extends Model {
 		return this.adjacentExit;
 	}
 	
+	public TextArea getActivatedTextArea() {
+		return this.activatedTextArea;
+	}
+	
 	public boolean isOnSurfaceBottom() {
 		return this.onSurfaceBottom;
 	}
@@ -168,6 +173,10 @@ public class Controllable extends Model {
 	
 	public void setAdjacentExit(Exit e) {
 		this.adjacentExit = e;
+	}
+	
+	public void setActivatedTextArea(TextArea t) {
+		this.activatedTextArea = t;
 	}
 	
 	public void setOnSurfaceBottom(boolean b) {

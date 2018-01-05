@@ -14,7 +14,8 @@ public enum KeyCommand {
 	SPACE_RELEASED,
 	DOWN_RELEASED,
 	M_PRESSED,
-	C_PRESSED;
+	C_PRESSED,
+	L_PRESSED;
 	
 	private KeyCommand(){};
 }
