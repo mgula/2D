@@ -67,8 +67,8 @@ public class Game implements KeyListener, MouseListener {
 	
 	private boolean play = true;
 	
-	private GameEngine currentEngine = new GameEngine();
-	private GameWrapper currentGame = new GameWrapper(); //avoid null pointer in updateViewStates()
+	private GameWrapper wrapper = new GameWrapper(); //avoid null pointer in updateViewStates()
+	private GameEngine currentGame = new GameEngine(this.wrapper);
 	
 	private MainView mainView;
 	private SettingsView settingsView;
@@ -181,7 +181,7 @@ public class Game implements KeyListener, MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE1;
-				currentGame.setGameState(GameState.UNINITIALIZED);
+				wrapper.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
 		});
@@ -197,7 +197,7 @@ public class Game implements KeyListener, MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE2;
-				currentGame.setGameState(GameState.UNINITIALIZED);
+				wrapper.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
 		});
@@ -213,7 +213,7 @@ public class Game implements KeyListener, MouseListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				currentSaveFile = SaveFile.SAVE3;
-				currentGame.setGameState(GameState.UNINITIALIZED);
+				wrapper.setGameState(GameState.UNINITIALIZED);
 				nextState = AppState.GAME1;
 			}
 		});
@@ -305,8 +305,8 @@ public class Game implements KeyListener, MouseListener {
 			public void actionPerformed(ActionEvent e) {
 				saveGame();
 				nextState = AppState.SELECT;
-				currentGame.setGameState(GameState.QUIT);
-				currentGame.setLastState(GameState.PAUSE);
+				wrapper.setGameState(GameState.QUIT);
+				wrapper.setLastState(GameState.PAUSE);
 				game1View.setPauseState(PauseState.PLAYER_INFO);
 				screenHandled = false;
 			}
@@ -314,13 +314,13 @@ public class Game implements KeyListener, MouseListener {
 		this.game1View.getResumeButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				unpauseGame(currentGame, game1View);
+				unpauseGame(wrapper, game1View);
 			}
 		});
 		this.game1View.getRestoreDefaultsButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				currentEngine.restoreDefaultAttributes(currentEngine.getPlayer());
+				currentGame.restoreDefaultAttributes(currentGame.getPlayer());
 				sleepTime = defaultSleepTime;
 			}
 		});
@@ -429,15 +429,13 @@ public class Game implements KeyListener, MouseListener {
 			this.loadGame();
 			this.loadingFromFile = false;
 		} else {
-			this.currentEngine = new GameEngine();
-			this.currentEngine.init();
-			this.currentGame = new GameWrapper();
-			this.currentGame.startEngine(this.currentEngine);
+			this.wrapper = new GameWrapper();
+			this.currentGame = new GameEngine(this.wrapper);
 		}
 		
-		this.currentGame.setGameState(GameState.PLAY);
-		this.currentGame.setLastState(GameState.LOAD);
-		this.game1View.load(this.currentEngine);
+		this.wrapper.setGameState(GameState.PLAY);
+		this.wrapper.setLastState(GameState.LOAD);
+		this.game1View.load(this.currentGame);
 	}
 	
 	public void tick() {
@@ -462,7 +460,7 @@ public class Game implements KeyListener, MouseListener {
 	}
 	
 	public void handleGame1() {
-		switch (this.currentGame.getGameState()) {
+		switch (this.wrapper.getGameState()) {
 			case PAUSE:
 				if (!this.screenHandled) {
 					this.screenHandled = true;
@@ -506,11 +504,11 @@ public class Game implements KeyListener, MouseListener {
 				break;
 				
 			case DEATH:
-				this.currentEngine.respawn(this.currentEngine.getPlayer());
+				this.currentGame.respawn(this.currentGame.getPlayer());
 				
 				this.game1View.setStartingOffsets();
 				
-				this.currentGame.setGameState(GameState.PLAY);
+				this.wrapper.setGameState(GameState.PLAY);
 				break;
 				
 			case LOAD:
@@ -521,29 +519,29 @@ public class Game implements KeyListener, MouseListener {
 				/*Use wrapper to handle arrow keys*/
 				if (this.byTick) {
 					if (this.advanceTick) {
-						this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+						this.wrapper.tick(this.currentGame, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
 						this.advanceTick = false;
 					}
 				} else {
-					this.currentGame.tick(this.currentEngine, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
+					this.wrapper.tick(this.currentGame, this.rightPressed, this.leftPressed, this.spacePressed, this.downPressed);
 				}
 				
 				/*Handle room change event - view needs to be updated as well*/
-				if (this.currentEngine.getRoomChangeEvent()) {
-					this.game1View.updateView(this.currentEngine);
-					this.currentEngine.setRoomChangeEvent(false);
+				if (this.currentGame.getRoomChangeEvent()) {
+					this.game1View.updateView(this.currentGame);
+					this.currentGame.setRoomChangeEvent(false);
 				}
 				
 				/*Change bodies - view needs to be updated as well*/
 				if (this.CEvent) {
-					this.currentEngine.changeBody();
-					this.game1View.loadPlayer(currentEngine);
+					this.currentGame.changeBody();
+					this.game1View.loadPlayer(currentGame);
 					this.CEvent = false;
 				}
 				
 				/*Activate a text area*/
 				if (this.LEvent) {
-					this.currentEngine.activateTextArea();
+					this.currentGame.activateTextArea();
 					this.LEvent = false;
 				}
 				break;
@@ -578,7 +576,7 @@ public class Game implements KeyListener, MouseListener {
 		try {
 			this.fileOut = new FileOutputStream(save);
 			this.objectOut = new ObjectOutputStream(this.fileOut);
-			this.objectOut.writeObject(this.currentEngine);
+			this.objectOut.writeObject(this.currentGame);
 			this.objectOut.close();
 			this.fileOut.close();
 		} catch (FileNotFoundException e) {
@@ -609,7 +607,7 @@ public class Game implements KeyListener, MouseListener {
 		try {
 			this.fileIn = new FileInputStream(save);
 			this.objectIn = new ObjectInputStream(this.fileIn);
-			this.currentEngine = (GameEngine) this.objectIn.readObject();
+			this.currentGame = (GameEngine) this.objectIn.readObject();
 			this.objectIn.close();
 			this.fileIn.close();
 		} catch (FileNotFoundException e) {
@@ -699,28 +697,28 @@ public class Game implements KeyListener, MouseListener {
 	
 	public void updateViewStates() {
 		for (View v : this.allViews) {
-			v.updateStates(this.currentState, this.currentGame.getGameState(), this.currentGame.getLastState());
+			v.updateStates(this.currentState, this.wrapper.getGameState(), this.wrapper.getLastState());
 		}
 	}
 	
 	public void changeMaxJumps(String input) {
 		int num = Integer.parseInt(input);
-		this.currentEngine.setMaxJumps(num);
+		this.currentGame.setMaxJumps(num);
 	}
 	
 	public void changeFloatingThreshold(String input) {
 		int num = Integer.parseInt(input);
-		this.currentEngine.setFloatingThreshold(num);
+		this.currentGame.setFloatingThreshold(num);
 	}
 	
 	public void changeXIncr(String input) {
 		int num = Integer.parseInt(input);
-		this.currentEngine.getPlayer().setXIncr(num);
+		this.currentGame.getPlayer().setXIncr(num);
 	}
 	
 	public void changeYIncr(String input) {
 		int num = Integer.parseInt(input);
-		this.currentEngine.getPlayer().setYIncr(num);
+		this.currentGame.getPlayer().setYIncr(num);
 	}
 	
 	public static void changeSleepTime(String input) {
@@ -780,11 +778,11 @@ public class Game implements KeyListener, MouseListener {
 				case M_PRESSED:
 					switch (currentState) {
 						case GAME1:
-							if (currentGame.getGameState() != GameState.PAUSE) {
-								currentGame.setLastState(currentGame.getGameState());
-								currentGame.setGameState(GameState.PAUSE);
-							} else if (currentGame.getGameState() == GameState.PAUSE) {
-								unpauseGame(currentGame, game1View);
+							if (wrapper.getGameState() != GameState.PAUSE) {
+								wrapper.setLastState(wrapper.getGameState());
+								wrapper.setGameState(GameState.PAUSE);
+							} else if (wrapper.getGameState() == GameState.PAUSE) {
+								unpauseGame(wrapper, game1View);
 							}
 							break;
 							

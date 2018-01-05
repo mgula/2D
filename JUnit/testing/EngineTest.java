@@ -16,8 +16,8 @@ import org.junit.Test;
 
 /*Tests include ample comments to narrate exactly what should be happening on any given frame.*/
 public class EngineTest {
-	private GameEngine engine;
-	private GameWrapper game;
+	private GameEngine game;
+	private GameWrapper wrapper;
 	
 	/*Attributes of the player that will vary among tests*/
 	private int minPlayerDimensions = 1;
@@ -81,8 +81,8 @@ public class EngineTest {
 		/*Make a room that just acts as a box - no environment or room links*/
 		Room r = new Room(RoomID.SPAWN, 0, 0, 2000, 2000, new ArrayList<Model>(), new ArrayList<Exit>());
 		
-		/*Pass the player, room and an empty environment to the engine*/
-		this.setEngine(c, r, new ArrayList<Model>());
+		/*Pass the player and empty room to the engine*/
+		this.setEngine(c, r);
 		
 		/*Initial tick to get booleans situated*/
 		this.simulate(1, false, false, false, false, false);
@@ -131,10 +131,10 @@ public class EngineTest {
 		this.assertAllCollisionVariables(c, false, false, false, false, false, false, false, false, false, false);
 		
 		/*Let the controllable reach the peak of the jump*/
-		this.simulate(this.engine.getJumpDuration() - 1, false, false, false, false, false);
+		this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false);
 		
 		/*We should now be at the peak of the jump*/
-		int newY = oldY - (c.getYIncr() * this.engine.getJumpDuration());
+		int newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
 		
 		assertEquals(newY, c.getYLoc());
 		
@@ -153,8 +153,8 @@ public class EngineTest {
 		/*Make a room that just acts as a box - no environment or room links*/
 		Room r = new Room(RoomID.SPAWN, 0, 0, 2000, 2000, new ArrayList<Model>(), new ArrayList<Exit>());
 		
-		/*Pass the player, room and an empty environment to the engine*/
-		this.setEngine(c, r, new ArrayList<Model>());
+		/*Pass the player and empty room to the engine*/
+		this.setEngine(c, r);
 		
 		/*Initial tick to get booleans situated*/
 		this.simulate(1, false, false, false, false, false);
@@ -176,11 +176,11 @@ public class EngineTest {
 		this.simulate(1, true, false, true, false, false);
 		
 		/*Hold right the rest of the way*/
-		this.simulate(this.engine.getJumpDuration() - 1, true, false, false, false, false);
+		this.simulate(this.game.getJumpDuration() - 1, true, false, false, false, false);
 		
 		/*Calculate new coords*/
-		int newX = oldX + (c.getXIncr() * this.engine.getJumpDuration());
-		int newY = oldY - (c.getYIncr() * this.engine.getJumpDuration());
+		int newX = oldX + (c.getXIncr() * this.game.getJumpDuration());
+		int newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
 		
 		/*We should have moved right and should also be at the peak of the jump*/
 		assertEquals(newX, c.getXLoc());
@@ -200,11 +200,11 @@ public class EngineTest {
 		this.simulate(1, false, true, true, false, false);
 		
 		/*Hold left the rest of the way*/
-		this.simulate(this.engine.getJumpDuration() - 1, false, true, false, false, false);
+		this.simulate(this.game.getJumpDuration() - 1, false, true, false, false, false);
 		
 		/*Calculate new coords*/
-		newX = oldX - (c.getXIncr() * this.engine.getJumpDuration());
-		newY = oldY - (c.getYIncr() * this.engine.getJumpDuration());
+		newX = oldX - (c.getXIncr() * this.game.getJumpDuration());
+		newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
 		
 		/*We should have moved left and should also be at the peak of the jump*/
 		assertEquals(newX, c.getXLoc());
@@ -276,7 +276,7 @@ public class EngineTest {
 		this.init();
 		
 		/*This test might require many consecutive jumps - set max jumps to some arbitrary high number*/
-		this.engine.setMaxJumps(100);
+		this.game.setMaxJumps(100);
 		
 		/*Make a small test environment with rocks and a platform*/
 		Rock rockA = new Rock(500, -50, 50, 50);
@@ -287,11 +287,11 @@ public class EngineTest {
 		e.add(rockB);
 		e.add(platform);
 		
-		/*Make a room that just acts as a box - no environment (we'll set that ourselves) or room links*/
-		Room r = new Room(RoomID.SPAWN, 0, 0, 2000, 2000, new ArrayList<Model>(), new ArrayList<Exit>());
+		/*Make a room that just acts as a box - no room links*/
+		Room r = new Room(RoomID.SPAWN, 0, 0, 2000, 2000, e, new ArrayList<Exit>());
 		
-		/*Pass the player, room and environment to the engine*/
-		this.setEngine(c, r, e);
+		/*Pass the player and room to the engine*/
+		this.setEngine(c, r);
 		
 		/*Initial tick to get booleans situated*/
 		this.simulate(1, false, false, false, false, false);
@@ -325,7 +325,7 @@ public class EngineTest {
 		
 		int distanceToJump = getDistance(0, 0, playerBottomEdgeY, rockTopEdgeY);
 
-		int distancePerJump = this.engine.getJumpDuration() * c.getYIncr();
+		int distancePerJump = this.game.getJumpDuration() * c.getYIncr();
 		
 		int numJumps = 0;
 		
@@ -347,7 +347,7 @@ public class EngineTest {
 			}
 			
 			/*Execute the rest of the rest of the jump*/
-			this.simulate(this.engine.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
+			this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
 			
 			if (numJumps != 1) { //add the tick back if jumping more than once (let jump counter completely exhaust)
 				this.simulate(1, false, false, false, false, false);
@@ -368,7 +368,7 @@ public class EngineTest {
 		
 		int fallFrames = (distance / c.getYIncr()) + 1; //add a frame for good measure
 		
-		fallFrames += this.engine.getFloatingThreshold() - 1; //subtract a frame for the tick where we moved right
+		fallFrames += this.game.getFloatingThreshold() - 1; //subtract a frame for the tick where we moved right
 		
 		/*Execute*/
 		this.simulate(fallFrames, false, false, false, false, false);
@@ -503,7 +503,7 @@ public class EngineTest {
 			this.assertAllCollisionVariables(c, false, false, false, false, false, false, false, false, false, false);
 			
 			/*Execute the rest of the rest of the jump*/
-			this.simulate(this.engine.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
+			this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
 			
 			if (numJumps != 1) { //add the tick back if jumping more than once (let jump counter completely exhaust)
 				this.simulate(1, false, false, false, false, false);
@@ -548,15 +548,14 @@ public class EngineTest {
 	
 	/*Set this class's GameEngine and GameWrapper references to brand new objects*/
 	public void init() {
-		this.engine = new GameEngine();
-		this.game = new GameWrapper();
+		this.wrapper = new GameWrapper();
+		this.game = new GameEngine(this.wrapper);
 	}
 	
 	/*Pass the given controllable, room, and environment to this class's engine*/
-	public void setEngine(Controllable c, Room r, ArrayList<Model> e) {
-		this.engine.setPlayer(c);
-		this.engine.setRoom(r);
-		this.engine.setEnvironment(e);
+	public void setEngine(Controllable c, Room r) {
+		this.game.setPlayer(c);
+		this.game.setRoom(r);
 	}
 	
 	/*Assert each of a controllable objects variable are in a given state. It's up to
@@ -578,9 +577,9 @@ public class EngineTest {
 	public void simulate(int numFrames, boolean right, boolean left, boolean space, boolean down, boolean debugOutput) {
 		for (int i = 0; i < numFrames; i++) {
 			if (debugOutput) {
-				this.printPlayerInfo(this.engine.getPlayer());
+				this.printPlayerInfo(this.game.getPlayer());
 			}
-			this.game.tick(this.engine, right, left, space, down);
+			this.wrapper.tick(this.game, right, left, space, down);
 		}
 	}
 	
@@ -603,7 +602,7 @@ public class EngineTest {
 		
 		int fallFrames = (distance / c.getYIncr()) + 1; //divide by how far the player travels each tick, add a frame to be sure
 		
-		fallFrames += this.engine.getFloatingThreshold(); //add frames for the floating threshold (player doesn't start falling until that many frames)
+		fallFrames += this.game.getFloatingThreshold(); //add frames for the floating threshold (player doesn't start falling until that many frames)
 		
 		/*Execute*/
 		this.simulate(fallFrames, false, false, false, false, false);

@@ -15,7 +15,6 @@ import models.*;
 public class Game1View extends GameView {
 	private GameEngine engine;
 	private Room currRoom;
-	private ArrayList<Model> environment;
 	private Controllable player;
 	
 	private int mainSleepTime;
@@ -87,7 +86,7 @@ public class Game1View extends GameView {
 	}
 	
 	public ArrayList<Model> getDraw() {
-		return this.environment;
+		return this.currRoom.getEnvironment();
 	}
 	
 	public void setRightArrow(boolean b) {
@@ -170,7 +169,7 @@ public class Game1View extends GameView {
 	}
 	
 	public void drawEnvironment(Graphics g) {
-		for (Model m : this.environment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof models.Rock) {
 				g.drawRect(m.getXLoc() - this.playerOffsetX, m.getYLoc() - this.playerOffsetY, m.getWidth(), m.getHeight());
 			} else if (m instanceof models.Enemy) {
@@ -246,7 +245,7 @@ public class Game1View extends GameView {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}
 		/*Environment and Enemy info*/ 
-		for (Model m : this.environment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			message = "X: " + m.getXLoc() + ", Y: " + m.getYLoc();
 			g.drawString(message, m.getXLoc() - this.playerOffsetX - 20, m.getYLoc() - 5 - this.playerOffsetY);
 		}
@@ -259,21 +258,19 @@ public class Game1View extends GameView {
 		this.player = engine.getPlayer();
 		this.currRoom = engine.getCurrRoom();
 		this.lastYloc = this.player.getYLoc();
-		this.environment = engine.getEnvironment();
 		
 		this.updateOffsets();
 	}
 	
 	public void loadPlayer(GameEngine engine) {
 		this.player = engine.getPlayer();
-		this.environment = engine.getEnvironment();
+		this.currRoom = engine.getCurrRoom();
 		
 		this.updateOffsets();
 	}
 	
 	public void updateView(GameEngine engine) {
 		this.currRoom = engine.getCurrRoom();
-		this.environment = engine.getEnvironment();
 		this.lastYloc = this.player.getYLoc();
 	}
 	

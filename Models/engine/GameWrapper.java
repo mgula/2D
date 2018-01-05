@@ -29,14 +29,9 @@ public class GameWrapper implements Serializable {
 	private AreaMap currMap;
 	private MapID currMapID = MapID.MAP1;
 	
-	public void startEngine(GameEngine e) {
+	public GameWrapper() {
 		this.initCurrMap();
-		
 		this.initCurrentMapRooms();
-		
-		e.setMap(this.currMap);
-		
-		e.makeCurrRoom();
 	}
 	
 	public void initCurrentMapRooms() {

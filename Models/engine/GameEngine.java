@@ -29,8 +29,6 @@ public class GameEngine implements Serializable {
 	
 	private Controllable player; //we'll use this reference to the player in various methods to see if the controllable in question is the player
 	
-	private ArrayList<Model> currEnvironment = new ArrayList<Model>();
-	
 	private AreaMap currMap;
 	
 	private boolean enemyCollision = false;
@@ -57,8 +55,14 @@ public class GameEngine implements Serializable {
 	
 	private final int interactableWaitTime = 100;
 	
-	public void init() {
+	public GameEngine(GameWrapper w) {
 		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
+		
+		this.currMap = w.getCurrMap();
+		
+		this.currMap.accessRoomEnvs(this.currRoomID).add(this.player);
+		
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
 	}
 
 	private boolean isPlayer(Controllable c) {
@@ -83,7 +87,9 @@ public class GameEngine implements Serializable {
 		this.floatingCounter = 0;
 		
 		this.currRoomID = RoomID.SPAWN;
-		this.makeCurrRoom();
+		
+		/*Make the current room*/
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
 	}
 	
 	/*Getters*/
@@ -117,10 +123,6 @@ public class GameEngine implements Serializable {
 	
 	public Room getCurrRoom() {
 		return this.currRoom;
-	}
-	
-	public ArrayList<Model> getEnvironment() {
-		return this.currEnvironment;
 	}
 	
 	public int getFloatingCounter() {
@@ -162,10 +164,6 @@ public class GameEngine implements Serializable {
 	
 	public void setFloatingThreshold(int n) {
 		this.floatingThreshold = n;
-	}
-	
-	public void setEnvironment(ArrayList<Model> e) {
-		this.currEnvironment = e;
 	}
 	
 	public void setMap(AreaMap m) {
@@ -351,7 +349,7 @@ public class GameEngine implements Serializable {
 				contact = true;
 			}
 			/*Check against every model that acts as a surface.*/
-			for (Model m : this.currEnvironment) {
+			for (Model m : this.currRoom.getEnvironment()) {
 				if (m instanceof models.Autonomous) {
 					if (this.checkBottomSurface(m, c)) {
 						movingContact = true;
@@ -393,7 +391,7 @@ public class GameEngine implements Serializable {
 			c.setOnSurfaceBottom(true);
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
 				if (this.checkBottomSurface(m, c)) {
 					if (player) {
@@ -466,7 +464,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
 				if (m instanceof Controllable) {
 					if (this.isPlayer((models.Controllable) m) && this.isPlayer(c)) {
@@ -532,7 +530,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
 				if (m instanceof Controllable) {
 					if (this.isPlayer((models.Controllable) m) && this.isPlayer(c)) {
@@ -596,7 +594,7 @@ public class GameEngine implements Serializable {
 			}
 		}
 		/*Check against every model that acts as a surface.*/
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof SolidObject || m instanceof Controllable) {
 				if (m instanceof Controllable) {
 					if (this.isPlayer((models.Controllable) m) && this.isPlayer(c)) {
@@ -671,7 +669,7 @@ public class GameEngine implements Serializable {
 		Force f = null;
 		
 		/*Check for event area collisions*/
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof EventArea) {
 				int x = m.getXLoc();
 				int y = m.getYLoc();
@@ -788,7 +786,7 @@ public class GameEngine implements Serializable {
 			}
 		} else {
 			c.setActivatedTextArea(null);
-			for (Model m : this.currEnvironment) {
+			for (Model m : this.currRoom.getEnvironment()) {
 				if (m instanceof models.TextArea) {
 					((models.TextArea) m).setActivated(false);
 				}
@@ -798,7 +796,7 @@ public class GameEngine implements Serializable {
 	
 	/*Move things that move (enemies, autonomous)*/
 	public void moveAll(Controllable c) {
-		for (Model m : this.currEnvironment) {
+		for (Model m : this.currRoom.getEnvironment()) {
 			if (m instanceof models.Enemy) {
 				((models.Enemy) m).move();
 			} else if (m instanceof models.Autonomous) {
@@ -911,22 +909,15 @@ public class GameEngine implements Serializable {
 	}
 	
 	/*Methods for rooms*/
-	public void makeCurrRoom() {
-		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
-		
-		while (!this.currEnvironment.isEmpty()) {
-			this.currEnvironment.remove(0);
-		}
-		this.currEnvironment.addAll(this.currRoom.getEnvironment());
-		
-		/*Add the player to the environment*/
-		this.currEnvironment.add(this.player);
-	}
-	
 	public void changeRoom(Controllable c) {
 		/*Make the current room*/
+		this.currMap.accessRoomEnvs(this.currRoomID).remove(this.player);
+		
 		this.currRoomID = this.destinationRoomID;
-		this.makeCurrRoom();
+		
+		this.currMap.accessRoomEnvs(this.currRoomID).add(this.player);
+		
+		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
 		
 		/*Offset the player from the doorway*/
 		switch (this.directionOfRoomChangeEvent) {
@@ -967,18 +958,16 @@ public class GameEngine implements Serializable {
 	public void changeBody() {
 		Controllable newBody = this.player.getAdjacentControllable();
 		if (newBody != null) {
-			/*Remove old model from current environment and room environment*/
-			this.currEnvironment.remove(newBody);
+			/*Remove old model from the room environment*/
 			this.currMap.accessRoomEnvs(this.currRoomID).remove(newBody);
 			
 			/*Make a copy of the player controllable in order to set all variables back to starting state*/
 			Controllable oldCopy = Controllable.makeCopy(this.player); 
 			
 			/*Remove the player from the environment*/
-			this.currEnvironment.remove(this.player);
+			this.currMap.accessRoomEnvs(this.currRoomID).remove(this.player);
 			
-			/*Add copy to the current environment and room environment*/
-			this.currEnvironment.add(oldCopy);
+			/*Add copy to the room environment*/
 			this.currMap.accessRoomEnvs(this.currRoomID).add(oldCopy);
 			
 			/*Make a copy of the body we are switching to*/
@@ -986,7 +975,7 @@ public class GameEngine implements Serializable {
 			
 			/*Set player to new body and add to current environment*/
 			this.player = newCopy;
-			this.currEnvironment.add(newCopy);
+			this.currMap.accessRoomEnvs(this.currRoomID).add(newCopy);
 		}
 	}
 	
