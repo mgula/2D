@@ -11,8 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /*This file changes a lot, and not necessarily in a meaningful needs-to-be-committed way, so I'm just going
- *to remove this file from version control and update it occasionally when it makes sense to. Routines will 
- *be committed as they are finished.*/
+ *to "remove" this file from version control (git update-index --assume-unchanged <path-to-this-file>) and 
+ *update it occasionally when it makes sense to (git update-index --no-assume-unchanged <path-to-this-file>). 
+ *Routines will be committed as they are finished.*/
 public class MasterTest {
 	/*Attributes of the player that will vary among tests*/
 	private int minPlayerDimensions = 1;
@@ -92,7 +93,7 @@ public class MasterTest {
 			numRuns += 3;
 		}
 		
-		/*Run the tests on various combinations of sizes and movement speeds*/
+		/*Run the tests on various combinations of sizes and movement speeds
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
 			for (int j = this.minMoveSpeed; j <= this.maxMoveSpeed; j++) {
 				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
@@ -107,7 +108,7 @@ public class MasterTest {
 				
 				numRuns += 9;
 			}
-		}
+		}*/
 		
 		System.out.println("Basic collision tests passed (" + numRuns + " runs).");
 	}
