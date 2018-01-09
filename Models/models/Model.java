@@ -4,17 +4,17 @@ import java.io.Serializable;
 
 public abstract class Model implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private int xloc;
-	private int yloc;
+	private int xLoc;
+	private int yLoc;
 	private int height;
 	private int width;
 
 	public int getXLoc() {
-		return this.xloc;
+		return this.xLoc;
 	}
 	
 	public int getYLoc() {
-		return this.yloc;
+		return this.yLoc;
 	}
 	
 	public int getHeight() {
@@ -26,11 +26,11 @@ public abstract class Model implements Serializable {
 	}
 	
 	public void setXLoc(int x) {
-		this.xloc = x;
+		this.xLoc = x;
 	}
 	
 	public void setYLoc(int y) {
-		this.yloc = y;
+		this.yLoc = y;
 	}
 	
 	public void setHeight(int h) {
@@ -44,8 +44,8 @@ public abstract class Model implements Serializable {
 	//each child will use this method in their toString()
 	public String getString() {
 		return "Model name: " + this.getClass() + 
-				"\nX Loc: " + this.xloc + 
-				"\nY Loc: " + this.yloc + 
+				"\nX Loc: " + this.xLoc + 
+				"\nY Loc: " + this.yLoc + 
 				"\nHeight: " + this.height +
 				"\nWidth: " + this.width;
 	}
@@ -53,8 +53,8 @@ public abstract class Model implements Serializable {
 	//each child will use this method in their toStringForAreaMap() that they will override.
 	public String getStringForAreaMap() {
 		return "\n\t\tModel name: " + this.getClass() + 
-				"\n\t\tX Loc: " + this.xloc + 
-				"\n\t\tY Loc: " + this.yloc + 
+				"\n\t\tX Loc: " + this.xLoc + 
+				"\n\t\tY Loc: " + this.yLoc + 
 				"\n\t\tHeight: " + this.height +
 				"\n\t\tWidth: " + this.width;
 	}

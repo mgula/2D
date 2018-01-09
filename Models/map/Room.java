@@ -1,31 +1,55 @@
-package models;
+package map;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
+import models.Model;
 import enums.RoomID;
 
-public class Room extends Model {
+public class Room implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private int xloc;
+	private int yloc;
+	private int height;
+	private int width;
+	
 	private RoomID ID;
 	private ArrayList<Model> environment;
 	private ArrayList<Exit> roomLinks;
 	
 	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Model> e) {
 		this.ID = n;
-		this.setXLoc(x);
-		this.setYLoc(y);
-		this.setHeight(h);
-		this.setWidth(w);
+		this.xloc = x;
+		this.yloc = y;
+		this.height = h;
+		this.width = w;
 		this.environment = e;
 	}
 	
 	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Model> e, ArrayList<Exit> rl) {
 		this.ID = n;
-		this.setXLoc(x);
-		this.setYLoc(y);
-		this.setHeight(h);
-		this.setWidth(w);
+		this.xloc = x;
+		this.yloc = y;
+		this.height = h;
+		this.width = w;
 		this.environment = e;
 		this.roomLinks = rl;
+	}
+	
+	public int getXLoc() {
+		return this.xloc;
+	}
+	
+	public int getYLoc() {
+		return this.yloc;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	public int getWidth() {
+		return this.width;
 	}
 	
 	public RoomID getID() {
@@ -57,5 +81,13 @@ public class Room extends Model {
 			info += e.toString() + "\n";
 		}
 		return info;
+	}
+	
+	public String getString() {
+		return "Model name: " + this.getClass() + 
+				"\nX Loc: " + this.xloc + 
+				"\nY Loc: " + this.yloc + 
+				"\nHeight: " + this.height +
+				"\nWidth: " + this.width;
 	}
 }

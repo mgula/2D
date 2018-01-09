@@ -1,6 +1,9 @@
 package models;
 
+import map.Exit;
+
 public class Controllable extends Model {
+	private static final long serialVersionUID = 1L;
 	private int xIncr;
 	private int yIncr;
 	

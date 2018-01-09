@@ -1,6 +1,7 @@
 package models;
 
 public class Marker extends Model {
+	private static final long serialVersionUID = 1L;
 
 	public Marker(int x, int y) {
 		this.setXLoc(x);

@@ -1,10 +1,12 @@
 package engine;
 
 import java.util.ArrayList;
+
 import java.awt.Color;
-import java.awt.Font;
 import java.io.Serializable;
 
+import map.AreaMap;
+import map.Exit;
 import models.*;
 import enums.Direction;
 import enums.GameState;

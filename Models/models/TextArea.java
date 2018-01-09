@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 public class TextArea extends EventArea {
-	
+	private static final long serialVersionUID = 1L;
 	private String text;
 	private boolean needsAction;
 	private boolean activated;

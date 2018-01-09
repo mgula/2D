@@ -4,6 +4,7 @@ import enums.Direction;
 
 /*Y loc must be within moveThreshU and moveThreshD!*/
 public class EnemyB extends Enemy {
+	private static final long serialVersionUID = 1L;
 	private final int yIncr;
 	private final int damage;
 	private int moveThreshU;

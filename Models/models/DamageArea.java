@@ -1,7 +1,7 @@
 package models;
 
 public class DamageArea extends EventArea {
-	
+	private static final long serialVersionUID = 1L;
 	private int healthDecr;
 	
 	public DamageArea(int x, int y, int h, int w, int d) {

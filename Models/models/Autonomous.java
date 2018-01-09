@@ -3,6 +3,7 @@ package models;
 import enums.Direction;
 
 public class Autonomous extends SolidObject {
+	private static final long serialVersionUID = 1L;
 	private int incr;
 	private int currSegment;
 	private int waitCounter = 0;

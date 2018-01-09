@@ -3,6 +3,7 @@ package models;
 import enums.Direction;
 
 public class Force extends EventArea {
+	private static final long serialVersionUID = 1L;
 	private Direction flowDir;
 	private int incr;
 	

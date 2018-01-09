@@ -1,9 +1,10 @@
-package models;
+package map;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import models.Model;
 import enums.MapID;
 import enums.RoomID;
 

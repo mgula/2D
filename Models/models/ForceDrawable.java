@@ -1,6 +1,7 @@
 package models;
 
 public class ForceDrawable extends Model {
+	private static final long serialVersionUID = 1L;
 	private final int drawHeight = 50;
 	private final int drawWidth = 185;
 	

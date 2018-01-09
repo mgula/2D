@@ -1,7 +1,8 @@
 package models;
 
 public class Rock extends SolidObject {
-	
+	private static final long serialVersionUID = 1L;
+
 	public Rock(int x, int y, int h, int w) {
 		this.setXLoc(x);
 		this.setYLoc(y);

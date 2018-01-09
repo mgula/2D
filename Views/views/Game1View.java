@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
+import map.Exit;
+import map.Room;
 import models.*;
 
 public class Game1View extends GameView {
@@ -163,7 +165,7 @@ public class Game1View extends GameView {
 	public void drawExits(Graphics g) {
 		g.setColor(Color.ORANGE);
 		for (Exit e : this.currRoom.getRoomLinks()) {
-			g.drawLine(e.getXLoc() - this.playerOffsetX, e.getYLoc() - this.playerOffsetY, e.getXLoc() + e.getWidth() - this.playerOffsetX, e.getYLoc() - e.getHeight() - this.playerOffsetY);
+			g.drawLine(e.getXLoc() - this.playerOffsetX, e.getYLoc() - this.playerOffsetY, e.getXLoc() - this.playerOffsetX, e.getYLoc() - e.getHeight() - this.playerOffsetY);
 		}
 		g.setColor(Color.BLACK);
 	}

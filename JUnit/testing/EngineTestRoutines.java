@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
+import map.Exit;
+import map.Room;
 import models.*;
 import engine.*;
 import enums.*;

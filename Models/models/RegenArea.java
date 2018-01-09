@@ -1,7 +1,7 @@
 package models;
 
 public class RegenArea extends EventArea {
-	
+	private static final long serialVersionUID = 1L;
 	private int healthIncr;
 	
 	public RegenArea(int x, int y, int h, int w, int i) {
