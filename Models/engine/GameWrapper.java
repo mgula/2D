@@ -53,7 +53,7 @@ public class GameWrapper implements Serializable {
 					env.add(new Rock(2500, -125, 70, 70));
 					env.add(new Rock(1500, -550, 70, 70));
 					env.add(new Rock(2500, -550, 70, 70));
-					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 900, 4));
+					env.add(new Autonomous(2000, -250, 50, 50, Direction.WEST, 900, 4, 100));
 					env.add(new Platform(1700, -125, 50));
 					env.add(new Platform(1400, -400, 1000));
 					env.add(new Platform(2925, -500, 75));
@@ -61,8 +61,8 @@ public class GameWrapper implements Serializable {
 					env.add(new DamageArea(2350, -50, 50, 50, 1));
 					env.add(new EnemyA(2000, -600, 60, 60, Direction.EAST, 500, 4, 25));
 					
-					env.add(new Controllable(1200, -125, 20, 20, 5, 4, 150, 150));
-					env.add(new Controllable(1300, -125, 30, 30, 5, 4, 100, 200));
+					env.add(new Controllable(1200, -125, 20, 20, 5, 4, 150, 150, 20, 3, 30));
+					env.add(new Controllable(1300, -125, 30, 30, 5, 4, 100, 200, 15, 1, 70));
 					
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.WEST1, Direction.WEST, 1000, this.groundLevel, 50));
 					roomLinks.add(new Exit(RoomID.SPAWN, RoomID.EAST1, Direction.EAST, 1000 + 2000, this.groundLevel, 50));
@@ -93,7 +93,7 @@ public class GameWrapper implements Serializable {
 					env.add(new Rock(500, -125, 70, 70));
 					env.add(new Rock(750, -250, 50, 50));
 					
-					env.add(new Controllable(650, -125, 20, 20, 5, 4, 150, 150));
+					env.add(new Controllable(650, -125, 20, 20, 5, 4, 150, 150, 30, 3, 50));
 					
 					env.add(new TextArea(100, -50, 100, 100, "here is some sample dialogue bub", false, 4, Color.CYAN, 100, -300));
 					env.add(new TextArea(250, -50, 100, 100, "this here is test dialogue bub", true, 7, Color.GREEN, 250, -300));
@@ -177,31 +177,22 @@ public class GameWrapper implements Serializable {
 		/*Evaluate user input*/
 		if (rightPressed) {
 			e.moveRight(e.getPlayer());
-			e.checkRightEdgeCollisions(e.getPlayer());
 			e.checkLeavingRoom(e.getPlayer(), Direction.EAST);
 		}
 		if (leftPressed) {
 			e.moveLeft(e.getPlayer());
-			e.checkLeftEdgeCollisions(e.getPlayer());
 			e.checkLeavingRoom(e.getPlayer(), Direction.WEST);
 		}
 		e.checkLeavingSurface(e.getPlayer());
 		if (spacePressed) {
-			e.setJumping(true);
+			e.getPlayer().setJumping(true);
 		}
 		if (downPressed) {
 			e.phaseThroughPlatformOrExit(e.getPlayer());
-			e.checkBottomEdgeCollisions(e.getPlayer());
 		}
 		
 		/*Evaluate jumping*/
-		if (e.getJumping()) {
-			e.checkTopEdgeCollisions(e.getPlayer());
-			e.checkLeavingRoom(e.getPlayer(), Direction.NORTH);
-			if (!e.executeJump(e.getPlayer())) {
-				e.setJumping(false);
-			}
-		}
+		e.jumpCheck(e.getPlayer());
 		
 		/*Check for room changes*/
 		if (e.getRoomChangeEvent()) {

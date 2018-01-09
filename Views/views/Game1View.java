@@ -126,9 +126,9 @@ public class Game1View extends GameView {
 			break;
 		case DEBUG:
 			g.drawString("Set max jumps: ", 500, 200);
-			g.drawString("Current: " + this.engine.getMaxJumps(), 700, 200);
+			g.drawString("Current: " + this.player.getMaxJumps(), 700, 200);
 			g.drawString("Set floating threshold: ", 450, 230);
-			g.drawString("Current: " + this.engine.getFloatingThreshold(), 700, 230);
+			g.drawString("Current: " + this.player.getFloatingThreshold(), 700, 230);
 			g.drawString("Set X increase: ", 480, 260);
 			g.drawString("Current: " + this.player.getXIncr(), 700, 260);
 			g.drawString("Set Y increase: ", 480, 290);
@@ -239,8 +239,8 @@ public class Game1View extends GameView {
 				this.player.isOnSurfaceBottom(), "Against surface top: " + this.player.isAgainstSurfaceTop(), "Against surface right: " + this.player.isAgainstSurfaceRight(), "Against surface left: " +
 				this.player.isAgainstSurfaceLeft(), "On moving surface bottom: " + this.player.isOnMovingSurfaceBottom(), "Against moving surface bottom: " + this.player.isAgainstMovingSurfaceBottom(), 
 				"Against moving surface top: " + this.player.isAgainstMovingSurfaceTop(), "Against moving surface right: " + this.player.isAgainstMovingSurfaceRight(), "Against moving surface left: " +
-				this.player.isAgainstMovingSurfaceLeft(), "On platform: " + this.player.isOnPlatform(), "Jump duration (final): " + this.engine.getJumpDuration(), "Max jumps: " + this.engine.getMaxJumps(), 
-				"Jump counter: " + this.engine.getJumpCounter(), "Jump number: " + this.engine.getJumpNumber(), "Floating threshold: " + this.engine.getFloatingThreshold(), "Floating counter: " + this.engine.getFloatingCounter()};
+				this.player.isAgainstMovingSurfaceLeft(), "On platform: " + this.player.isOnPlatform(), "Jump duration (final): " + this.player.getJumpDuration(), "Max jumps: " + this.player.getMaxJumps(), 
+				"Jump counter: " + this.player.getJumpCounter(), "Jump number: " + this.player.getJumpNumber(), "Floating threshold: " + this.player.getFloatingThreshold(), "Floating counter: " + this.player.getFloatingCounter()};
 		for (int i = 0; i < debugMessages.length; i++) {
 			g.drawString(debugMessages[i], this.debugMsgXlocs[i], this.debugMsgYlocs[i]);
 		}

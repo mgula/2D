@@ -59,13 +59,13 @@ public class EngineTest {
     	
 		/*Test on a few combinations of movement speeds*/
 		for (int i = this.minMoveSpeed; i < this.maxMoveSpeed; i++) {
-			this.basicPlayerMovementTest1(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
-			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
-			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100, 20, 2, 50));
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100, 20, 2, 50));
+			this.basicPlayerMovementTest1(new Controllable(1000, -100, i, i, 3, 3, 100, 100, 20, 2, 50));
 			
-			this.basicPlayerMovementTest2(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100));
-			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100));
-			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, i, 3, 3, 100, 100));
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100, 20, 2, 50));
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100, 20, 2, 50));
+			this.basicPlayerMovementTest2(new Controllable(1000, -100, i, i, 3, 3, 100, 100, 20, 2, 50));
         	
 			numRuns += 6;
 		}
@@ -131,10 +131,10 @@ public class EngineTest {
 		this.assertAllCollisionVariables(c, false, false, false, false, false, false, false, false, false, false);
 		
 		/*Let the controllable reach the peak of the jump*/
-		this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false);
+		this.simulate(c.getJumpDuration() - 1, false, false, false, false, false);
 		
 		/*We should now be at the peak of the jump*/
-		int newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
+		int newY = oldY - (c.getYIncr() * c.getJumpDuration());
 		
 		assertEquals(newY, c.getYLoc());
 		
@@ -176,11 +176,11 @@ public class EngineTest {
 		this.simulate(1, true, false, true, false, false);
 		
 		/*Hold right the rest of the way*/
-		this.simulate(this.game.getJumpDuration() - 1, true, false, false, false, false);
+		this.simulate(c.getJumpDuration() - 1, true, false, false, false, false);
 		
 		/*Calculate new coords*/
-		int newX = oldX + (c.getXIncr() * this.game.getJumpDuration());
-		int newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
+		int newX = oldX + (c.getXIncr() * c.getJumpDuration());
+		int newY = oldY - (c.getYIncr() * c.getJumpDuration());
 		
 		/*We should have moved right and should also be at the peak of the jump*/
 		assertEquals(newX, c.getXLoc());
@@ -200,11 +200,11 @@ public class EngineTest {
 		this.simulate(1, false, true, true, false, false);
 		
 		/*Hold left the rest of the way*/
-		this.simulate(this.game.getJumpDuration() - 1, false, true, false, false, false);
+		this.simulate(c.getJumpDuration() - 1, false, true, false, false, false);
 		
 		/*Calculate new coords*/
-		newX = oldX - (c.getXIncr() * this.game.getJumpDuration());
-		newY = oldY - (c.getYIncr() * this.game.getJumpDuration());
+		newX = oldX - (c.getXIncr() * c.getJumpDuration());
+		newY = oldY - (c.getYIncr() * c.getJumpDuration());
 		
 		/*We should have moved left and should also be at the peak of the jump*/
 		assertEquals(newX, c.getXLoc());
@@ -233,9 +233,9 @@ public class EngineTest {
 		/*Run the tests on various combinations of player sizes - static move speed*/
 		int staticMoveSpeed = 4; //pick some random move speed
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, staticMoveSpeed, staticMoveSpeed, 100, 100));
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, staticMoveSpeed, staticMoveSpeed, 100, 100));
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, staticMoveSpeed, staticMoveSpeed, 100, 100));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
 			
 			numRuns += 3;
 		}
@@ -243,29 +243,29 @@ public class EngineTest {
 		/*Run the tests on various combinations of movement speeds - static player size*/
 		int staticPlayerSize = 30; //pick some random player dimensions
 		for (int i = this.minMoveSpeed; i <= this.maxMoveSpeed; i++) {
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, this.minMoveSpeed, i, 100, 100));
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, this.minMoveSpeed, 100, 100));
-			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, i, 100, 100));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, this.minMoveSpeed, i, 100, 100, 20, 100, 50));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, this.minMoveSpeed, 100, 100, 20, 100, 50));
+			this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, i, 100, 100, 20, 100, 50));
 			
 			numRuns += 3;
 		}
 		
-		/*Run the tests on various combinations of sizes and movement speeds*/
+		/*Run the tests on various combinations of sizes and movement speeds
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
 			for (int j = this.minMoveSpeed; j <= this.maxMoveSpeed; j++) {
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, this.minMoveSpeed, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, j, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, this.minMoveSpeed, j, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, this.minMoveSpeed, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, j, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, this.minMoveSpeed, j, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, this.minMoveSpeed, 100, 100));
-				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, j, 100, 100));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, j, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, j, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
+				this.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, j, 100, 100, 20, 100, 50));
 				
 				numRuns += 9;
 			}
-		}
+		}*/
 		
 		System.out.println("Basic collision tests passed (" + numRuns + " runs).");
 	}
@@ -274,9 +274,6 @@ public class EngineTest {
 	public void basicCollisionTest1(Controllable c) {
 		/*Initialize the engine and wrapper*/
 		this.init();
-		
-		/*This test might require many consecutive jumps - set max jumps to some arbitrary high number*/
-		this.game.setMaxJumps(100);
 		
 		/*Make a small test environment with rocks and a platform*/
 		Rock rockA = new Rock(500, -50, 50, 50);
@@ -325,7 +322,7 @@ public class EngineTest {
 		
 		int distanceToJump = getDistance(0, 0, playerBottomEdgeY, rockTopEdgeY);
 
-		int distancePerJump = this.game.getJumpDuration() * c.getYIncr();
+		int distancePerJump = c.getJumpDuration() * c.getYIncr();
 		
 		int numJumps = 0;
 		
@@ -347,7 +344,7 @@ public class EngineTest {
 			}
 			
 			/*Execute the rest of the rest of the jump*/
-			this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
+			this.simulate(c.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
 			
 			if (numJumps != 1) { //add the tick back if jumping more than once (let jump counter completely exhaust)
 				this.simulate(1, false, false, false, false, false);
@@ -368,7 +365,7 @@ public class EngineTest {
 		
 		int fallFrames = (distance / c.getYIncr()) + 1; //add a frame for good measure
 		
-		fallFrames += this.game.getFloatingThreshold() - 1; //subtract a frame for the tick where we moved right
+		fallFrames += c.getFloatingThreshold() - 1; //subtract a frame for the tick where we moved right
 		
 		/*Execute*/
 		this.simulate(fallFrames, false, false, false, false, false);
@@ -503,7 +500,7 @@ public class EngineTest {
 			this.assertAllCollisionVariables(c, false, false, false, false, false, false, false, false, false, false);
 			
 			/*Execute the rest of the rest of the jump*/
-			this.simulate(this.game.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
+			this.simulate(c.getJumpDuration() - 1, false, false, false, false, false); //subtract a tick for the one that initiated the jump
 			
 			if (numJumps != 1) { //add the tick back if jumping more than once (let jump counter completely exhaust)
 				this.simulate(1, false, false, false, false, false);
@@ -548,8 +545,8 @@ public class EngineTest {
 	
 	/*Set this class's GameEngine and GameWrapper references to brand new objects*/
 	public void init() {
+		this.game = new GameEngine();
 		this.wrapper = new GameWrapper();
-		this.game = new GameEngine(this.wrapper);
 	}
 	
 	/*Pass the given controllable, room, and environment to this class's engine*/
@@ -602,7 +599,7 @@ public class EngineTest {
 		
 		int fallFrames = (distance / c.getYIncr()) + 1; //divide by how far the player travels each tick, add a frame to be sure
 		
-		fallFrames += this.game.getFloatingThreshold(); //add frames for the floating threshold (player doesn't start falling until that many frames)
+		fallFrames += c.getFloatingThreshold(); //add frames for the floating threshold (player doesn't start falling until that many frames)
 		
 		/*Execute*/
 		this.simulate(fallFrames, false, false, false, false, false);

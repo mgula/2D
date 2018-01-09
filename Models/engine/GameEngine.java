@@ -14,18 +14,13 @@ public class GameEngine implements Serializable {
 	private final int defaultYIncr = 3;
 	private final int defaultFloatingThreshold = 20;
 	private final int defaultMaxJumps = 2;
+	private final int defaultJumpDuration = 50;
+	private final int defaultMaxHealth = 100;
 	
 	private int playerStartingXloc = 2000; 
 	private int playerStartingYloc = -100;
 	private int playerHeight = 40;
 	private int playerWidth = 40;
-	
-	private boolean jumping = false;
-	
-	private int defaultHealth = 100;
-	
-	private int floatingCounter = 0;
-	private int floatingThreshold = this.defaultFloatingThreshold; // used to make the player float for a moment after jumping, as if underwater
 	
 	private Controllable player; //we'll use this reference to the player in various methods to see if the controllable in question is the player
 	
@@ -40,10 +35,6 @@ public class GameEngine implements Serializable {
 	private boolean roomChangeEvent = false;
 	private Direction directionOfRoomChangeEvent;
 	
-	private int jumpingCounter = 0;
-	private int jumpDuration = 50;
-	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
-	
 	private int damageCooldownThresh = 135;
 	private int damageCooldown = this.damageCooldownThresh;
 	private int healthIncrease = 0;
@@ -51,29 +42,21 @@ public class GameEngine implements Serializable {
 	private int healthDecreaseDamArea = 0;
 	private boolean damageDealt = false;
 	
-	private int maxJumps = this.defaultMaxJumps; // maximum number of jumps allowed
+	public GameEngine() {
+		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultMaxHealth, this.defaultMaxHealth, this.defaultFloatingThreshold, this.defaultMaxJumps, this.defaultJumpDuration);
+	}
 	
-	private final int interactableWaitTime = 100;
-	
-	public GameEngine(GameWrapper w) {
-		this.player = new Controllable(this.playerStartingXloc, this.playerStartingYloc, this.playerHeight, this.playerWidth, this.defaultXIncr, this.defaultYIncr, this.defaultHealth, this.defaultHealth);
-		
-		this.currMap = w.getCurrMap();
-		
+	public void initMapAndRoom() {
 		this.currMap.accessRoomEnvs(this.currRoomID).add(this.player);
 		
 		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
-	}
-
-	private boolean isPlayer(Controllable c) {
-		return c == this.player;
 	}
 	
 	public void restoreDefaultAttributes(Controllable c) {
 		c.setXIncr(this.defaultXIncr);
 		c.setYIncr(this.defaultYIncr);
-		this.floatingThreshold = this.defaultFloatingThreshold;
-		this.maxJumps = this.defaultMaxJumps;
+		c.setFloatingThreshold(this.defaultFloatingThreshold);
+		c.setMaxJumps(this.defaultMaxJumps);
 	}
 	
 	public void respawn(Controllable c) {
@@ -81,15 +64,22 @@ public class GameEngine implements Serializable {
 		c.setYLoc(this.playerStartingYloc);
 		c.setCurrHealth(c.getMaxHealth());
 		
-		this.jumping = false;
-		this.jumpCount = 0;
-		this.jumpingCounter = 0;
-		this.floatingCounter = 0;
+		c.setJumping(false);
+		c.setJumpNumber(0);
+		c.setJumpCounter(0);
+		
+		c.setFloatingCounter(0);
 		
 		this.currRoomID = RoomID.SPAWN;
 		
 		/*Make the current room*/
 		this.currRoom = new Room(this.currRoomID, this.currMap.accessRoomData(this.currRoomID)[0], this.currMap.accessRoomData(this.currRoomID)[1], this.currMap.accessRoomData(this.currRoomID)[2], this.currMap.accessRoomData(this.currRoomID)[3], this.currMap.accessRoomEnvs(this.currRoomID), this.currMap.accessRoomLinks(this.currRoomID));
+	}
+	
+	/*This method is used primarily to aid in cases where checks are being made on controllables that
+	 *are not the player - controllables need to check to see if they are colliding with the player*/
+	private boolean isPlayer(Controllable c) {
+		return c == this.player;
 	}
 	
 	/*Getters*/
@@ -105,40 +95,12 @@ public class GameEngine implements Serializable {
 		return this.playerStartingYloc;
 	}
 	
-	public boolean getJumping() {
-		return this.jumping;
-	}
-	
-	public int getJumpCounter() {
-		return this.jumpingCounter;
-	}
-	
-	public int getJumpDuration() {
-		return this.jumpDuration;
-	}
-	
-	public int getJumpNumber() {
-		return this.jumpCount;
-	}
-	
 	public Room getCurrRoom() {
 		return this.currRoom;
 	}
 	
-	public int getFloatingCounter() {
-		return this.floatingCounter;
-	}
-	
 	public int getDamageCoolDown() {
 		return this.damageCooldown;
-	}
-	
-	public int getMaxJumps() {
-		return this.maxJumps;
-	}
-	
-	public int getFloatingThreshold() {
-		return this.floatingThreshold;
 	}
 	
 	public boolean getEnemyCollision() {
@@ -154,18 +116,6 @@ public class GameEngine implements Serializable {
 		this.player = c;
 	}
 	
-	public void setJumping(boolean b) {
-		this.jumping = b;
-	}
-	
-	public void setMaxJumps(int n) {
-		this.maxJumps = n;
-	}
-	
-	public void setFloatingThreshold(int n) {
-		this.floatingThreshold = n;
-	}
-	
 	public void setMap(AreaMap m) {
 		this.currMap = m;
 	}
@@ -177,7 +127,6 @@ public class GameEngine implements Serializable {
 	public void setRoomChangeEvent(boolean b) {
 		this.roomChangeEvent = b;
 	}
-	
 	
 	/*Methods that move a controllable object*/
 	public void moveRight(Controllable c) {
@@ -213,7 +162,7 @@ public class GameEngine implements Serializable {
 			c.setNewBody(null);
 			c.setOnPlatform(false);
 			c.setAgainstMovingSurfaceBottom(false);
-			this.floatingCounter = 0;
+			c.setFloatingCounter(0);
 			while (c.getCurrYSegment() < c.getYIncr()) {
 				this.checkTopEdgeCollisions(c);
 				if (!c.isAgainstSurfaceTop() && !c.isAgainstMovingSurfaceTop()) {
@@ -225,19 +174,21 @@ public class GameEngine implements Serializable {
 			}
 			c.setCurrYSegment(0);
 		} else {
-			this.jumpingCounter = this.jumpDuration;
+			c.setJumpCounter(c.getJumpDuration());
 		}
 	}
 	
 	public boolean executeJump(Controllable c) {
-		if (this.jumpCount < this.maxJumps) {
-			if (this.jumpingCounter < this.jumpDuration) {
-				this.jumpingCounter++;
+		int jumpNumber = c.getJumpNumber();
+		if (jumpNumber < c.getMaxJumps()) {
+			int count = c.getJumpCounter();
+			if (count < c.getJumpDuration()) {
+				c.setJumpCounter(count + 1);
 				this.raiseY(c);
 				return true;
 			} else {
-				this.jumpCount++;
-				this.jumpingCounter = 0;
+				c.setJumpNumber(jumpNumber + 1);
+				c.setJumpCounter(0);
 				return false;
 			}
 		} else {
@@ -246,10 +197,10 @@ public class GameEngine implements Serializable {
 	}
 	
 	public void assertGravity(Controllable c) {
-		boolean player = this.isPlayer(c);
 		if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
-			if (this.floatingCounter < this.floatingThreshold && player) {
-				this.floatingCounter++;
+			int counter = c.getFloatingCounter();
+			if (counter < c.getFloatingThreshold()) {
+				c.setFloatingCounter(counter + 1);
 			} else {
 				while (c.getCurrYSegment() < c.getYIncr()) {
 					this.respondToMovingSurfaces(c);
@@ -270,7 +221,7 @@ public class GameEngine implements Serializable {
 		if (c.isOnPlatform()) {
 			c.setOnPlatform(false);
 			c.setOnSurfaceBottom(false);
-			this.floatingCounter = this.floatingThreshold;
+			c.setFloatingCounter(c.getFloatingThreshold());
 			if (!c.isOnSurfaceBottom() && !c.isOnMovingSurfaceBottom()) {
 				c.setYLoc(c.getYLoc() + 1);
 			}
@@ -281,7 +232,7 @@ public class GameEngine implements Serializable {
 					if (c.getYLoc() <= ex.getYLoc()) {
 						if (c.getXLoc() >= ex.getXLoc() && c.getXLoc() + c.getWidth() <= ex.getXLoc() + ex.getWidth()) {
 							c.setOnSurfaceBottom(false);
-							this.floatingCounter = this.floatingThreshold;
+							c.setFloatingCounter(c.getFloatingThreshold());
 							
 							this.destinationRoomID = ex.getNextRoom();
 							this.roomChangeEvent = true;
@@ -337,6 +288,16 @@ public class GameEngine implements Serializable {
 		}
 	}
 	
+	public void jumpCheck(Controllable c) {
+		if (c.getJumping()) {
+			this.checkTopEdgeCollisions(c);
+			this.checkLeavingRoom(c, Direction.NORTH);
+			if (!this.executeJump(c)) {
+				c.setJumping(false);
+			}
+		}
+	}
+	
 	/*Methods for checking collisions with other models*/
 	public void checkLeavingSurface(Controllable c) {
 		boolean player = this.isPlayer(c);
@@ -369,13 +330,13 @@ public class GameEngine implements Serializable {
 			if (!contact) {
 				c.setOnPlatform(false);
 				if (player) {
-					this.floatingCounter = 0;
+					c.setFloatingCounter(0);
 				}
 				c.setOnSurfaceBottom(false);
 			}
 			if (!movingContact) {
 				if (player) {
-					this.floatingCounter = 0;
+					c.setFloatingCounter(0);
 				}
 				c.setOnMovingSurfaceBottom(false);
 				c.setAgainstMovingSurfaceBottom(false);
@@ -395,7 +356,7 @@ public class GameEngine implements Serializable {
 			if (m instanceof SolidObject || m instanceof Platform || m instanceof Controllable) {
 				if (this.checkBottomSurface(m, c)) {
 					if (player) {
-						this.floatingCounter = 0;
+						c.setFloatingCounter(0);
 					}
 					if (m instanceof models.Autonomous) {
 						c.setAdjacentAutonomous((Autonomous) m);
@@ -425,8 +386,8 @@ public class GameEngine implements Serializable {
 			}
 		}
 		
-		if ((c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) && this.jumpingCounter == 0 && player) {
-			this.jumpCount = 0;
+		if ((c.isOnSurfaceBottom() || c.isOnMovingSurfaceBottom()) && c.getJumpCounter() == 0 && player) {
+			c.setJumpNumber(0);
 		}
 	}
 	
@@ -877,7 +838,7 @@ public class GameEngine implements Serializable {
 				
 			/*Autonomous objects wait for a moment before switching directions.*/
 			case IDLE:
-				if (a.getWaitCounter() < this.interactableWaitTime) {
+				if (a.getWaitCounter() < a.getWaitTime()) {
 					a.setWaitCounter(a.getWaitCounter() + 1);
 				} else {
 					a.setWaitCounter(0);
@@ -927,11 +888,11 @@ public class GameEngine implements Serializable {
 				
 				c.setOnSurfaceBottom(true);
 				
-				this.floatingCounter = 0;
+				c.setFloatingCounter(0);
 				
-				this.jumpCount = 0;
-				this.jumpingCounter = 0;
-				this.jumping = false;
+				c.setJumpNumber(0);
+				c.setJumpCounter(0);
+				c.setJumping(false);
 				break;
 				
 			case SOUTH:

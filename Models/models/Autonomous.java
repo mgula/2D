@@ -6,6 +6,7 @@ public class Autonomous extends SolidObject {
 	private int incr;
 	private int currSegment;
 	private int waitCounter = 0;
+	private int waitTime;
 	private int moveThreshL;
 	private int moveThreshR;
 	private int moveThreshU;
@@ -13,7 +14,7 @@ public class Autonomous extends SolidObject {
 	private Direction currDir;
 	private Direction lastDir;
 	
-	public Autonomous(int x, int y, int h, int w, Direction d, int moveVariance, int incr) {
+	public Autonomous(int x, int y, int h, int w, Direction d, int moveVariance, int incr, int waitTime) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);
@@ -24,6 +25,7 @@ public class Autonomous extends SolidObject {
 		this.moveThreshU = y - moveVariance;
 		this.moveThreshD = y + moveVariance;
 		this.incr = incr;
+		this.waitTime = waitTime;
 	}
 	
 	/*Getters*/
@@ -37,6 +39,10 @@ public class Autonomous extends SolidObject {
 	
 	public int getWaitCounter() {
 		return this.waitCounter;
+	}
+	
+	public int getWaitTime() {
+		return this.waitTime;
 	}
 	
 	public int getMoveThreshL() {

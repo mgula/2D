@@ -67,8 +67,8 @@ public class Game implements KeyListener, MouseListener {
 	
 	private boolean play = true;
 	
+	private GameEngine currentGame = new GameEngine();
 	private GameWrapper wrapper = new GameWrapper(); //avoid null pointer in updateViewStates()
-	private GameEngine currentGame = new GameEngine(this.wrapper);
 	
 	private MainView mainView;
 	private SettingsView settingsView;
@@ -429,8 +429,11 @@ public class Game implements KeyListener, MouseListener {
 			this.loadGame();
 			this.loadingFromFile = false;
 		} else {
+			this.currentGame = new GameEngine();
 			this.wrapper = new GameWrapper();
-			this.currentGame = new GameEngine(this.wrapper);
+			
+			this.currentGame.setMap(this.wrapper.getCurrMap());
+			this.currentGame.initMapAndRoom();
 		}
 		
 		this.wrapper.setGameState(GameState.PLAY);
@@ -703,12 +706,12 @@ public class Game implements KeyListener, MouseListener {
 	
 	public void changeMaxJumps(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.setMaxJumps(num);
+		this.currentGame.getPlayer().setMaxJumps(num);
 	}
 	
 	public void changeFloatingThreshold(String input) {
 		int num = Integer.parseInt(input);
-		this.currentGame.setFloatingThreshold(num);
+		this.currentGame.getPlayer().setFloatingThreshold(num);
 	}
 	
 	public void changeXIncr(String input) {

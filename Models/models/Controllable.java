@@ -28,7 +28,18 @@ public class Controllable extends Model {
 	
 	private boolean onPlatform = false;
 	
-	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health, int maxHealth) {
+	private int floatingCounter = 0;
+	private int floatingThreshold; // used to make the player float for a moment after jumping
+	
+	private int maxJumps; // maximum number of jumps allowed
+	
+	private boolean jumping = false;
+	
+	private int jumpingCounter = 0;
+	private int jumpDuration;
+	private int jumpCount = 0; // current number of times jumped (resets when you land on a surface)
+	
+	public Controllable(int x, int y, int h, int w, int xIncr, int yIncr, int health, int maxHealth, int floatThresh, int maxJumps, int jumpDuration) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(h);
@@ -38,10 +49,14 @@ public class Controllable extends Model {
 		this.yIncr = yIncr;
 		this.currHealth = health;
 		this.maxHealth = maxHealth;
+		
+		this.floatingThreshold = floatThresh;
+		this.maxJumps = maxJumps;
+		this.jumpDuration = jumpDuration;
 	}
 	
 	/*Make a square controllable*/
-	public Controllable(int x, int y, int d, int xIncr, int yIncr, int health, int maxHealth) {
+	public Controllable(int x, int y, int d, int xIncr, int yIncr, int health, int maxHealth, int floatThresh, int maxJumps, int jumpDuration) {
 		this.setXLoc(x);
 		this.setYLoc(y);
 		this.setHeight(d);
@@ -51,10 +66,14 @@ public class Controllable extends Model {
 		this.yIncr = yIncr;
 		this.currHealth = health;
 		this.maxHealth = maxHealth;
+		
+		this.floatingThreshold = floatThresh;
+		this.maxJumps = maxJumps;
+		this.jumpDuration = jumpDuration;
 	}
 	
 	public static Controllable makeCopy(Controllable c) {
-		return new Controllable(c.getXLoc(), c.getYLoc(), c.getHeight(), c.getWidth(), c.getXIncr(), c.getYIncr(), c.getCurrHealth(), c.getMaxHealth());
+		return new Controllable(c.getXLoc(), c.getYLoc(), c.getHeight(), c.getWidth(), c.getXIncr(), c.getYIncr(), c.getCurrHealth(), c.getMaxHealth(), c.getFloatingThreshold(), c.getMaxJumps(), c.getJumpDuration());
 	}
 	
 	/*Getters*/
@@ -138,6 +157,34 @@ public class Controllable extends Model {
 		return this.onPlatform;
 	}
 	
+	public int getFloatingCounter() {
+		return this.floatingCounter;
+	}
+	
+	public int getFloatingThreshold() {
+		return this.floatingThreshold;
+	}
+	
+	public int getMaxJumps() {
+		return this.maxJumps;
+	}
+	
+	public boolean getJumping() {
+		return this.jumping;
+	}
+	
+	public int getJumpCounter() {
+		return this.jumpingCounter;
+	}
+	
+	public int getJumpDuration() {
+		return this.jumpDuration;
+	}
+	
+	public int getJumpNumber() {
+		return this.jumpCount;
+	}
+	
 	/*Setters*/
 	public void setXIncr(int x) {
 		this.xIncr = x;
@@ -217,5 +264,33 @@ public class Controllable extends Model {
 	
 	public void setOnPlatform(boolean b) {
 		this.onPlatform = b;
+	}
+	
+	public void setFloatingCounter(int f) {
+		this.floatingCounter = f;
+	}
+	
+	public void setFloatingThreshold(int t) {
+		this.floatingThreshold = t;
+	}
+
+	public void setMaxJumps(int n) {
+		this.maxJumps = n;
+	}
+	
+	public void setJumping(boolean b) {
+		this.jumping = b;
+	}
+	
+	public void setJumpCounter(int n) {
+		this.jumpingCounter = n;
+	}
+	
+	public void setJumpDuration(int n) {
+		this.jumpDuration = n;
+	}
+	
+	public void setJumpNumber(int n) {
+		this.jumpCount = n;
 	}
 }
