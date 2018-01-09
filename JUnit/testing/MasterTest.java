@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
-import models.*;
+import models.Controllable;
 
 import org.junit.After;
 import org.junit.Before;
@@ -48,16 +48,26 @@ public class MasterTest {
 	
 	public void testPlayerMovement() {
 		int numRuns = 0;
+		
+		final int playerStartX = 1000;
+		final int playerStartY = -100;
+		
+		/*These aren't necessarily important but can be changed as desired*/
+		final int playerDimensions = 20;
+		final int health = 100;
+		final int floatThresh = 20;
+		final int maxJumps = 2;
+		final int jumpDuration = 50;
     	
 		/*Test on a few combinations of movement speeds*/
 		for (int i = this.minMoveSpeed; i < this.maxMoveSpeed; i++) {
-			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100, 20, 2, 50));
-			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100, 20, 2, 50));
-			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(1000, -100, i, i, 3, 3, 100, 100, 20, 2, 50));
+			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(playerStartX, playerStartY, playerDimensions, this.maxMoveSpeed, i, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(playerStartX, playerStartY, playerDimensions, i, this.maxMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicPlayerMovementTest1(new Controllable(playerStartX, playerStartY, playerDimensions, i, i, health, health, floatThresh, maxJumps, jumpDuration));
 			
-			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(1000, -100, this.maxMoveSpeed, i, 3, 3, 100, 100, 20, 2, 50));
-			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(1000, -100, i, this.maxMoveSpeed, 3, 3, 100, 100, 20, 2, 50));
-			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(1000, -100, i, i, 3, 3, 100, 100, 20, 2, 50));
+			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(playerStartX, playerStartY, playerDimensions, this.maxMoveSpeed, i, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(playerStartX, playerStartY, playerDimensions, i, this.maxMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicPlayerMovementTest2(new Controllable(playerStartX, playerStartY, playerDimensions, i, i, health, health, floatThresh, maxJumps, jumpDuration));
         	
 			numRuns += 6;
 		}
@@ -70,25 +80,31 @@ public class MasterTest {
 	public void testBasicCollisions() {
 		int numRuns = 0;
 		
-		int playerStartX = 0;
-		int playerStartY = -350; //should be greater in magnitude than the player's height
+		final int playerStartX = 0;
+		final int playerStartY = -350; //should be greater in magnitude than the player's height
+		
+		/*These aren't necessarily important but can be changed as desired*/
+		final int health = 100;
+		final int floatThresh = 20;
+		final int maxJumps = 50; //this needs to be a bit bigger, some size configurations require more jumps
+		final int jumpDuration = 50;
 		
 		/*Run the tests on various combinations of player sizes - static move speed*/
-		int staticMoveSpeed = 4; //pick some random move speed
+		final int staticMoveSpeed = 4; //pick some random move speed
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, staticMoveSpeed, staticMoveSpeed, 100, 100, 20, 100, 50));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, staticMoveSpeed, staticMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, staticMoveSpeed, staticMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, staticMoveSpeed, staticMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
 			
 			numRuns += 3;
 		}
 		
 		/*Run the tests on various combinations of movement speeds - static player size*/
-		int staticPlayerSize = 30; //pick some random player dimensions
+		final int staticPlayerSize = 30; //pick some random player dimensions
 		for (int i = this.minMoveSpeed; i <= this.maxMoveSpeed; i++) {
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, this.minMoveSpeed, i, 100, 100, 20, 100, 50));
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, this.minMoveSpeed, 100, 100, 20, 100, 50));
-			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, i, 100, 100, 20, 100, 50));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, this.minMoveSpeed, i, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, this.minMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+			EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, staticPlayerSize, i, i, health, health, floatThresh, maxJumps, jumpDuration));
 			
 			numRuns += 3;
 		}
@@ -96,15 +112,15 @@ public class MasterTest {
 		/*Run the tests on various combinations of sizes and movement speeds*/
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
 			for (int j = this.minMoveSpeed; j <= this.maxMoveSpeed; j++) {
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, j, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, j, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, this.minMoveSpeed, 100, 100, 20, 100, 50));
-				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, j, 100, 100, 20, 100, 50));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, this.minMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, j, j, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, this.minMoveSpeed, j, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, this.minMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, this.minPlayerDimensions, j, j, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, this.minMoveSpeed, j, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, this.minMoveSpeed, health, health, floatThresh, maxJumps, jumpDuration));
+				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, i, i, j, j, health, health, floatThresh, maxJumps, jumpDuration));
 				
 				numRuns += 9;
 			}
