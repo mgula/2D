@@ -93,7 +93,7 @@ public class MasterTest {
 			numRuns += 3;
 		}
 		
-		/*Run the tests on various combinations of sizes and movement speeds
+		/*Run the tests on various combinations of sizes and movement speeds*/
 		for (int i = this.minPlayerDimensions; i <= this.maxPlayerDimensions; i++) {
 			for (int j = this.minMoveSpeed; j <= this.maxMoveSpeed; j++) {
 				EngineTestRoutines.basicCollisionTest1(new Controllable(playerStartX, playerStartY, this.minPlayerDimensions, i, this.minMoveSpeed, j, 100, 100, 20, 100, 50));
@@ -108,7 +108,7 @@ public class MasterTest {
 				
 				numRuns += 9;
 			}
-		}*/
+		}
 		
 		System.out.println("Basic collision tests passed (" + numRuns + " runs).");
 	}
