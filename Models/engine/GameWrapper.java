@@ -23,8 +23,6 @@ public class GameWrapper implements Serializable {
 	
 	private int groundLevel = 0;
 	
-	public static final int RoomDataArrayLength = 4;
-	
 	private AreaMap map1;
 	private RoomID[] map1Rooms = {RoomID.SPAWN, RoomID.EAST1, RoomID.WEST1, RoomID.EAST2, RoomID.WEST2, RoomID.NORTHEAST1};
 	
@@ -39,7 +37,7 @@ public class GameWrapper implements Serializable {
 	public void initCurrentMapRooms() {
 		for (RoomID r : this.currMap.getRoomIDs()) {
 			
-			int[] roomDims = new int[RoomDataArrayLength];
+			int[] roomDims = new int[map.Room.RoomDataArrayLength];
 			ArrayList<Model> env = new ArrayList<Model>();
 			ArrayList<Exit> roomLinks = new ArrayList<Exit>();
 			

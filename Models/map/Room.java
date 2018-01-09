@@ -17,6 +17,8 @@ public class Room implements Serializable {
 	private ArrayList<Model> environment;
 	private ArrayList<Exit> roomLinks;
 	
+	public static final int RoomDataArrayLength = 4;
+	
 	public Room(RoomID n, int x, int y, int h, int w, ArrayList<Model> e) {
 		this.ID = n;
 		this.xloc = x;
