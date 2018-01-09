@@ -19,12 +19,6 @@ public class RegenArea extends EventArea {
 	@Override
 	public String toString() {
 		return this.getString() + 
-				"\nHealth Increase: " + this.healthIncr;
-	}
-	
-	@Override
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap() +
-				"\n\t\tHealth Increase: " + this.healthIncr;
+				"\n\t\t\tHealth increase: " + this.healthIncr;
 	}
 }

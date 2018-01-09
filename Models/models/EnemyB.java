@@ -52,16 +52,8 @@ public class EnemyB extends Enemy {
 	@Override
 	public String toString() {
 		return this.getString() + 
-				"\nY Increase: " + this.yIncr +
-				"\nDamage: " + this.damage +
-				"\nCurrent Direction: " + this.currDir;
-	}
-	
-	@Override
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap() + 
-				"\n\t\tY Increase: " + this.yIncr +
-				"\n\t\tDamage: " + this.damage +
-				"\n\t\tCurrent Direction: " + this.currDir;
+				"\n\t\t\tY increase: " + this.yIncr +
+				"\n\t\t\tDamage: " + this.damage +
+				"\n\t\t\tCurrent direction: " + this.currDir;
 	}
 }

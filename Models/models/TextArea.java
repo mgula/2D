@@ -83,4 +83,12 @@ public class TextArea extends EventArea {
 	public void setActivated(boolean b) {
 		this.activated = b;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getString() +
+				"\n\t\t\tText: " + this.text +
+				"\n\t\t\tText color: " + this.textColor.toString() +
+				"\n\t\t\tText speed: " + this.textSpeed;
+	}
 }

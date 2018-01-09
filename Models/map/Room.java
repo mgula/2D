@@ -63,31 +63,4 @@ public class Room implements Serializable {
 	public ArrayList<Exit> getRoomLinks() {
 		return this.roomLinks;
 	}
-	
-	@Override
-	public String toString() {
-		String info = "Room ID: " + this.ID +
-				"\n" + this.getString();
-		
-		info += "\nEnvironment Info: \n";
-		
-		for (Model m : this.environment) {
-			info += m.toString() + "\n";
-		}
-		
-		info += "Exit Info: \n";
-		
-		for (Exit e : this.roomLinks) {
-			info += e.toString() + "\n";
-		}
-		return info;
-	}
-	
-	public String getString() {
-		return "Model name: " + this.getClass() + 
-				"\nX Loc: " + this.xloc + 
-				"\nY Loc: " + this.yloc + 
-				"\nHeight: " + this.height +
-				"\nWidth: " + this.width;
-	}
 }

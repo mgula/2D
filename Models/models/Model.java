@@ -41,26 +41,13 @@ public abstract class Model implements Serializable {
 		this.width = w;
 	}
 	
-	//each child will use this method in their toString()
+	/*Not necessarily a toString() - each subclass will use this in their actual toString(). Each
+	 *toString() will be formatted to print in a way that makes sense for AreaMap's toString().*/
 	public String getString() {
-		return "Model name: " + this.getClass() + 
-				"\nX Loc: " + this.xLoc + 
-				"\nY Loc: " + this.yLoc + 
-				"\nHeight: " + this.height +
-				"\nWidth: " + this.width;
-	}
-	
-	//each child will use this method in their toStringForAreaMap() that they will override.
-	public String getStringForAreaMap() {
-		return "\n\t\tModel name: " + this.getClass() + 
-				"\n\t\tX Loc: " + this.xLoc + 
-				"\n\t\tY Loc: " + this.yLoc + 
-				"\n\t\tHeight: " + this.height +
-				"\n\t\tWidth: " + this.width;
-	}
-	
-	//method for each child to override that AreaMap will use in its toString()
-	public String toStringForAreaMap(){
-		return null;
+		return "\t\tModel name: " + this.getClass() + 
+				"\n\t\t\tX loc: " + this.xLoc + 
+				"\n\t\t\tY loc: " + this.yLoc + 
+				"\n\t\t\tHeight: " + this.height +
+				"\n\t\t\tWidth: " + this.width;
 	}
 }

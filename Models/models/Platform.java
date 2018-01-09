@@ -14,9 +14,4 @@ public class Platform extends Model {
 	public String toString() {
 		return this.getString();
 	}
-	
-	@Override
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap();
-	}
 }

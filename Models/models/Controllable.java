@@ -296,4 +296,16 @@ public class Controllable extends Model {
 	public void setJumpNumber(int n) {
 		this.jumpCount = n;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getString() +
+				"\n\t\t\tX incr: " + this.xIncr +
+				"\n\t\t\tY incr: " + this.yIncr +
+				"\n\t\t\tCurrent health: " + this.currHealth +
+				"\n\t\t\tMax health: " + this.maxHealth +
+				"\n\t\t\tFloating thresh: " + this.floatingThreshold +
+				"\n\t\t\tMax jumps: " + this.maxJumps +
+				"\n\t\t\tJump duration: " + this.jumpDuration;
+	}
 }

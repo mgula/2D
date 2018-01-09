@@ -77,23 +77,25 @@ public class AreaMap implements Serializable {
 		String info = "Map ID: " + this.mapID + "\n";
 		
 		for (RoomID r : this.roomIDs) {
-			info += "\nRoom ID: " + r +
-					"\n\tX Location: " + this.accessRoomData(r)[0] +
-					"\n\tY Location: " + this.accessRoomData(r)[1] +
-					"\n\tHeight: " + this.accessRoomData(r)[2] +
-					"\n\tWidth: " + this.accessRoomData(r)[3];
+			info += "\tRoom ID: " + r +
+					"\n\t\tX loc: " + this.accessRoomData(r)[0] +
+					"\n\t\tY loc: " + this.accessRoomData(r)[1] +
+					"\n\t\tHeight: " + this.accessRoomData(r)[2] +
+					"\n\t\tWidth: " + this.accessRoomData(r)[3];
 			
-			info += "\n\tEnvironment Info: ";
+			info += "\n\tEnvironment info: \n";
 			
 			for (Model m : this.accessRoomEnvs(r)) {
-				info += m.toStringForAreaMap() + "\n";
+				info += m.toString() + "\n";
 			}
 			
-			info += "\n\tExit Info: ";
+			info += "\tExit info: \n";
 			
 			for (Exit e : this.accessRoomLinks(r)) {
-				info += e.toStringForAreaMap() + "\n";
+				info += e.toString() + "\n";
 			}
+			
+			info += "\n";
 		}
 		
 		return info;

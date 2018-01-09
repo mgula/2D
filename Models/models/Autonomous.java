@@ -90,16 +90,8 @@ public class Autonomous extends SolidObject {
 	@Override
 	public String toString() {
 		return this.getString() + 
-				"\nIncrease: " + this.incr +
-				"\nCurrent Direction: " + this.currDir +
-				"\nLast Direction: " + this.lastDir;
-	}
-	
-	@Override
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap() + 
-				"\n\t\tIncrease: " + this.incr +
-				"\n\t\tCurrent Direction: " + this.currDir +
-				"\n\t\tLast Direction: " + this.lastDir;
+				"\n\t\t\tIncrease: " + this.incr +
+				"\n\t\t\tCurrent direction: " + this.currDir +
+				"\n\t\t\tLast direction: " + this.lastDir;
 	}
 }

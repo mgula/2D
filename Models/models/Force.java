@@ -34,14 +34,7 @@ public class Force extends EventArea {
 	@Override
 	public String toString() {
 		return this.getString() + 
-				"\nFlow Direction: " + this.flowDir +
-				"\nFlow Increase: " + this.incr;
-	}
-	
-	@Override
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap() + 
-				"\n\t\tFlow Direction: " + this.flowDir +
-				"\n\t\tFlow Increase: " + this.incr;
+				"\n\t\t\tFlow direction: " + this.flowDir +
+				"\n\t\t\tFlow increase: " + this.incr;
 	}
 }

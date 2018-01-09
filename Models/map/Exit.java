@@ -80,32 +80,12 @@ public class Exit implements Serializable {
 	
 	@Override 
 	public String toString() {
-		return this.getString() + 
-				"\nExists in Room ID: " + this.thisRoom +
-				"\nLeads to Room ID: " + this.nextRoom +
-				"\nDirection: " + this.dir;
-	}
-	
-	public String toStringForAreaMap() {
-		return this.getStringForAreaMap() + 
-				"\n\t\tExists in Room ID: " + this.thisRoom +
-				"\n\t\tLeads to Room ID: " + this.nextRoom +
-				"\n\t\tDirection: " + this.dir;
-	}
-	
-	public String getStringForAreaMap() {
-		return "\n\t\tModel name: " + this.getClass() + 
-				"\n\t\tX Loc: " + this.xLoc + 
-				"\n\t\tY Loc: " + this.yLoc + 
-				"\n\t\tHeight: " + this.height +
-				"\n\t\tWidth: " + this.width;
-	}
-	
-	public String getString() {
-		return "Model name: " + this.getClass() + 
-				"\nX Loc: " + this.xLoc + 
-				"\nY Loc: " + this.yLoc + 
-				"\nHeight: " + this.height +
-				"\nWidth: " + this.width;
+		return "\t\tExit exists in room ID: " + this.thisRoom +
+				"\n\t\t\tLeads to room ID: " + this.nextRoom +
+				"\n\t\t\tDirection: " + this.dir +
+				"\n\t\t\tX loc: " + this.xLoc + 
+				"\n\t\t\tY loc: " + this.yLoc + 
+				"\n\t\t\tHeight: " + this.height +
+				"\n\t\t\tWidth: " + this.width;
 	}
 }
