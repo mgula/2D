@@ -29,7 +29,7 @@ public class Exit implements Serializable {
 	public void setDimensions(int dimension) {
 		switch (this.dir) {
 			case NORTH:
-				this.height = 0;
+				this.height = 0; //the 0 is for drawable purposes. should probably re-work that
 				this.width = dimension;
 				break;
 			case SOUTH:

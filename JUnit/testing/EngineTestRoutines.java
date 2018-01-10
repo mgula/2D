@@ -22,7 +22,7 @@ public class EngineTestRoutines {
 		GameEngine e = new GameEngine();
 		
 		/*Make a room that just acts as a box - no environment or room links*/
-		Room r = new Room(RoomID.SPAWN, 0, 0, 2000, 2000, new ArrayList<Model>(), new ArrayList<Exit>());
+		Room r = new Room(RoomID.SPAWN, 0, 0, 10000, 10000, new ArrayList<Model>(), new ArrayList<Exit>());
 		
 		/*Pass the player and empty room to the engine*/
 		e.setPlayer(c);
@@ -96,7 +96,7 @@ public class EngineTestRoutines {
 		GameEngine e = new GameEngine();
 		
 		/*Make a room that just acts as a box - no environment or room links*/
-		Room r = new Room(RoomID.SPAWN, 0, 0, 3000, 3000, new ArrayList<Model>(), new ArrayList<Exit>());
+		Room r = new Room(RoomID.SPAWN, 0, 0, 10000, 10000, new ArrayList<Model>(), new ArrayList<Exit>());
 		
 		/*Pass the player and empty room to the engine*/
 		e.setPlayer(c);

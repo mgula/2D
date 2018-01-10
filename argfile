@@ -1,7 +1,6 @@
 Constants/enums/AppState.java
 Constants/enums/Direction.java
 Constants/enums/GameState.java
-Constants/enums/KeyCommand.java
 Constants/enums/MapID.java
 Constants/enums/PauseState.java
 Constants/enums/RoomID.java
