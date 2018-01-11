@@ -3,11 +3,12 @@ package views;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import enums.AppState;
@@ -36,6 +37,8 @@ public abstract class View extends JPanel {
 	private int buttonSlot5Y;
 	private int buttonSlot6Y;
 	private int buttonXlocB;
+	
+	private ArrayList<JComponent> allComponents;
 	
 	public View(int w, int h) {
 		this.screenHeight = h;
@@ -187,4 +190,15 @@ public abstract class View extends JPanel {
 	
 	public void initButtons(){};
 
+	public void initComponentsArrayList() {
+		this.allComponents = new ArrayList<JComponent>();
+	}
+	
+	public void addComponent(JComponent j) {
+		this.allComponents.add(j);
+	}
+	
+	public ArrayList<JComponent> allComponents() {
+		return this.allComponents;
+	}
 }

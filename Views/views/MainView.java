@@ -46,6 +46,12 @@ public class MainView extends View {
 		
 		this.exitButton = new JButton("exit");
 		this.exitButton.setBounds(this.getButtonXloc(), this.getButtonSlot4Y(), this.getButtonWidth(), this.getButtonHeight());
+		
+		/*Add all components to array list for easier access later*/
+		this.initComponentsArrayList();
+		this.addComponent(this.mg1Button);
+		this.addComponent(this.controls);
+		this.addComponent(this.exitButton);
 	}
 	
 	public boolean getSelect() {

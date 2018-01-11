@@ -13,7 +13,7 @@ public class Controllable extends Model {
 	private int currHealth;
 	private int maxHealth;
 	
-	private Autonomous adjacentAutonmous = null;
+	private Autonomous adjacentAutonomous = null;
 	private Controllable adjacentControllable = null;
 	private Exit adjacentExit = null;
 	private TextArea activatedTextArea = null;
@@ -105,7 +105,7 @@ public class Controllable extends Model {
 	}
 	
 	public Autonomous getAdjacentAutonomous() {
-		return this.adjacentAutonmous;
+		return this.adjacentAutonomous;
 	}
 	
 	public Controllable getAdjacentControllable() {
@@ -214,7 +214,7 @@ public class Controllable extends Model {
 	}
 	
 	public void setAdjacentAutonomous(Autonomous a) {
-		this.adjacentAutonmous = a;
+		this.adjacentAutonomous = a;
 	}
 	
 	public void setNewBody(Controllable c) {

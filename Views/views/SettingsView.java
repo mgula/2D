@@ -1,9 +1,11 @@
 package views;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 
 public class SettingsView extends MainView {
@@ -103,5 +105,16 @@ public class SettingsView extends MainView {
 		this.clearDataButton2.setBounds(600, 500, this.getButtonWidth(), this.getButtonHeight());
 		this.clearDataButton3 = new JButton("clear data 3");
 		this.clearDataButton3.setBounds(800, 500, this.getButtonWidth(), this.getButtonHeight());
+		
+		/*Add all components to array list for easier access later*/
+		this.initComponentsArrayList();
+		this.addComponent(this.clearDataButton1);
+		this.addComponent(this.clearDataButton2);
+		this.addComponent(this.clearDataButton3);
+		this.addComponent(this.debugToggleOn);
+		this.addComponent(this.debugToggleOff);
+		this.addComponent(this.windowedOn);
+		this.addComponent(this.windowedOff);
+		this.addComponent(this.backButton);
 	}
 }

@@ -8,6 +8,7 @@ import enums.SaveFile;
 import views.*;
 
 import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
  * -slopes/stairs
  * -pushable objects
  * -JUnit tests.
+ * -set adjacent autonomous back to null where relevant (in gameengine)
  * 
  * Things to remove if there's ever a final version:
  * -frame by frame debugging (q and w keys)
@@ -154,6 +156,7 @@ public class Game implements KeyListener, MouseListener {
 			v.setDebugMode(true); //default to debug mode on
 			if (v instanceof views.GameView) {
 				((views.GameView) v).loadImgs();
+				this.bindKeysToView(v);
 			}
 		}
 		this.setButtonListeners();
@@ -385,43 +388,38 @@ public class Game implements KeyListener, MouseListener {
 					
 				case SELECT:
 					/*Add the menu buttons to the frame*/
-					this.frame.add(this.mainView.getMg1Button());
-					this.frame.add(this.mainView.getControlsButton());
-					this.frame.add(this.mainView.getExitButton());
+					for (JComponent j : this.mainView.allComponents()) {
+						this.frame.getContentPane().add(j);
+					}
 					/*Add main view to the frame*/
 					this.addViewToFrame(this.mainView);
 					break;
 					
 				case INBETWEEN1:
-					this.frame.add(this.betweenView.getBackButton());
+					this.frame.getContentPane().add(this.betweenView.getBackButton());
 					if (this.save1.length() == 0) {
-						this.frame.add(this.betweenView.getNewGameButton1());
+						this.frame.getContentPane().add(this.betweenView.getNewGameButton1());
 					} else {
-						this.frame.add(this.betweenView.getLoadGameButton1());
+						this.frame.getContentPane().add(this.betweenView.getLoadGameButton1());
 					}
 					if (this.save2.length() == 0) {
-						this.frame.add(this.betweenView.getNewGameButton2());
+						this.frame.getContentPane().add(this.betweenView.getNewGameButton2());
 					} else {
-						this.frame.add(this.betweenView.getLoadGameButton2());
+						this.frame.getContentPane().add(this.betweenView.getLoadGameButton2());
 					}
 					if (this.save3.length() == 0) {
-						this.frame.add(this.betweenView.getNewGameButton3());
+						this.frame.getContentPane().add(this.betweenView.getNewGameButton3());
 					} else {
-						this.frame.add(this.betweenView.getLoadGameButton3());
+						this.frame.getContentPane().add(this.betweenView.getLoadGameButton3());
 					}
 					this.addViewToFrame(this.betweenView);
 					break;
 					
 				case SETTINGS:
 					/*Add radio buttons and back button to the frame*/
-					this.frame.add(this.settingsView.getBackButton());
-					this.frame.add(this.settingsView.getDebugToggleOn());
-					this.frame.add(this.settingsView.getDebugToggleOff());
-					this.frame.add(this.settingsView.getWindowedOn());
-					this.frame.add(this.settingsView.getWindowedOff());
-					this.frame.add(this.settingsView.getClearDataButton1());
-					this.frame.add(this.settingsView.getClearDataButton2());
-					this.frame.add(this.settingsView.getClearDataButton3());
+					for (JComponent j : this.settingsView.allComponents()) {
+						this.frame.getContentPane().add(j);
+					}
 					/*Add control view to the frame*/
 					this.addViewToFrame(this.settingsView);
 					break;
@@ -434,8 +432,12 @@ public class Game implements KeyListener, MouseListener {
 	}
 	
 	public void loadGame1() {
+		this.leftPressed = false;
 		this.rightPressed = false;
 		this.spacePressed = false;
+		this.downPressed = false;
+		this.cPressed = false;
+		this.leftPressed = false;
 		
 		if (this.loadingFromFile) {
 			this.loadGame();
@@ -482,10 +484,10 @@ public class Game implements KeyListener, MouseListener {
 					this.frame.getContentPane().removeAll();
 					
 					//Add tabs
-					this.frame.add(this.game1View.getPlayerInfoButton());
-					this.frame.add(this.game1View.getSystemButton());
+					this.frame.getContentPane().add(this.game1View.getPlayerInfoButton());
+					this.frame.getContentPane().add(this.game1View.getSystemButton());
 					if (this.game1View.getDebugMode()) {
-						this.frame.add(this.game1View.getDebugButton());
+						this.frame.getContentPane().add(this.game1View.getDebugButton());
 					}
 					
 					switch (this.game1View.getPauseState()) {
@@ -493,22 +495,22 @@ public class Game implements KeyListener, MouseListener {
 							break;
 						
 						case SYSTEM:
-							this.frame.add(this.game1View.getBackButton());
-							this.frame.add(this.game1View.getResumeButton());
+							this.frame.getContentPane().add(this.game1View.getBackButton());
+							this.frame.getContentPane().add(this.game1View.getResumeButton());
 							break;
 							
 						case DEBUG:
-							this.frame.add(this.game1View.getRestoreDefaultsButton());
-							this.frame.add(this.game1View.getEditJumpsField());
-							this.frame.add(this.game1View.getEditJumpsButton());
-							this.frame.add(this.game1View.getEditFloatField());
-							this.frame.add(this.game1View.getEditFloatButton());
-							this.frame.add(this.game1View.getEditXIncrField());
-							this.frame.add(this.game1View.getEditXIncrButton());
-							this.frame.add(this.game1View.getEditYIncrField());
-							this.frame.add(this.game1View.getEditYIncrButton());
-							this.frame.add(this.game1View.getEditSleepTimeField());
-							this.frame.add(this.game1View.getEditSleepTimeButton());
+							this.frame.getContentPane().add(this.game1View.getRestoreDefaultsButton());
+							this.frame.getContentPane().add(this.game1View.getEditJumpsField());
+							this.frame.getContentPane().add(this.game1View.getEditJumpsButton());
+							this.frame.getContentPane().add(this.game1View.getEditFloatField());
+							this.frame.getContentPane().add(this.game1View.getEditFloatButton());
+							this.frame.getContentPane().add(this.game1View.getEditXIncrField());
+							this.frame.getContentPane().add(this.game1View.getEditXIncrButton());
+							this.frame.getContentPane().add(this.game1View.getEditYIncrField());
+							this.frame.getContentPane().add(this.game1View.getEditYIncrButton());
+							this.frame.getContentPane().add(this.game1View.getEditSleepTimeField());
+							this.frame.getContentPane().add(this.game1View.getEditSleepTimeButton());
 							break;
 							
 						default:
@@ -531,6 +533,8 @@ public class Game implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
+				this.game1View.requestFocusInWindow();
+				
 				/*Use wrapper to handle arrow keys*/
 				if (this.byTick) {
 					if (this.advanceTick) {
@@ -549,7 +553,6 @@ public class Game implements KeyListener, MouseListener {
 				
 				/*Change bodies - view needs to be updated as well*/
 				if (this.cPressed && !this.cLock) {
-					System.out.println("attempt body change");
 					this.cLock = true;
 					this.currentGame.changeBody();
 					this.game1View.loadPlayer(this.currentGame);
@@ -668,10 +671,6 @@ public class Game implements KeyListener, MouseListener {
 	public void addViewToFrame(View view) {
 		this.frame.setBackground(Color.GRAY);
 		this.frame.getContentPane().add(view);
-		if (view instanceof views.Game1View) {
-			this.bindKeysToView(view);
-			view.requestFocusInWindow();
-		}
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.setVisible(true);
 	}
@@ -682,7 +681,7 @@ public class Game implements KeyListener, MouseListener {
 		this.frame.getContentPane().removeAll();
 		this.screenHandled = false;
 		this.game1View.setPauseState(PauseState.PLAYER_INFO);
-		addViewToFrame(view);
+		this.addViewToFrame(view);
 	}
 	
 	public void toggleWindowedMode(boolean b) {
@@ -692,28 +691,18 @@ public class Game implements KeyListener, MouseListener {
 			if (this.fullScreen) {
 				this.fullScreen = false;
 				this.frame.setSize((int)this.screenSize.getWidth(), (int)this.screenSize.getHeight());
-				this.frame.add(this.settingsView.getBackButton());
-				this.frame.add(this.settingsView.getDebugToggleOn());
-				this.frame.add(this.settingsView.getDebugToggleOff());
-				this.frame.add(this.settingsView.getWindowedOn());
-				this.frame.add(this.settingsView.getWindowedOff());
-				this.frame.add(this.settingsView.getClearDataButton1());
-				this.frame.add(this.settingsView.getClearDataButton2());
-				this.frame.add(this.settingsView.getClearDataButton3());
+				for (JComponent j : this.settingsView.allComponents()) {
+					this.frame.getContentPane().add(j);
+				}
 			}
 		} else {
 			if (!this.fullScreen) {
 				this.fullScreen = true;
 				this.frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // full screen
 				this.frame.setUndecorated(true);
-				this.frame.add(this.settingsView.getBackButton());
-				this.frame.add(this.settingsView.getDebugToggleOn());
-				this.frame.add(this.settingsView.getDebugToggleOff());
-				this.frame.add(this.settingsView.getWindowedOn());
-				this.frame.add(this.settingsView.getWindowedOff());
-				this.frame.add(this.settingsView.getClearDataButton1());
-				this.frame.add(this.settingsView.getClearDataButton2());
-				this.frame.add(this.settingsView.getClearDataButton3());
+				for (JComponent j : this.settingsView.allComponents()) {
+					this.frame.getContentPane().add(j);
+				}
 			}
 		}
 		this.addViewToFrame(this.settingsView);
@@ -761,7 +750,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("Right Pressed", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("right pressed");
 				rightPressed = true;
 				game1View.setRightArrow(true);
 			}	
@@ -769,7 +757,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("Left Pressed", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("left pressed");
 				leftPressed = true;
 				game1View.setLeftArrow(true);
 			}	
@@ -803,7 +790,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("C Pressed", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("c pressed");
 				cPressed = true;
 			}	
 		});
@@ -823,7 +809,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("Right Released", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("right released");
 				rightPressed = false;
 				game1View.setRightArrow(false);
 			}	
@@ -831,7 +816,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("Left Released", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("left released");
 				leftPressed = false;
 				game1View.setLeftArrow(false);
 			}	
@@ -852,7 +836,6 @@ public class Game implements KeyListener, MouseListener {
 		v.getActionMap().put("C Released", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("c r");
 				cPressed = false;
 				cLock = false;
 			}	
