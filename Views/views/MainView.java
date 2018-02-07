@@ -11,7 +11,7 @@ public class MainView extends View {
 	
 	public MainView(int w, int h) {
 		super(w, h);
-		this.setFlashingText("press any key to continue");
+		this.setFlashingText("press space to continue");
 	}
 	
 	public JButton getMg1Button() {

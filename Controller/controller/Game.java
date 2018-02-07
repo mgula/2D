@@ -8,6 +8,8 @@ import enums.SaveFile;
 import views.*;
 
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -49,7 +51,7 @@ import java.util.ArrayList;
  * -junit test suite and debug enums
  */
 
-public class Game implements KeyListener, MouseListener {
+public class Game implements MouseListener {
 	private final String savePath1 = "data/game1data.txt";
 	private final String savePath2 = "data/game2data.txt";
 	private final String savePath3 = "data/game3data.txt";
@@ -78,7 +80,7 @@ public class Game implements KeyListener, MouseListener {
 	private ArrayList<View> allViews  = new ArrayList<View>();
 	private AppState currentState = AppState.START;
 	private AppState nextState = AppState.START;
-	private JFrame frame = new JFrame();
+	private JFrame frame;
 	
 	private boolean rightPressed = false;
 	private boolean leftPressed = false;
@@ -141,8 +143,6 @@ public class Game implements KeyListener, MouseListener {
 		int width = (int)this.screenSize.getWidth();
 		int height = (int)this.screenSize.getHeight();
 		this.mainView = new MainView(width, height);
-		this.mainView.setFocusable(true);
-		this.mainView.addKeyListener(this);
 		this.settingsView = new SettingsView(width, height);
 		this.game1View = new Game1View(width, height);
 		this.betweenView = new BetweenView(width, height);
@@ -154,15 +154,22 @@ public class Game implements KeyListener, MouseListener {
 			v.initButtonLocations();
 			v.initButtons();
 			v.setDebugMode(true); //default to debug mode on
-			if (v instanceof views.GameView) {
-				((views.GameView) v).loadImgs();
-				this.bindKeysToView(v);
+			if (v instanceof views.Game1View) {
+				this.bindGameKeys(v);
+			}
+			if (v instanceof views.MainView) {
+				this.bindSpaceBar(v);
 			}
 		}
 		this.setButtonListeners();
+		this.initFrame();
+		this.addViewToFrame(this.mainView);
+	}
+	
+	public void initFrame() {
+		this.frame = new JFrame();
 		this.frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // full screen
 		this.frame.setUndecorated(true);
-		this.addViewToFrame(this.mainView);
 	}
 	
 	public void setButtonListeners() {
@@ -533,8 +540,6 @@ public class Game implements KeyListener, MouseListener {
 				break;
 				
 			case PLAY:
-				this.game1View.requestFocusInWindow();
-				
 				/*Use wrapper to handle arrow keys*/
 				if (this.byTick) {
 					if (this.advanceTick) {
@@ -739,42 +744,111 @@ public class Game implements KeyListener, MouseListener {
 		this.sleepTime = num;
 	}
 	
-	public void bindKeysToView(View v) {
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "Right Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false), "Left Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false), "Space Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "Down Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0, false), "M Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false), "C Pressed");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false), "L Pressed");
-		v.getActionMap().put("Right Pressed", new AbstractAction() {
+	public void bindSpaceBar(View v) {
+		final int wifw = JComponent.WHEN_IN_FOCUSED_WINDOW;
+		
+		final KeyStroke spacePress = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+		
+		v.getInputMap(wifw).put(spacePress, "Space Pressed");
+		v.getActionMap().put("Space Pressed", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainView.setSelect();
+				nextState = AppState.SELECT;
+			}	
+		});
+	}
+	
+	public void bindGameKeys(View v) {
+		InputMap i = v.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap a = v.getActionMap();
+		
+		i.clear();
+		a.clear();
+		
+		final KeyStroke rightPress = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false);
+		final KeyStroke leftPress = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false);
+		final KeyStroke spacePress = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false);
+		final KeyStroke downPress = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false);
+		final KeyStroke mPress = KeyStroke.getKeyStroke(KeyEvent.VK_M, 0, false);
+		final KeyStroke cPress = KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, false);
+		final KeyStroke lPress = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false);
+		final KeyStroke qPress = KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false);
+		final KeyStroke wPress = KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false);
+		final KeyStroke rightRelease = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true);
+		final KeyStroke leftRelease = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true);
+		final KeyStroke spaceRelease = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true);
+		final KeyStroke downRelease = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true);
+		final KeyStroke cRelease = KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, true);
+		final KeyStroke lRelease = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true);
+		
+		final String rightPressString = "RightPressed";
+		final String leftPressString = "LeftPressed";
+		final String spacePressString = "SpacePressed";
+		final String downPressString = "DownPressed";
+		final String mPressString = "MPressed";
+		final String cPressString = "CPressed";
+		final String lPressString = "LPressed";
+		final String qPressString = "QPressed";
+		final String wPressString = "WPressed";
+		final String rightReleaseString = "RightReleased";
+		final String leftReleaseString = "LeftReleased";
+		final String spaceReleaseString = "SpaceReleased";
+		final String downReleaseString = "DownReleased";
+		final String cReleaseString = "CReleased";
+		final String lReleaseString = "LReleased";
+		
+		/*Add to input map*/
+		i.put(rightPress, rightPressString);
+		i.put(leftPress, leftPressString);
+		i.put(spacePress, spacePressString);
+		i.put(downPress, downPressString);
+		i.put(mPress, mPressString);
+		i.put(cPress, cPressString);
+		i.put(lPress, lPressString);
+		i.put(rightRelease, rightReleaseString);
+		i.put(leftRelease, leftReleaseString);
+		i.put(spaceRelease, spaceReleaseString);
+		i.put(downRelease, downReleaseString);
+		i.put(cRelease, cReleaseString);
+		i.put(lRelease, lReleaseString);
+		/*Debug*/
+		i.put(qPress, qPressString);
+		i.put(wPress, wPressString);
+		
+		/*Add to action map*/
+		a.put(rightPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				rightPressed = true;
 				game1View.setRightArrow(true);
+				return;
 			}	
 		});
-		v.getActionMap().put("Left Pressed", new AbstractAction() {
+		a.put(leftPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				leftPressed = true;
 				game1View.setLeftArrow(true);
+				return;
 			}	
 		});
-		v.getActionMap().put("Space Pressed", new AbstractAction() {
+		a.put(spacePressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				spacePressed = true;
 				game1View.setSpaceBar(true);
+				return;
 			}	
 		});
-		v.getActionMap().put("Down Pressed", new AbstractAction() {
+		a.put(downPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				downPressed = true;
+				return;
 			}	
 		});
-		v.getActionMap().put("M Pressed", new AbstractAction() {
+		a.put(mPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (currentState == AppState.GAME1) {
@@ -785,102 +859,86 @@ public class Game implements KeyListener, MouseListener {
 						unpauseGame(wrapper, game1View);
 					}
 				}
+				return;
 			}	
 		});
-		v.getActionMap().put("C Pressed", new AbstractAction() {
+		a.put(cPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cPressed = true;
+				return;
 			}	
 		});
-		v.getActionMap().put("L Pressed", new AbstractAction() {
+		a.put(lPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				lPressed = true;
+				return;
 			}	
 		});
-		
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "Right Released");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "Left Released");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true), "Space Released");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "Down Released");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0, true), "C Released");
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true), "L Released");
-		v.getActionMap().put("Right Released", new AbstractAction() {
+		a.put(rightReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				rightPressed = false;
 				game1View.setRightArrow(false);
+				return;
 			}	
 		});
-		v.getActionMap().put("Left Released", new AbstractAction() {
+		a.put(leftReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				leftPressed = false;
 				game1View.setLeftArrow(false);
+				return;
 			}	
 		});
-		v.getActionMap().put("Space Released", new AbstractAction() {
+		a.put(spaceReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				spacePressed = false;
 				game1View.setSpaceBar(false);
+				return;
 			}	
 		});
-		v.getActionMap().put("Down Released", new AbstractAction() {
+		a.put(downReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				downPressed = false;
+				return;
 			}	
 		});
-		v.getActionMap().put("C Released", new AbstractAction() {
+		a.put(cReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cPressed = false;
 				cLock = false;
+				return;
 			}	
 		});
-		v.getActionMap().put("L Released", new AbstractAction() {
+		a.put(lReleaseString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				lPressed = false;
 				lLock = false;
+				return;
 			}	
 		});
-		
 		/*Debug*/
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false), "Q Pressed");
-		v.getActionMap().put("Q Pressed", new AbstractAction() {
+		a.put(qPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				byTick = !byTick;
+				return;
 			}	
 		});
-		
-		v.getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, false), "W Pressed");
-		v.getActionMap().put("W Pressed", new AbstractAction() {
+		a.put(wPressString, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				advanceTick = true;
+				return;
 			}	
 		});
 	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if (this.currentState == AppState.START) {
-			this.mainView.setSelect();
-			this.mainView.setFocusable(false);
-			this.mainView.removeKeyListener(this);
-			this.nextState = AppState.SELECT;
-		}
-	}
-	
-	@Override
-	public void keyReleased(KeyEvent e) {}
 	
 	@Override
 	public void mouseClicked(MouseEvent click) {}
